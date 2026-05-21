@@ -43,31 +43,47 @@
     background: var(--surface); border: 1px solid var(--rule);
     border-radius: 22px; padding: 12px;
     display: grid; grid-template-columns: 1.6fr 1fr 1fr 0.9fr auto;
-    gap: 0; align-items: stretch;
+    gap: 0; align-items: stretch; position: relative;
     box-shadow: 0 8px 40px rgba(22,20,15,0.05);
   }
   .search .seg {
     padding: 14px 22px; position: relative;
     border-right: 1px solid var(--rule);
     cursor: pointer; transition: background .12s;
-    border-radius: 14px;
+    border-radius: 14px; display: flex; flex-direction: column; justify-content: center;
   }
-  .search .seg:last-child { border-right: none; padding: 6px; }
+  .search .seg:nth-last-child(2) { border-right: none; }
   .search .seg:hover { background: rgba(22,20,15,0.025); }
   .search .seg.active { background: var(--paper); }
   .search .seg .lbl { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 4px; display: block; }
-  .search .seg .val { font-size: 15px; color: var(--ink); display: flex; align-items: center; gap: 8px; }
-  .search .seg .val .ph-txt { color: var(--ink-4); }
+  .search .seg .val { font-size: 15px; color: var(--ink); display: flex; align-items: center; gap: 8px; width: 100%; }
   .search .seg input, .search .seg select {
-    border: none; background: transparent; padding: 0;
+    border: none; background: transparent; padding: 0; margin: 0;
     font-family: var(--sans); font-size: 15px; color: var(--ink); outline: none; width: 100%;
+    cursor: pointer; appearance: none; -webkit-appearance: none;
   }
+  .search .seg input[type="text"] { cursor: text; }
   .search .seg input::placeholder { color: var(--ink-4); }
+  
+  /* Calendar Dropdown Styling */
+  .cal-pop {
+    position: absolute; top: calc(100% + 12px); left: 0; right: 0; margin: 0 auto;
+    max-width: 360px; background: var(--surface); border: 1px solid var(--rule);
+    border-radius: 16px; padding: 20px; box-shadow: 0 12px 36px rgba(22,20,15,0.12);
+    z-index: 100; display: none;
+  }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; margin-top: 12px; }
+  .cal-head { font-family: var(--mono); font-size: 10px; color: var(--ink-3); text-transform: uppercase; }
+  .cal-day { padding: 8px 0; font-size: 13px; border-radius: 8px; color: var(--ink-2); cursor: pointer; transition: background .1s; }
+  .cal-day:hover { background: var(--paper); color: var(--ink); }
+  .cal-day.disabled { color: var(--ink-4); opacity: 0.3; pointer-events: none; }
+  .cal-day.selected { background: var(--brick); color: white !important; }
+
   .search-go {
     background: var(--brick); color: white; border: none; border-radius: 14px;
     padding: 0 28px; cursor: pointer; display: flex; align-items: center; gap: 10px;
     font-family: var(--sans); font-weight: 500; font-size: 15px;
-    transition: background .12s;
+    transition: background .12s; margin-left: 8px;
   }
   .search-go:hover { background: var(--brick-2); }
   .search-go svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
@@ -76,23 +92,25 @@
   .qf { display:flex; gap: 10px; margin-top: 18px; align-items: center; flex-wrap: wrap; }
   .qf .qf-label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); margin-right: 4px; }
 
-  /* HERO IMAGE STRIP */
+  /* HERO IMAGE STRIP - Updated to match equal size rows and premium photography */
   .hero-strip {
     margin: 56px -32px 0;
-    display: grid; grid-template-columns: 0.7fr 1.2fr 0.9fr 0.8fr;
+    display: grid; grid-template-columns: repeat(4, 1fr);
     gap: 12px;
     padding: 0 32px;
   }
-  .hero-strip .ph { aspect-ratio: 3/4; border-radius: 14px; }
-  .hero-strip .ph:nth-child(2) { aspect-ratio: 4/5; align-self: end; }
-  .hero-strip .ph:nth-child(4) { aspect-ratio: 5/6; align-self: end; }
+  .hero-strip .ph { 
+    aspect-ratio: 3/4; border-radius: 14px; align-self: stretch; 
+    background-size: cover; background-position: center;
+  }
 
   /* ─── DESTINATIONS ─── */
   .dest { padding: 96px 0 48px; }
+  /* Scaled down aspect ratios to make cards vertically more compact */
   .dest-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
-  .dest-card { position: relative; border-radius: 16px; overflow: hidden; cursor: pointer; transition: transform .25s; }
+  .dest-card { position: relative; border-radius: 16px; overflow: hidden; cursor: pointer; transition: transform .25s; text-decoration: none; display: block; }
   .dest-card:hover { transform: translateY(-2px); }
-  .dest-card .ph { width: 100%; height: 100%; }
+  .dest-card .ph { width: 100%; height: 100%; background-size: cover; background-position: center; }
   .dest-card .meta {
     position: absolute; left: 16px; right: 16px; bottom: 16px;
     color: white; z-index: 2;
@@ -104,12 +122,14 @@
   }
   .dest-card .title { font-family: var(--serif); font-style: italic; font-size: 32px; line-height: 1; }
   .dest-card .sub { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.75); margin-top: 6px; }
-  .dest-1 { grid-column: span 5; aspect-ratio: 5/6; }
-  .dest-2 { grid-column: span 4; aspect-ratio: 4/5; }
-  .dest-3 { grid-column: span 3; aspect-ratio: 3/4; }
-  .dest-4 { grid-column: span 3; aspect-ratio: 4/5; }
-  .dest-5 { grid-column: span 5; aspect-ratio: 5/4; }
-  .dest-6 { grid-column: span 4; aspect-ratio: 4/5; }
+  
+  /* Reduced grid heights for an elegant compact feel */
+  .dest-1 { grid-column: span 5; aspect-ratio: 5/4.2; }
+  .dest-2 { grid-column: span 4; aspect-ratio: 4/3.5; }
+  .dest-3 { grid-column: span 3; aspect-ratio: 3/2.8; }
+  .dest-4 { grid-column: span 3; aspect-ratio: 4/3.5; }
+  .dest-5 { grid-column: span 5; aspect-ratio: 5/3.5; }
+  .dest-6 { grid-column: span 4; aspect-ratio: 4/3.5; }
 
   /* ─── DIFFERENCE STRIP ─── */
   .diff { background: var(--surface); color: var(--ink); padding: 96px 0; margin: 56px 0 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
@@ -137,7 +157,6 @@
   .compare .val.win svg { width: 14px; height: 14px; stroke: var(--brick); fill: none; stroke-width: 2.5; }
   .compare .val.lose { color: var(--ink-4); text-decoration: line-through; }
 
-  /* Column 4 Highlight for Casa vs Competitors */
   .compare .crow > *:nth-child(4) {
     background: rgba(188, 71, 54, 0.03);
     padding-left: 16px; padding-right: 16px;
@@ -180,44 +199,41 @@
   .post-mini .body { font-size: 13.5px; color: var(--ink-2); line-height: 1.5; }
   .post-mini .body i { font-style: italic; color: var(--brick); cursor: pointer; }
 
-  /* ─── HOST CTA ─── */
+  /* ─── DUAL SPLIT HOST/RENTER CTA ─── */
   .host-cta { padding: 0 0 96px; }
   .host-cta-inner {
     background: var(--brick); color: var(--paper);
-    border-radius: 24px; padding: 80px 64px;
-    display: grid; grid-template-columns: 1.6fr 1fr; gap: 64px; align-items: center;
+    border-radius: 24px; padding: 56px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
     position: relative; overflow: hidden;
   }
-  .host-cta-inner::before {
-    content: ''; position: absolute; right: -60px; top: -60px;
-    width: 360px; height: 360px; border-radius: 50%;
-    background: rgba(255,255,255,0.08);
+  .cta-card {
+    background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px; padding: 40px; display: flex; flex-direction: column;
+    justify-content: space-between; position: relative; z-index: 2;
   }
-  .host-cta h2 { font-family: var(--serif); font-size: 72px; line-height: 0.95; letter-spacing: -0.025em; position: relative; }
-  .host-cta h2 i { font-style: italic; color: rgba(255,255,255,0.75); }
-  .host-cta .cta-actions { display: flex; flex-direction: column; gap: 14px; position: relative; }
-  .host-cta .cta-actions .stat { font-size: 13.5px; color: rgba(255,255,255,0.75); display: flex; align-items: baseline; gap: 8px; }
-  .host-cta .cta-actions .stat .nm { font-family: var(--serif); font-style: italic; font-size: 24px; color: var(--paper); }
-  .host-cta .cta-btn {
-    background: var(--paper); color: var(--ink); padding: 18px 28px;
-    border-radius: 14px; text-decoration: none;
-    font-size: 16px; font-weight: 500;
+  .cta-card h3 { font-family: var(--serif); font-size: 44px; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 14px; }
+  .cta-card h3 i { font-style: italic; color: rgba(255,255,255,0.85); }
+  .cta-card p { font-size: 15px; color: rgba(255,255,255,0.8); line-height: 1.5; margin-bottom: 24px; }
+  .cta-link-btn {
+    background: var(--paper); color: var(--ink); padding: 16px 24px;
+    border-radius: 12px; text-decoration: none; font-size: 15px; font-weight: 500;
     display: inline-flex; align-items: center; justify-content: space-between;
-    margin-top: 12px; transition: background .15s;
+    transition: background .15s, transform .12s; margin-top: auto;
   }
-  .host-cta .cta-btn:hover { background: white; }
-  .host-cta .cta-btn svg { stroke: var(--brick); width: 18px; height: 18px; fill: none; stroke-width: 2; }
+  .cta-link-btn:hover { background: white; transform: translateY(-1px); }
+  .cta-link-btn svg { stroke: var(--brick); width: 18px; height: 18px; fill: none; stroke-width: 2; }
 
-  /* Responsive niceties */
   @media (max-width: 1000px) {
     .hero-title { font-size: 80px; }
     .hero-top { grid-template-columns: 1fr; gap: 32px; }
-    .search { grid-template-columns: 1fr 1fr; }
-    .search .seg { border-right: none; border-bottom: 1px solid var(--rule); }
-    .search-go { grid-column: span 2; padding: 14px; }
+    .search { grid-template-columns: 1fr; }
+    .search .seg { border-right: none; border-bottom: 1px solid var(--rule); padding: 16px; }
+    .search-go { margin-left: 0; margin-top: 12px; padding: 16px; justify-content: center; }
     .diff-head { grid-template-columns: 1fr; }
     .community-grid { grid-template-columns: 1fr; }
-    .host-cta-inner { grid-template-columns: 1fr; padding: 48px 32px; }
+    .host-cta-inner { grid-template-columns: 1fr; padding: 32px; gap: 24px; }
+    .hero-strip { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
 </head>
@@ -263,28 +279,66 @@
     </div>
 
     <div class="search rise-3">
-      <div class="seg active" onclick="goSearch()">
+      <div class="seg active" id="where-seg">
         <span class="lbl">Where</span>
         <div class="val">
-          <input type="text" placeholder="Lake District, Cornwall, #cottage…" value="Lake District">
+          <input type="text" id="where-input" placeholder="Lake District, Cornwall, #cottage…" value="Lake District">
         </div>
       </div>
-      <div class="seg" onclick="goSearch()">
+      
+      <div class="seg" id="checkin-seg">
         <span class="lbl">Check in</span>
-        <div class="val"><span class="ph-txt">Sat 12 Jul</span></div>
+        <div class="val">
+          <input type="text" id="checkin-input" placeholder="Select date" readonly>
+        </div>
       </div>
-      <div class="seg" onclick="goSearch()">
+      
+      <div class="seg" id="checkout-seg">
         <span class="lbl">Check out</span>
-        <div class="val"><span class="ph-txt">Sat 19 Jul</span></div>
+        <div class="val">
+          <input type="text" id="checkout-input" placeholder="Select date" readonly>
+        </div>
       </div>
-      <div class="seg" onclick="goSearch()">
+      
+      <div class="seg" id="guests-seg">
         <span class="lbl">Guests</span>
-        <div class="val"><span class="ph-txt">2 adults</span></div>
+        <div class="val">
+          <select id="guests-input">
+            <option value="1 guest">1 guest</option>
+            <option value="2 guests" selected>2 guests</option>
+            <option value="3 guests">3 guests</option>
+            <option value="4 guests">4 guests</option>
+            <option value="5 guests">5 guests</option>
+            <option value="6 guests">6 guests</option>
+            <option value="7 guests">7 guests</option>
+            <option value="8 guests">8 guests</option>
+            <option value="9 guests">9 guests</option>
+            <option value="10 guests">10 guests</option>
+            <option value="11 guests">11 guests</option>
+            <option value="12 guests">12 guests</option>
+            <option value="13 guests">13 guests</option>
+            <option value="14 guests">14 guests</option>
+            <option value="15 guests">15 guests</option>
+            <option value="16 guests">16 guests</option>
+          </select>
+        </div>
       </div>
-      <button class="search-go" onclick="goSearch()">
+      
+      <button class="search-go" id="search-submit-btn">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
         Search
       </button>
+
+      <div class="cal-pop" id="calendar-widget">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <span style="font-weight:600; font-size:14px; color:var(--ink);" id="cal-month-title">July 2026</span>
+        </div>
+        <div class="cal-grid cal-head">
+          <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+        </div>
+        <div class="cal-grid" id="cal-days-container">
+          </div>
+      </div>
     </div>
 
     <div class="qf">
@@ -299,10 +353,10 @@
     </div>
 
     <div class="hero-strip rise-4">
-      <div class="ph warm" data-label="STONE COTTAGE · WINDERMERE"></div>
-      <div class="ph dusk" data-label="BLACKHOUSE · ISLE OF SKYE"></div>
-      <div class="ph sage" data-label="FARMHOUSE · SNOWDONIA"></div>
-      <div class="ph fog" data-label="CLIFF HOUSE · ANTRIM"></div>
+      <div class="ph" style="background-image: url('https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=600&q=80');" data-label="STONE COTTAGE · WINDERMERE"></div>
+      <div class="ph" style="background-image: url('https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=600&q=80');" data-label="BLACKHOUSE · ISLE OF SKYE"></div>
+      <div class="ph" style="background-image: url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=600&q=80');" data-label="FARMHOUSE · SNOWDONIA"></div>
+      <div class="ph" style="background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80');" data-label="CLIFF HOUSE · ANTRIM"></div>
     </div>
   </div>
 </section>
@@ -320,43 +374,43 @@
     </div>
 
     <div class="dest-grid">
-      <a href="property.html" class="dest-card dest-1">
-        <div class="ph warm" data-label="THE LAKE DISTRICT · 214 STAYS"></div>
+      <a href="browse.html?where=Lake+District" class="dest-card dest-1">
+        <div class="ph" style="background-image: url('https://images.unsplash.com/photo-1508849789987-4e5333c12b78?auto=format&fit=crop&w=800&q=80');"></div>
         <div class="meta">
-          <div class="title">The <i style="font-style:italic">Lake District</i></div>
+          <div class="title">The <i>Lake District</i></div>
           <div class="sub">214 stays · from £95/night</div>
         </div>
       </a>
-      <a href="property.html" class="dest-card dest-2">
-        <div class="ph dusk" data-label="ISLE OF SKYE · 67 STAYS"></div>
+      <a href="browse.html?where=Isle+of+Skye" class="dest-card dest-2">
+        <div class="ph" style="background-image: url('https://images.unsplash.com/photo-1529963183134-61a90db47eaf?auto=format&fit=crop&w=800&q=80');"></div>
         <div class="meta">
           <div class="title">Isle of <i>Skye</i></div>
           <div class="sub">67 stays · from £110</div>
         </div>
       </a>
-      <a href="property.html" class="dest-card dest-3">
-        <div class="ph sage" data-label="CORNWALL · 198 STAYS"></div>
+      <a href="browse.html?where=Cornwall" class="dest-card dest-3">
+        <div class="ph" style="background-image: url('https://images.unsplash.com/photo-1543832903-43af43d67b8a?auto=format&fit=crop&w=600&q=80');"></div>
         <div class="meta">
           <div class="title"><i>Cornwall</i></div>
           <div class="sub">198 stays</div>
         </div>
       </a>
-      <a href="property.html" class="dest-card dest-4">
-        <div class="ph fog" data-label="THE COTSWOLDS · 87 STAYS"></div>
+      <a href="browse.html?where=Cotswolds" class="dest-card dest-4">
+        <div class="ph" style="background-image: url('https://images.unsplash.com/photo-1549877452-9c387ad5431d?auto=format&fit=crop&w=600&q=80');"></div>
         <div class="meta">
           <div class="title">The <i>Cotswolds</i></div>
           <div class="sub">87 stays</div>
         </div>
       </a>
-      <a href="property.html" class="dest-card dest-5">
-        <div class="ph ink" data-label="SNOWDONIA · 54 STAYS"></div>
+      <a href="browse.html?where=Snowdonia" class="dest-card dest-5">
+        <div class="ph" style="background-image: url('https://images.unsplash.com/photo-1516410529446-2c777cb7366d?auto=format&fit=crop&w=800&q=80');"></div>
         <div class="meta">
           <div class="title"><i>Snowdonia</i></div>
           <div class="sub">54 stays · from £120</div>
         </div>
       </a>
-      <a href="property.html" class="dest-card dest-6">
-        <div class="ph brick" data-label="THE CAUSEWAY COAST · 29 STAYS"></div>
+      <a href="browse.html?where=Causeway+Coast" class="dest-card dest-6">
+        <div class="ph" style="background-image: url('https://images.unsplash.com/photo-1555899434-94d1368aa7af?auto=format&fit=crop&w=800&q=80');"></div>
         <div class="meta">
           <div class="title">Causeway <i>Coast</i></div>
           <div class="sub">29 stays</div>
@@ -497,13 +551,24 @@
 <section class="host-cta">
   <div class="wrap">
     <div class="host-cta-inner">
-      <h2>Have a place?<br><i>List it for £19/month.</i><br>Keep <span style="color:var(--paper)">100%</span> of every booking.</h2>
-      <div class="cta-actions">
-        <div class="stat"><span class="nm">£19/mo</span> &mdash; flat listing fee</div>
-        <div class="stat"><span class="nm">0%</span> &mdash; commission on every booking</div>
-        <div class="stat"><span class="nm">2 min</span> &mdash; to set up your listing</div>
-        <a href="list.html" class="cta-btn">
-          List your property
+      <div class="cta-card">
+        <div>
+          <h3>Looking to <i>Rent?</i></h3>
+          <p>Book authentic stays directly with homeowners. Enjoy standard transparent pricing with absolutely zero booking platform markup fees attached to your checkout bill.</p>
+        </div>
+        <a href="signup.html" class="cta-link-btn">
+          Sign in to book free
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      <div class="cta-card">
+        <div>
+          <h3>Have a <i>Place?</i></h3>
+          <p>List your UK property for a simple flat fee. Take full ownership of your calendar with 0% booking commission cuts subtracted from your hard-earned payouts.</p>
+        </div>
+        <a href="signup.html" class="cta-link-btn">
+          Sign in to list property
           <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
         </a>
       </div>
@@ -558,14 +623,82 @@
 </footer>
 
 <script>
-function goSearch() {
-  // Smooth visual feedback before navigating
-  document.querySelectorAll('.search .seg').forEach(s => s.classList.remove('active'));
-  event.currentTarget.classList.add('active');
+let currentTargetField = null;
+
+// Calendar State Generation Loop
+function generateCalendarWidget() {
+  const container = document.getElementById('cal-days-container');
+  container.innerHTML = '';
+  // Empty space offsets for starting position days of month
+  for (let i = 0; i < 3; i++) {
+    const space = document.createElement('div');
+    container.appendChild(space);
+  }
+  // Generate visual text nodes
+  for (let day = 1; day <= 31; day++) {
+    const dayBox = document.createElement('div');
+    dayBox.className = 'cal-day';
+    dayBox.textContent = day;
+    dayBox.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if(currentTargetField) {
+        document.getElementById(currentTargetField).value = day + ' Jul 2026';
+        document.getElementById('calendar-widget').style.display = 'none';
+      }
+    });
+    container.appendChild(dayBox);
+  }
 }
-document.querySelector('.search-go').addEventListener('click', e => {
-  e.stopPropagation();
-  window.location.href = 'browse.html';
+
+document.addEventListener('DOMContentLoaded', () => {
+  generateCalendarWidget();
+
+  // Tab Selection Visual Feedback Toggle Loop
+  document.querySelectorAll('.search .seg').forEach(segment => {
+    segment.addEventListener('click', (e) => {
+      document.querySelectorAll('.search .seg').forEach(s => s.classList.remove('active'));
+      segment.classList.add('active');
+      
+      const widget = document.getElementById('calendar-widget');
+      if (segment.id === 'checkin-seg') {
+        currentTargetField = 'checkin-input';
+        widget.style.display = 'block';
+        widget.style.left = segment.offsetLeft + 'px';
+      } else if (segment.id === 'checkout-seg') {
+        currentTargetField = 'checkout-input';
+        widget.style.display = 'block';
+        widget.style.left = segment.offsetLeft + 'px';
+      } else {
+        widget.style.display = 'none';
+      }
+    });
+  });
+
+  // Global document closing handler for calendar overlay 
+  document.addEventListener('click', (e) => {
+    if(!e.target.closest('.search')) {
+      document.getElementById('calendar-widget').style.display = 'none';
+    }
+  });
+
+  // Search Submit Redirection Handler (Carrying parameters strictly over on click)
+  document.getElementById('search-submit-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    
+    const where = document.getElementById('where-input').value.trim();
+    const checkin = document.getElementById('checkin-input').value.trim();
+    const checkout = document.getElementById('checkout-input').value.trim();
+    const guests = document.getElementById('guests-input').value;
+    
+    const datesConcatenated = (checkin || checkout) ? `${checkin} - ${checkout}` : '12-19 Jul';
+    
+    const targetUrl = new URL('browse.html', window.location.href);
+    targetUrl.searchParams.set('where', where || 'Lake District');
+    targetUrl.searchParams.set('dates', datesConcatenated);
+    targetUrl.searchParams.set('guests', guests);
+    
+    window.location.href = targetUrl.toString();
+  });
 });
 </script>
 
