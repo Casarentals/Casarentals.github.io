@@ -15,7 +15,7 @@
     overflow: hidden;
   }
   .hero-inner { max-width: 1280px; margin: 0 auto; padding: 0 32px; }
-  .hero-top { display: grid; grid-template-columns: 1.4fr 1fr; gap: 64px; align-items: end; margin-bottom: 56px; }
+  .hero-top { display: grid; grid-template-columns: 1.4fr 1fr; gap: 64px; align-items: end; margin-bottom: 40px; }
   .hero-eyebrow {
     display: inline-flex; align-items: center; gap: 10px;
     font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em;
@@ -30,80 +30,113 @@
   .hero-aside { padding-bottom: 18px; }
   .hero-aside p {
     font-family: var(--serif); font-size: 22px; line-height: 1.4;
-    color: var(--ink-2); max-width: 360px; margin-bottom: 20px;
+    color: var(--ink-2); max-width: 380px; margin-bottom: 20px;
   }
   .hero-aside p i { font-style: italic; color: var(--brick); }
   .hero-aside .stat-row { display: flex; gap: 28px; align-items: baseline; }
   .hero-aside .stat-row .stat { }
-  .hero-aside .stat-row .n { font-family: var(--serif); font-style: italic; font-size: 32px; line-height: 1; color: var(--brick); }
-  .hero-aside .stat-row .l { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); margin-top: 4px; }
+  .hero-aside .stat-row .n { font-family: var(--serif); font-style: italic; font-size: 36px; line-height: 1; color: var(--brick); }
+  .hero-aside .stat-row .l { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); margin-top: 6px; }
 
-  /* SEARCH BOX */
-  .search {
-    background: var(--surface); border: 1px solid var(--rule);
-    border-radius: 22px; padding: 12px;
-    display: grid; grid-template-columns: 1.6fr 1fr 1fr 0.9fr auto;
-    gap: 0; align-items: stretch;
-    box-shadow: 0 8px 40px rgba(22,20,15,0.05);
+  /* ─── SCENIC PICTURES / SEARCH BANNER ─── */
+  .search-banner {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 48px;
+    margin-top: 48px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 24px;
+    padding: 40px;
+    align-items: center;
+    box-shadow: 0 8px 40px rgba(22,20,15,0.04);
   }
-  .search .seg {
-    padding: 14px 22px; position: relative;
-    border-right: 1px solid var(--rule);
-    cursor: pointer; transition: background .12s;
-    border-radius: 14px;
+  .search-banner h3 {
+    font-family: var(--serif);
+    font-size: 42px;
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 14px;
   }
-  .search .seg:last-child { border-right: none; padding: 6px; }
-  .search .seg:hover { background: rgba(22,20,15,0.025); }
-  .search .seg.active { background: var(--paper); }
-  .search .seg .lbl { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 4px; display: block; }
-  .search .seg .val { font-size: 15px; color: var(--ink); display: flex; align-items: center; gap: 8px; }
-  .search .seg .val .ph-txt { color: var(--ink-4); }
-  .search .seg input, .search .seg select {
-    border: none; background: transparent; padding: 0;
-    font-family: var(--sans); font-size: 15px; color: var(--ink); outline: none; width: 100%;
+  .search-banner h3 i {
+    font-style: italic;
+    color: var(--brick);
   }
-  .search .seg input::placeholder { color: var(--ink-4); }
-  .search-go {
-    background: var(--brick); color: white; border: none; border-radius: 14px;
-    padding: 0 28px; cursor: pointer; display: flex; align-items: center; gap: 10px;
-    font-family: var(--sans); font-weight: 500; font-size: 15px;
-    transition: background .12s;
+  .search-banner p {
+    font-size: 15px;
+    color: var(--ink-2);
+    line-height: 1.6;
+    margin-bottom: 28px;
+    max-width: 460px;
   }
-  .search-go:hover { background: var(--brick-2); }
-  .search-go svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
-
-  /* Quick filters under search */
-  .qf { display:flex; gap: 10px; margin-top: 18px; align-items: center; flex-wrap: wrap; }
-  .qf .qf-label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); margin-right: 4px; }
-
-  /* HERO IMAGE STRIP */
-  .hero-strip {
-    margin: 56px -32px 0;
-    display: grid; grid-template-columns: 0.7fr 1.2fr 0.9fr 0.8fr;
+  .search-banner .search-trigger-btn {
+    display: inline-flex;
+    align-items: center;
     gap: 12px;
-    padding: 0 32px;
+    background: var(--brick);
+    color: white;
+    text-decoration: none;
+    padding: 16px 32px;
+    border-radius: var(--r-pill);
+    font-weight: 500;
+    font-size: 15px;
+    transition: background .15s, transform .12s;
   }
-  .hero-strip .ph { aspect-ratio: 3/4; border-radius: 14px; }
-  .hero-strip .ph:nth-child(2) { aspect-ratio: 4/5; align-self: end; }
-  .hero-strip .ph:nth-child(4) { aspect-ratio: 5/6; align-self: end; }
+  .search-banner .search-trigger-btn:hover {
+    background: var(--brick-2);
+    transform: translateY(-1px);
+  }
+  .search-banner .search-trigger-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.5;
+  }
+  .scenic-gallery {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    height: 260px;
+    position: relative;
+  }
+  .scenic-img {
+    background-size: cover;
+    background-position: center;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    transition: transform 0.3s;
+  }
+  .scenic-img:hover {
+    transform: scale(1.02);
+  }
 
-  /* ─── DESTINATIONS ─── */
+  /* ─── DESTINATIONS (SEARCH BY) ─── */
   .dest { padding: 96px 0 48px; }
   .dest-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
-  .dest-card { position: relative; border-radius: 16px; overflow: hidden; cursor: pointer; transition: transform .25s; }
-  .dest-card:hover { transform: translateY(-2px); }
-  .dest-card .ph { width: 100%; height: 100%; }
+  .dest-card { 
+    position: relative; 
+    border-radius: 16px; 
+    overflow: hidden; 
+    cursor: pointer; 
+    transition: transform .25s, box-shadow .25s; 
+    background-size: cover;
+    background-position: center;
+  }
+  .dest-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(22,20,15,0.12); }
   .dest-card .meta {
-    position: absolute; left: 16px; right: 16px; bottom: 16px;
+    position: absolute; left: 20px; right: 20px; bottom: 20px;
     color: white; z-index: 2;
   }
   .dest-card::after {
     content: ''; position: absolute; inset: 0;
-    background: linear-gradient(to top, rgba(22,20,15,0.6) 0%, transparent 60%);
+    background: linear-gradient(to top, rgba(22,20,15,0.7) 0%, transparent 65%);
     z-index: 1;
   }
-  .dest-card .title { font-family: var(--serif); font-style: italic; font-size: 32px; line-height: 1; }
-  .dest-card .sub { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.75); margin-top: 6px; }
+  .dest-card .title { font-family: var(--serif); font-style: italic; font-size: 32px; line-height: 1; text-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+  .dest-card .sub { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.85); margin-top: 6px; display: flex; align-items: center; gap: 6px; }
+  .dest-card .sub svg { width: 10px; height: 10px; fill: currentColor; }
   .dest-1 { grid-column: span 5; aspect-ratio: 5/6; }
   .dest-2 { grid-column: span 4; aspect-ratio: 4/5; }
   .dest-3 { grid-column: span 3; aspect-ratio: 3/4; }
@@ -111,53 +144,35 @@
   .dest-5 { grid-column: span 5; aspect-ratio: 5/4; }
   .dest-6 { grid-column: span 4; aspect-ratio: 4/5; }
 
-  /* ─── DIFFERENCE STRIP ─── */
-  .diff { background: var(--ink); color: var(--paper); padding: 96px 0; margin: 56px 0 0; }
+  /* ─── PHILOSOPHY / MISSION STATEMENT STRIP ─── */
+  .diff { background: var(--ink); color: var(--paper); padding: 72px 0; margin: 80px 0 0; }
   .diff-inner { max-width: 1280px; margin: 0 auto; padding: 0 32px; }
-  .diff-head { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: end; margin-bottom: 64px; }
-  .diff-head h2 { font-family: var(--serif); font-size: 72px; line-height: 0.95; letter-spacing: -0.025em; color: var(--paper); }
-  .diff-head h2 i { font-style: italic; color: var(--brick-2); }
-  .diff-head p { font-size: 16px; color: rgba(255,255,255,0.7); line-height: 1.6; }
+  .diff-container { display: grid; grid-template-columns: 1fr 1.3fr; gap: 64px; align-items: center; }
+  .diff-container h2 { font-family: var(--serif); font-size: 52px; line-height: 1.05; letter-spacing: -0.025em; color: var(--paper); }
+  .diff-container h2 i { font-style: italic; color: var(--brick-2); }
+  .diff-text-blocks { display: flex; flex-direction: column; gap: 24px; }
+  .diff-text-blocks p { font-size: 15.5px; color: rgba(255,255,255,0.75); line-height: 1.65; }
+  .diff-text-blocks p strong { color: var(--paper); font-weight: 500; }
 
-  /* COMPARISON TABLE */
-  .compare {
-    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 20px; overflow: hidden;
-  }
-  .compare .crow { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; padding: 22px 28px; border-bottom: 1px solid rgba(255,255,255,0.08); align-items: center; }
-  .compare .crow:last-child { border-bottom: none; }
-  .compare .crow.head { background: rgba(255,255,255,0.04); padding: 18px 28px; }
-  .compare .crow.head .h-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
-  .compare .crow.head .casa { color: var(--brick-2); }
-  .compare .crow.head .casa-pill { display: inline-flex; align-items: center; gap: 6px; font-family: var(--serif); font-style: italic; font-size: 28px; color: var(--brick-2); }
-  .compare .label-cell { font-size: 16px; color: var(--paper); }
-  .compare .label-cell .sub { display: block; font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
-  .compare .val { font-size: 15px; color: rgba(255,255,255,0.75); }
-  .compare .val.win { color: var(--brick-2); font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
-  .compare .val.win svg { width: 14px; height: 14px; stroke: var(--brick-2); fill: none; stroke-width: 2; }
-  .compare .val.lose { color: rgba(255,255,255,0.4); text-decoration: line-through; }
-
-  /* ─── COMMUNITY ─── */
+  /* ─── COMMUNITY TIMELINE EYE ─── */
   .community { padding: 96px 0 48px; }
-  .community-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 80px; align-items: start; }
-  .community-head h2 { font-family: var(--serif); font-size: 56px; line-height: 1; letter-spacing: -0.025em; margin-bottom: 20px; }
+  .community-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 80px; align-items: start; }
+  .community-head h2 { font-family: var(--serif); font-size: 56px; line-height: 1.05; letter-spacing: -0.025em; margin-bottom: 20px; }
   .community-head h2 i { font-style: italic; color: var(--brick); }
-  .community-head p { font-size: 16px; line-height: 1.6; color: var(--ink-2); max-width: 520px; margin-bottom: 24px; }
+  .community-head p { font-size: 16px; line-height: 1.6; color: var(--ink-2); max-width: 520px; margin-bottom: 28px; }
 
   /* tag wall */
   .tag-wall { display: flex; flex-wrap: wrap; gap: 10px; max-width: 720px; }
   .tag-wall .ch {
     display: inline-flex; align-items: center; gap: 6px;
     background: var(--surface); border: 1px solid var(--rule);
-    padding: 9px 16px; border-radius: var(--r-pill);
-    font-size: 13.5px; color: var(--ink-2); cursor: pointer;
+    padding: 8px 14px; border-radius: var(--r-pill);
+    font-size: 13px; color: var(--ink-2); text-decoration: none;
     transition: all .15s;
   }
   .tag-wall .ch:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
   .tag-wall .ch .tag-name { font-family: var(--serif); font-style: italic; color: var(--brick); }
   .tag-wall .ch:hover .tag-name { color: var(--brick-2); }
-  .tag-wall .ch .ct { font-family: var(--mono); font-size: 10px; color: var(--ink-4); }
-  .tag-wall .ch:hover .ct { color: rgba(255,255,255,0.55); }
 
   .post-feed { display: flex; flex-direction: column; gap: 16px; }
   .post-mini { background: var(--surface); border: 1px solid var(--rule); border-radius: 14px; padding: 18px 20px; }
@@ -167,52 +182,51 @@
   .post-mini .nm { font-size: 13.5px; font-weight: 500; }
   .post-mini .when { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-4); margin-left: auto; }
   .post-mini .body { font-size: 13.5px; color: var(--ink-2); line-height: 1.5; }
-  .post-mini .body i { font-style: italic; color: var(--brick); cursor: pointer; }
+  .post-mini .body i { font-style: italic; color: var(--brick); }
 
-  /* ─── HOST CTA ─── */
-  .host-cta { padding: 0 0 96px; }
-  .host-cta-inner {
-    background: var(--brick); color: var(--paper);
-    border-radius: 24px; padding: 80px 64px;
-    display: grid; grid-template-columns: 1.6fr 1fr; gap: 64px; align-items: center;
-    position: relative; overflow: hidden;
+  /* ─── DUAL ACTION CTA CARDS ─── */
+  .host-cta { padding: 48px 0 96px; }
+  .cta-dual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  .cta-card {
+    border-radius: 24px; padding: 56px 48px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    position: relative; overflow: hidden; min-height: 340px;
+    box-shadow: 0 8px 30px rgba(22,20,15,0.03);
   }
-  .host-cta-inner::before {
-    content: ''; position: absolute; right: -60px; top: -60px;
-    width: 360px; height: 360px; border-radius: 50%;
-    background: rgba(255,255,255,0.08);
+  .cta-card.host-side { background: var(--brick); color: var(--paper); }
+  .cta-card.guest-side { background: var(--ink); color: var(--paper); }
+  .cta-card h3 { font-family: var(--serif); font-size: 46px; line-height: 1.05; letter-spacing: -0.02em; font-weight: 400; margin-bottom: 16px; }
+  .cta-card h3 i { font-style: italic; }
+  .cta-card .card-tag { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; display: block; margin-bottom: 20px; opacity: 0.7; }
+  .cta-card p { font-size: 15px; line-height: 1.55; max-width: 400px; opacity: 0.9; }
+  .cta-card .cta-btn {
+    padding: 16px 24px; border-radius: 12px; text-decoration: none;
+    font-size: 15px; font-weight: 500; display: inline-flex; align-items: center; justify-content: space-between;
+    margin-top: 32px; transition: background .15s, transform .12s;
   }
-  .host-cta h2 { font-family: var(--serif); font-size: 72px; line-height: 0.95; letter-spacing: -0.025em; position: relative; }
-  .host-cta h2 i { font-style: italic; color: rgba(255,255,255,0.75); }
-  .host-cta .cta-actions { display: flex; flex-direction: column; gap: 14px; position: relative; }
-  .host-cta .cta-actions .stat { font-size: 13.5px; color: rgba(255,255,255,0.75); display: flex; align-items: baseline; gap: 8px; }
-  .host-cta .cta-actions .stat .nm { font-family: var(--serif); font-style: italic; font-size: 24px; color: var(--paper); }
-  .host-cta .cta-btn {
-    background: var(--paper); color: var(--ink); padding: 18px 28px;
-    border-radius: 14px; text-decoration: none;
-    font-size: 16px; font-weight: 500;
-    display: inline-flex; align-items: center; justify-content: space-between;
-    margin-top: 12px; transition: background .15s;
-  }
-  .host-cta .cta-btn:hover { background: white; }
-  .host-cta .cta-btn svg { stroke: var(--brick); width: 18px; height: 18px; fill: none; stroke-width: 2; }
+  .cta-card.host-side .cta-btn { background: var(--paper); color: var(--ink); }
+  .cta-card.guest-side .cta-btn { background: var(--surface); color: var(--ink); }
+  .cta-card .cta-btn:hover { transform: translateY(-1px); background: white; }
+  .cta-card .cta-btn svg { width: 16px; height: 16px; fill: none; stroke-width: 2.5; }
+  .cta-card.host-side .cta-btn svg { stroke: var(--brick); }
+  .cta-card.guest-side .cta-btn svg { stroke: var(--ink); }
 
-  /* Responsive niceties */
+  /* Responsive styling */
   @media (max-width: 1000px) {
-    .hero-title { font-size: 80px; }
+    .hero-title { font-size: 76px; }
     .hero-top { grid-template-columns: 1fr; gap: 32px; }
-    .search { grid-template-columns: 1fr 1fr; }
-    .search .seg { border-right: none; border-bottom: 1px solid var(--rule); }
-    .search-go { grid-column: span 2; padding: 14px; }
-    .diff-head { grid-template-columns: 1fr; }
-    .community-grid { grid-template-columns: 1fr; }
-    .host-cta-inner { grid-template-columns: 1fr; padding: 48px 32px; }
+    .search-banner { grid-template-columns: 1fr; gap: 32px; padding: 32px; }
+    .scenic-gallery { height: 200px; }
+    .dest-grid { grid-template-columns: 1fr; }
+    .dest-card { grid-column: span 12 !important; aspect-ratio: 4/3 !important; }
+    .diff-container { grid-template-columns: 1fr; gap: 32px; }
+    .community-grid { grid-template-columns: 1fr; gap: 48px; }
+    .cta-dual-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav class="casa-nav">
   <a class="brand-lockup" href="index.html">
     <span class="casa-mark">casa</span><span class="casa-tld">.co.uk</span>
@@ -228,217 +242,183 @@
   </div>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
   <div class="hero-inner">
 
     <div class="hero-top">
       <div class="rise">
         <div class="hero-eyebrow">
-          <span class="live-dot"></span> Casa &mdash; UK holiday rentals &mdash; est. 2025
+          <span class="live-dot"></span> Casa &mdash; UK holiday stays &mdash; Prototype Link
         </div>
         <h1 class="hero-title">
-          <i>Connect</i>, <i>search</i><br>
-          &amp; <i>stay</i> at<br>
-          casa<span style="color:var(--ink-3);font-style:normal">.co.uk</span>.
+          <i>Connect</i>,<br>
+          search &amp; stay<br>
+          at casa.
         </h1>
       </div>
       <div class="hero-aside rise-2">
-        <p><i>Connect</i> with hosts &amp; guests across the UK. <i>Search</i> the whole country, by county or by feeling. <i>Stay</i> direct &mdash; no commission, no fees, ever.</p>
+        <p>Our community network is building for a formal hard launch. This is the trusted system the site will connect you with directly.</p>
         <div class="stat-row">
-          <div class="stat"><div class="n">4,202</div><div class="l">UK stays</div></div>
-          <div class="stat"><div class="n">£0</div><div class="l">Booking fees</div></div>
-          <div class="stat"><div class="n">4.9</div><div class="l">Avg. rating</div></div>
+          <div class="stat"><div class="n">0</div><div class="l">Active Users</div></div>
+          <div class="stat"><div class="n">0</div><div class="l">Active Hosts</div></div>
+          <div class="stat"><div class="n">0</div><div class="l">Rentals Complete</div></div>
         </div>
       </div>
     </div>
 
-    <!-- SEARCH -->
-    <div class="search rise-3">
-      <div class="seg active" onclick="goSearch()">
-        <span class="lbl">Where</span>
-        <div class="val">
-          <input type="text" placeholder="Lake District, Cornwall, #cottage…" value="Lake District">
+    <div class="search-banner rise-3">
+      <div>
+        <h3>Where will you <i>connect</i> with next?</h3>
+        <p>Explore boutique holiday stays, heritage cottages, and hidden seaside architecture up and down the country. Interact directly with local homeowners with zero middleman interference.</p>
+        <a href="browse.html" class="search-trigger-btn">
+          Go to Search Page
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+      
+      <div class="scenic-gallery">
+        <div class="scenic-img" style="background-image: url('https://images.unsplash.com/photo-1543872084-c7bd3822856f?auto=format&fit=crop&w=600&q=80');"></div>
+        <div class="scenic-img" style="background-image: url('https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=600&q=80'); transform: translateY(20px);"></div>
+      </div>
+    </div>
+
+    <div style="margin-top: 80px; border-top: 1px solid var(--rule); padding-top: 48px;" class="rise-4">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
+        <span style="font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; background: var(--brick-pale); color: var(--brick-text); padding: 4px 10px; border-radius: 99px; font-weight: 600;">Curated Spotlight</span>
+        <h4 style="font-family: var(--sans); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3);">Property of the Week</h4>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px; background: var(--surface); border: 1px solid var(--rule); border-radius: 20px; overflow: hidden; align-items: center;">
+        <div style="background-image: url('https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1200&q=80'); background-size: cover; background-position: center; height: 360px;"></div>
+        <div style="padding: 40px 40px 40px 0;">
+          <div style="font-family: var(--mono); font-size: 11px; color: var(--ink-3); margin-bottom: 8px; letter-spacing: 0.05em;">COTSWOLDS · HERITAGE STAY</div>
+          <h3 style="font-family: var(--serif); font-size: 40px; font-weight: 400; line-height: 1.1; color: var(--ink); margin-bottom: 16px; font-style: italic;">The Old Forge Meadow</h3>
+          <p style="font-size: 14.5px; color: var(--ink-2); line-height: 1.6; margin-bottom: 24px;">A beautifully prepared layout card reserved to showcase outstanding independent stays upon launch. Features 300-year-old honeyed stone, private orchard pathways, and an open hearth built for long evenings.</p>
+          
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--brick); color: white; display: inline-flex; align-items: center; justify-content: center; font-family: var(--serif); font-style: italic; font-weight: 600;">E</div>
+            <div>
+              <div style="font-size: 13px; font-weight: 600; color: var(--ink);">Eleanor Vance</div>
+              <div style="font-size: 11px; color: var(--ink-4); font-family: var(--mono);">Verified Host &amp; Owner</div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="seg" onclick="goSearch()">
-        <span class="lbl">Check in</span>
-        <div class="val"><span class="ph-txt">Sat 12 Jul</span></div>
-      </div>
-      <div class="seg" onclick="goSearch()">
-        <span class="lbl">Check out</span>
-        <div class="val"><span class="ph-txt">Sat 19 Jul</span></div>
-      </div>
-      <div class="seg" onclick="goSearch()">
-        <span class="lbl">Guests</span>
-        <div class="val"><span class="ph-txt">2 adults</span></div>
-      </div>
-      <button class="search-go" onclick="goSearch()">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        Search
-      </button>
     </div>
 
-    <div class="qf">
-      <span class="qf-label">Popular</span>
-      <a href="browse.html" class="chip"><svg class="i i-sm" viewBox="0 0 24 24"><path d="M12 22c-4 0-7-3-7-7 0-3 2-5 4-7 0 3 2 4 3 2 1-3-1-5 2-8 0 4 3 5 4 9 1 4-2 11-6 11z"/></svg> Wood burner</a>
-      <a href="browse.html" class="chip"><svg class="i i-sm" viewBox="0 0 24 24"><path d="M2 12c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2"/><path d="M2 17c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2"/></svg> Sea view</a>
-      <a href="browse.html" class="chip"><svg class="i i-sm" viewBox="0 0 24 24"><circle cx="6" cy="9" r="2"/><circle cx="18" cy="9" r="2"/><circle cx="9" cy="5" r="2"/><circle cx="15" cy="5" r="2"/><path d="M8 18c0-3 2-5 4-5s4 2 4 5c0 2-2 3-4 3s-4-1-4-3z"/></svg> Pet friendly</a>
-      <a href="browse.html" class="chip"><svg class="i i-sm" viewBox="0 0 24 24"><path d="M3 20 9 10l4 6 2-3 6 7z"/></svg> Mountain</a>
-      <a href="browse.html" class="chip"><svg class="i i-sm" viewBox="0 0 24 24"><path d="M12 3 6 12h3v3h6v-3h3z"/><path d="M12 15v6"/></svg> Off-grid</a>
-      <a href="browse.html" class="chip">Last minute</a>
-      <a href="browse.html" class="chip">Long stay</a>
-    </div>
-
-    <!-- IMAGE STRIP -->
-    <div class="hero-strip rise-4">
-      <div class="ph warm" data-label="STONE COTTAGE · WINDERMERE"></div>
-      <div class="ph dusk" data-label="BLACKHOUSE · ISLE OF SKYE"></div>
-      <div class="ph sage" data-label="FARMHOUSE · SNOWDONIA"></div>
-      <div class="ph fog" data-label="CLIFF HOUSE · ANTRIM"></div>
-    </div>
   </div>
 </section>
 
-<!-- DESTINATIONS -->
 <section class="dest">
   <div class="wrap">
     <div class="sec-head">
       <div>
-        <div class="eyebrow" style="color:var(--brick);margin-bottom:8px">01 &mdash; Search</div>
-        <h2><i>Search</i> the country, by county or by feeling.</h2>
+        <div class="eyebrow" style="color:var(--brick);margin-bottom:8px">01 &mdash; Search By Region</div>
+        <h2>Search the country by verified locations.</h2>
       </div>
-      <a href="browse.html" class="see">See all 4,202 stays
-        <svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-      </a>
     </div>
 
     <div class="dest-grid">
-      <a href="property.html" class="dest-card dest-1">
-        <div class="ph warm" data-label="THE LAKE DISTRICT · 214 STAYS"></div>
+      <a href="browse.html?where=Lake+District" class="dest-card dest-1" style="background-image: url('https://images.unsplash.com/photo-1508873696983-2df519f0397e?auto=format&fit=crop&w=800&q=80');">
         <div class="meta">
-          <div class="title">The <i style="font-style:italic">Lake District</i></div>
-          <div class="sub">214 stays · from £95/night</div>
+          <div class="title">The <i>Lake District</i></div>
+          <div class="sub">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            Pre-set Search Filter
+          </div>
         </div>
       </a>
-      <a href="property.html" class="dest-card dest-2">
-        <div class="ph dusk" data-label="ISLE OF SKYE · 67 STAYS"></div>
+      
+      <a href="browse.html?where=Isle+of+Skye" class="dest-card dest-2" style="background-image: url('https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&w=800&q=80');">
         <div class="meta">
           <div class="title">Isle of <i>Skye</i></div>
-          <div class="sub">67 stays · from £110</div>
+          <div class="sub">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            Pre-set Search Filter
+          </div>
         </div>
       </a>
-      <a href="property.html" class="dest-card dest-3">
-        <div class="ph sage" data-label="CORNWALL · 198 STAYS"></div>
+      
+      <a href="browse.html?where=Cornwall" class="dest-card dest-3" style="background-image: url('https://images.unsplash.com/photo-1510146758428-e5e4b17b8b6a?auto=format&fit=crop&w=800&q=80');">
         <div class="meta">
           <div class="title"><i>Cornwall</i></div>
-          <div class="sub">198 stays</div>
+          <div class="sub">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            Pre-set Search Filter
+          </div>
         </div>
       </a>
-      <a href="property.html" class="dest-card dest-4">
-        <div class="ph fog" data-label="THE COTSWOLDS · 87 STAYS"></div>
+      
+      <a href="browse.html?where=Cotswolds" class="dest-card dest-4" style="background-image: url('https://images.unsplash.com/photo-1549144511-f099e773c147?auto=format&fit=crop&w=800&q=80');">
         <div class="meta">
           <div class="title">The <i>Cotswolds</i></div>
-          <div class="sub">87 stays</div>
+          <div class="sub">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            Pre-set Search Filter
+          </div>
         </div>
       </a>
-      <a href="property.html" class="dest-card dest-5">
-        <div class="ph ink" data-label="SNOWDONIA · 54 STAYS"></div>
+      
+      <a href="browse.html?where=Snowdonia" class="dest-card dest-5" style="background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80');">
         <div class="meta">
           <div class="title"><i>Snowdonia</i></div>
-          <div class="sub">54 stays · from £120</div>
+          <div class="sub">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            Pre-set Search Filter
+          </div>
         </div>
       </a>
-      <a href="property.html" class="dest-card dest-6">
-        <div class="ph brick" data-label="THE CAUSEWAY COAST · 29 STAYS"></div>
+      
+      <a href="browse.html?where=Causeway+Coast" class="dest-card dest-6" style="background-image: url('https://images.unsplash.com/photo-1552057348-673e30ec2629?auto=format&fit=crop&w=800&q=80');">
         <div class="meta">
           <div class="title">Causeway <i>Coast</i></div>
-          <div class="sub">29 stays</div>
+          <div class="sub">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            Pre-set Search Filter
+          </div>
         </div>
       </a>
     </div>
   </div>
 </section>
 
-<!-- DIFFERENCE -->
 <section class="diff">
   <div class="diff-inner">
-    <div class="diff-head">
+    <div class="diff-container">
       <div>
-        <div class="eyebrow" style="color:var(--brick-2);margin-bottom:12px;opacity:0.85">02 &mdash; Stay</div>
-        <h2><i>Stay</i> direct &mdash;<br>not through middlemen.</h2>
+        <div class="eyebrow" style="color:var(--brick-2); margin-bottom:12px; opacity:0.85;">02 &mdash; Our Space</div>
+        <h2>An online sanctuary for <i>direct interaction</i>.</h2>
       </div>
-      <p>The big platforms take 15&ndash;22% out of every booking. We don't. Casa is a directory and an enquiry inbox &mdash; we put you face-to-face with the host. They pay a £19/month listing fee, and that's it.</p>
-    </div>
-
-    <div class="compare">
-      <div class="crow head">
-        <div class="h-label">Same property &mdash; £1,225 / week</div>
-        <div class="h-label">Booking.com</div>
-        <div class="h-label">Airbnb</div>
-        <div class="h-label"><span class="casa-pill">casa</span></div>
-      </div>
-      <div class="crow">
-        <div class="label-cell">Stay cost <span class="sub">£175 × 7 nights</span></div>
-        <div class="val">£1,225</div>
-        <div class="val">£1,225</div>
-        <div class="val">£1,225</div>
-      </div>
-      <div class="crow">
-        <div class="label-cell">Service / guest fee <span class="sub">platform commission</span></div>
-        <div class="val">£183</div>
-        <div class="val">£170</div>
-        <div class="val win"><svg viewBox="0 0 24 24"><path d="m4 12 5 5 11-11"/></svg> £0</div>
-      </div>
-      <div class="crow">
-        <div class="label-cell">Cleaning surcharge <span class="sub">often hidden until checkout</span></div>
-        <div class="val">£60</div>
-        <div class="val">£80</div>
-        <div class="val">Agreed with host</div>
-      </div>
-      <div class="crow">
-        <div class="label-cell">Host receives <span class="sub">the people doing the work</span></div>
-        <div class="val">£955</div>
-        <div class="val">£980</div>
-        <div class="val win"><svg viewBox="0 0 24 24"><path d="m4 12 5 5 11-11"/></svg> £1,225</div>
-      </div>
-      <div class="crow">
-        <div class="label-cell">You talk to the host directly <span class="sub">before, during, after</span></div>
-        <div class="val lose">Through platform</div>
-        <div class="val lose">Through platform</div>
-        <div class="val win"><svg viewBox="0 0 24 24"><path d="m4 12 5 5 11-11"/></svg> Always</div>
+      <div class="diff-text-blocks">
+        <p><strong>Our Mission Statement:</strong> To provide an elegant, open online space that allows travellers to directly interact with an area and the local hosts who manage it. Guests can message owners safely with absolutely no hidden booking markup or platform commissions on either side of the reservation.</p>
+        <p><strong>Integrated Communication:</strong> This ecosystem is natively intertwined with <strong>The Feed</strong>—a dedicated section allowing community members to log recent holiday stays, swap travel ideas, and utilize powerful hashtag tools to tag accounts, beautiful hamlets, and architectural properties.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- COMMUNITY -->
 <section class="community">
   <div class="wrap">
     <div class="community-grid">
       <div>
-        <div class="eyebrow" style="color:var(--brick);margin-bottom:12px">03 &mdash; Connect</div>
-        <h2><i>Connect</i> with the people<br>who run the places.</h2>
-        <p>Hosts post their stays. Guests share their reviews and ask questions. Conversations happen in the open &mdash; with hashtags, replies, and the people behind the listings. Follow a place, follow a host.</p>
-        <a href="feed.html" class="btn btn-ink btn-lg">
-          Open the community feed
-          <svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        <div class="eyebrow" style="color:var(--brick);margin-bottom:12px">03 &mdash; Community Feed Gateway</div>
+        <h2>A clear window into <i>the feed</i> aspect.</h2>
+        <p>We are actively building out the foundational micro-blogging architecture behind Casa. Once complete, you can review live updates from hosts and trip assessments from verified travellers globally.</p>
+        
+        <a href="feed.html" class="btn btn-ink btn-lg" style="display: inline-flex; align-items: center; gap: 10px; background: var(--ink); color: var(--paper); text-decoration: none; padding: 14px 24px; border-radius: var(--r-pill); font-size: 14px; font-weight: 500;">
+          Open the live feed preview
+          <svg class="i" style="width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2;" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
         </a>
 
         <div class="tag-wall" style="margin-top: 40px;">
-          <span class="ch"><span class="tag-name">#lakedistrict</span><span class="ct">214</span></span>
-          <span class="ch"><span class="tag-name">#cornwall</span><span class="ct">198</span></span>
-          <span class="ch"><span class="tag-name">#scottishhighlands</span><span class="ct">145</span></span>
-          <span class="ch"><span class="tag-name">#norfolk</span><span class="ct">112</span></span>
-          <span class="ch"><span class="tag-name">#cotswolds</span><span class="ct">87</span></span>
-          <span class="ch"><span class="tag-name">#snowdonia</span><span class="ct">54</span></span>
-          <span class="ch"><span class="tag-name">#cottage</span><span class="ct">341</span></span>
-          <span class="ch"><span class="tag-name">#seaview</span><span class="ct">156</span></span>
-          <span class="ch"><span class="tag-name">#petfriendly</span><span class="ct">134</span></span>
-          <span class="ch"><span class="tag-name">#glamping</span><span class="ct">89</span></span>
-          <span class="ch"><span class="tag-name">#hottub</span><span class="ct">71</span></span>
-          <span class="ch"><span class="tag-name">#offgrid</span><span class="ct">62</span></span>
-          <span class="ch"><span class="tag-name">#causewaycoast</span><span class="ct">29</span></span>
+          <a href="feed.html" class="ch"><span class="tag-name">#lakedistrict</span></a>
+          <a href="feed.html" class="ch"><span class="tag-name">#cornwall</span></a>
+          <a href="feed.html" class="ch"><span class="tag-name">#scottishhighlands</span></a>
+          <a href="feed.html" class="ch"><span class="tag-name">#cotswolds</span></a>
+          <a href="feed.html" class="ch"><span class="tag-name">#snowdonia</span></a>
+          <a href="feed.html" class="ch"><span class="tag-name">#cottage</span></a>
+          <a href="feed.html" class="ch"><span class="tag-name">#seaview</span></a>
+          <a href="feed.html" class="ch"><span class="tag-name">#petfriendly</span></a>
         </div>
       </div>
 
@@ -452,7 +432,7 @@
             </div>
             <span class="when">2 hrs</span>
           </div>
-          <div class="body">300-year-old stone cottage, sleeps 6. Wood burner, garden onto the fells. July is open. <i>#lakedistrict</i> <i>#cottage</i> <i>#familyfriendly</i></div>
+          <div class="body">300-year-old stone cottage, sleeps 6. Wood burner, garden onto the fells. July is open. <i>#lakedistrict</i> <i>#cottage</i></div>
         </div>
 
         <div class="post-mini">
@@ -466,43 +446,44 @@
           </div>
           <div class="body">Just back from a week in Cornwall &mdash; booked direct through Casa, saved about £180. Cannot recommend it enough. <i>#cornwall</i> <i>#seaview</i></div>
         </div>
-
-        <div class="post-mini">
-          <div class="pm-head">
-            <div class="av">F</div>
-            <div>
-              <div class="nm">Fiona C.</div>
-              <div class="mono" style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-4)">Host · Isle of Skye</div>
-            </div>
-            <span class="when">Yest.</span>
-          </div>
-          <div class="body">Restored blackhouse on the Trotternish. Solar, wood-fired hot tub, views to the Old Man. <i>#isleofskye</i> <i>#offgrid</i></div>
-        </div>
       </div>
 
     </div>
   </div>
 </section>
 
-<!-- HOST CTA -->
 <section class="host-cta">
   <div class="wrap">
-    <div class="host-cta-inner">
-      <h2>Have a place?<br><i>List it for £19/month.</i><br>Keep <span style="color:var(--paper)">100%</span> of every booking.</h2>
-      <div class="cta-actions">
-        <div class="stat"><span class="nm">£19/mo</span> &mdash; flat listing fee</div>
-        <div class="stat"><span class="nm">0%</span> &mdash; commission on every booking</div>
-        <div class="stat"><span class="nm">2 min</span> &mdash; to set up your listing</div>
+    <div class="cta-dual-grid">
+      
+      <div class="cta-card host-side">
+        <div>
+          <span class="card-tag">For Independent Hosts</span>
+          <h3>Have a place?<br>List with <i>zero fees</i>.</h3>
+          <p>Promote your property directly to guests. Keep 100% of every reservation transaction without platform middleman commissions or hidden booking charges.</p>
+        </div>
         <a href="list.html" class="cta-btn">
           List your property
           <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
         </a>
       </div>
+
+      <div class="cta-card guest-side">
+        <div>
+          <span class="card-tag">For Smart Travellers</span>
+          <h3>Create your simple<br><i>user profile</i>.</h3>
+          <p>Unlock authentic network connections and communicate with property owners seamlessly. Enjoy zero booking fees and a free 2-minute setup process.</p>
+        </div>
+        <a href="signup.html" class="cta-btn">
+          Create free profile
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+
     </div>
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer class="casa-foot">
   <div class="inner">
     <div class="top">
@@ -515,30 +496,22 @@
         <h5>Stays</h5>
         <a href="browse.html">Browse all</a>
         <a href="map.html">Map view</a>
-        <a href="#">Last minute</a>
-        <a href="#">Long stays</a>
-        <a href="#">Gift cards</a>
+        <a href="feed.html">Community feed</a>
       </div>
       <div>
         <h5>Hosts</h5>
         <a href="list.html">List a property</a>
         <a href="host.html">Host dashboard</a>
-        <a href="#">Resources</a>
-        <a href="#">Community</a>
       </div>
       <div>
         <h5>Account</h5>
         <a href="signup.html">Sign in</a>
         <a href="signup.html">Join free</a>
-        <a href="saved.html">Saved</a>
-        <a href="messages.html">Messages</a>
         <a href="profile.html">Profile</a>
       </div>
       <div>
         <h5>Casa</h5>
         <a href="#">Our story</a>
-        <a href="#">Press</a>
-        <a href="#">Careers</a>
         <a href="#">Help &amp; contact</a>
       </div>
     </div>
@@ -548,18 +521,6 @@
     </div>
   </div>
 </footer>
-
-<script>
-function goSearch() {
-  // Smooth visual feedback before navigating
-  document.querySelectorAll('.search .seg').forEach(s => s.classList.remove('active'));
-  event.currentTarget.classList.add('active');
-}
-document.querySelector('.search-go').addEventListener('click', e => {
-  e.stopPropagation();
-  window.location.href = 'browse.html';
-});
-</script>
 
 <script src="casa.js"></script>
 </body>
