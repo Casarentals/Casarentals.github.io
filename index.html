@@ -83,78 +83,94 @@
     gap: 12px;
     padding: 0 32px;
   }
-  .hero-strip .ph { aspect-ratio: 3/4; border-radius: 14px; max-height: 180px; background-size: cover; background-position: center; }
-  .hero-strip .ph:nth-child(2) { aspect-ratio: 4/5; align-self: end; max-height: 180px; }
-  .hero-strip .ph:nth-child(4) { aspect-ratio: 5/6; align-self: end; max-height: 180px; }
+  .hero-strip .ph { aspect-ratio: 3/4; border-radius: 14px; }
+  .hero-strip .ph:nth-child(2) { aspect-ratio: 4/5; align-self: end; }
+  .hero-strip .ph:nth-child(4) { aspect-ratio: 5/6; align-self: end; }
 
   /* ─── DESTINATIONS ─── */
   .dest { padding: 96px 0 48px; }
   .dest-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; }
-  .dest-card { position: relative; border-radius: 16px; overflow: hidden; cursor: pointer; transition: transform .25s; max-height: 250px; }
+  .dest-card { position: relative; border-radius: 16px; overflow: hidden; cursor: pointer; transition: transform .25s; }
   .dest-card:hover { transform: translateY(-2px); }
-  .dest-card .ph { width: 100%; height: 100%; min-height: 250px; background-size: cover; background-position: center; }
+  .dest-card .ph { width: 100%; height: 100%; }
   .dest-card .meta {
     position: absolute; left: 16px; right: 16px; bottom: 16px;
     color: white; z-index: 2;
   }
   .dest-card::after {
     content: ''; position: absolute; inset: 0;
-    background: linear-gradient(to top, rgba(22,20,15,0.7) 0%, transparent 60%);
+    background: linear-gradient(to top, rgba(22,20,15,0.6) 0%, transparent 60%);
     z-index: 1;
   }
   .dest-card .title { font-family: var(--serif); font-style: italic; font-size: 32px; line-height: 1; }
   .dest-card .sub { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.75); margin-top: 6px; }
-  .dest-1 { grid-column: span 5; }
-  .dest-2 { grid-column: span 4; }
-  .dest-3 { grid-column: span 3; }
-  .dest-4 { grid-column: span 3; }
-  .dest-5 { grid-column: span 5; }
-  .dest-6 { grid-column: span 4; }
+  .dest-1 { grid-column: span 5; aspect-ratio: 5/6; }
+  .dest-2 { grid-column: span 4; aspect-ratio: 4/5; }
+  .dest-3 { grid-column: span 3; aspect-ratio: 3/4; }
+  .dest-4 { grid-column: span 3; aspect-ratio: 4/5; }
+  .dest-5 { grid-column: span 5; aspect-ratio: 5/4; }
+  .dest-6 { grid-column: span 4; aspect-ratio: 4/5; }
 
   /* ─── DIFFERENCE STRIP ─── */
-  .diff { background: var(--ink); color: var(--paper); padding: 96px 0; margin: 56px 0 0; }
+  .diff { background: var(--surface); color: var(--ink); padding: 96px 0; margin: 56px 0 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
   .diff-inner { max-width: 1280px; margin: 0 auto; padding: 0 32px; }
   .diff-head { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: end; margin-bottom: 64px; }
-  .diff-head h2 { font-family: var(--serif); font-size: 72px; line-height: 0.95; letter-spacing: -0.025em; color: var(--paper); }
-  .diff-head h2 i { font-style: italic; color: var(--brick-2); }
-  .diff-head p { font-size: 16px; color: rgba(255,255,255,0.7); line-height: 1.6; }
+  .diff-head h2 { font-family: var(--serif); font-size: 72px; line-height: 0.95; letter-spacing: -0.025em; color: var(--ink); }
+  .diff-head h2 i { font-style: italic; color: var(--brick); }
+  .diff-head p { font-size: 16px; color: var(--ink-2); line-height: 1.6; }
 
   /* COMPARISON TABLE */
   .compare {
-    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12);
+    background: var(--paper); border: 1px solid var(--rule);
     border-radius: 20px; overflow: hidden;
+    box-shadow: 0 8px 32px rgba(22,20,15,0.03);
   }
-  .compare .crow { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; padding: 22px 28px; border-bottom: 1px solid rgba(255,255,255,0.08); align-items: center; }
+  .compare .crow { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; padding: 22px 28px; border-bottom: 1px solid var(--rule); align-items: center; }
   .compare .crow:last-child { border-bottom: none; }
-  .compare .crow.head { background: rgba(255,255,255,0.04); padding: 18px 28px; }
-  .compare .crow.head .h-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
-  .compare .crow.head .casa { color: var(--brick-2); }
-  .compare .crow.head .casa-pill { display: inline-flex; align-items: center; gap: 6px; font-family: var(--serif); font-style: italic; font-size: 28px; color: var(--brick-2); }
-  .compare .label-cell { font-size: 16px; color: var(--paper); }
-  .compare .label-cell .sub { display: block; font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
-  .compare .val { font-size: 15px; color: rgba(255,255,255,0.75); }
-  .compare .val.win { color: var(--brick-2); font-weight: 500; display: inline-flex; align-items: center; gap: 6px; }
-  .compare .val.win svg { width: 14px; height: 14px; stroke: var(--brick-2); fill: none; stroke-width: 2; }
-  .compare .val.lose { color: rgba(255,255,255,0.4); text-decoration: line-through; }
+  .compare .crow.head { background: rgba(22,20,15,0.02); padding: 18px 28px; }
+  .compare .crow.head .h-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); }
+  .compare .crow.head .casa-pill { display: inline-flex; align-items: center; gap: 6px; font-family: var(--serif); font-style: italic; font-size: 28px; color: var(--brick); }
+  .compare .label-cell { font-size: 16px; color: var(--ink); }
+  .compare .label-cell .sub { display: block; font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+  .compare .val { font-size: 15px; color: var(--ink-2); }
+  .compare .val.win { color: var(--brick); font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+  .compare .val.win svg { width: 14px; height: 14px; stroke: var(--brick); fill: none; stroke-width: 2.5; }
+  .compare .val.lose { color: var(--ink-4); text-decoration: line-through; }
+
+  /* Column 4 Highlight for Casa vs Competitors */
+  .compare .crow > *:nth-child(4) {
+    background: rgba(188, 71, 54, 0.03);
+    padding-left: 16px; padding-right: 16px;
+    margin-left: -16px; margin-right: -16px;
+    align-self: stretch; display: flex; align-items: center;
+  }
+  .compare .crow.head > *:nth-child(4) {
+    background: rgba(188, 71, 54, 0.07);
+  }
 
   /* ─── COMMUNITY ─── */
   .community { padding: 96px 0 48px; }
-  .community-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 48px; align-items: start; }
-  
+  .community-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 80px; align-items: start; }
+  .community-head h2 { font-family: var(--serif); font-size: 56px; line-height: 1; letter-spacing: -0.025em; margin-bottom: 20px; }
+  .community-head h2 i { font-style: italic; color: var(--brick); }
+  .community-head p { font-size: 16px; line-height: 1.6; color: var(--ink-2); max-width: 520px; margin-bottom: 24px; }
+
   /* tag wall */
-  .tag-wall { display: flex; flex-wrap: wrap; gap: 8px; max-width: 720px; }
+  .tag-wall { display: flex; flex-wrap: wrap; gap: 10px; max-width: 720px; }
   .tag-wall .ch {
-    display: inline-flex; align-items: center; gap: 4px;
+    display: inline-flex; align-items: center; gap: 6px;
     background: var(--surface); border: 1px solid var(--rule);
-    padding: 6px 12px; border-radius: var(--r-pill);
-    font-size: 12.5px; color: var(--ink-2); cursor: pointer;
+    padding: 9px 16px; border-radius: var(--r-pill);
+    font-size: 13.5px; color: var(--ink-2); cursor: pointer;
     transition: all .15s;
   }
   .tag-wall .ch:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
   .tag-wall .ch .tag-name { font-family: var(--serif); font-style: italic; color: var(--brick); }
   .tag-wall .ch:hover .tag-name { color: var(--brick-2); }
+  .tag-wall .ch .ct { font-family: var(--mono); font-size: 10px; color: var(--ink-4); }
+  .tag-wall .ch:hover .ct { color: rgba(255,255,255,0.55); }
 
-  .post-feed { display: flex; flex-direction: column; gap: 16px; max-height: 380px; overflow-y: auto; padding-right: 8px; }
+  .post-feed { display: flex; flex-direction: column; gap: 16px; }
   .post-mini { background: var(--surface); border: 1px solid var(--rule); border-radius: 14px; padding: 18px 20px; }
   .post-mini .pm-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
   .post-mini .av { width: 32px; height: 32px; border-radius: 50%; background: var(--brick); color: white; display: inline-flex; align-items: center; justify-content: center; font-family: var(--serif); font-style: italic; font-size: 14px; }
@@ -232,7 +248,8 @@
         </div>
         <h1 class="hero-title">
           <i>Connect</i>, <i>search</i><br>
-          &amp; <i>stay</i> with <i>casa</i>.
+          &amp; <i>stay</i> at<br>
+          casa<span style="color:var(--ink-3);font-style:normal">.co.uk</span>.
         </h1>
       </div>
       <div class="hero-aside rise-2">
@@ -282,10 +299,10 @@
     </div>
 
     <div class="hero-strip rise-4">
-      <div class="ph" style="background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=500&q=80')" data-label="STONE COTTAGE · WINDERMERE"></div>
-      <div class="ph" style="background-image: url('https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&w=500&q=80')" data-label="BLACKHOUSE · ISLE OF SKYE"></div>
-      <div class="ph" style="background-image: url('https://images.unsplash.com/photo-1517760444937-f6397edcbbcd?auto=format&fit=crop&w=500&q=80')" data-label="FARMHOUSE · SNOWDONIA"></div>
-      <div class="ph" style="background-image: url('https://images.unsplash.com/photo-1549880338-65ddcdfd017b?auto=format&fit=crop&w=500&q=80')" data-label="CLIFF HOUSE · ANTRIM"></div>
+      <div class="ph warm" data-label="STONE COTTAGE · WINDERMERE"></div>
+      <div class="ph dusk" data-label="BLACKHOUSE · ISLE OF SKYE"></div>
+      <div class="ph sage" data-label="FARMHOUSE · SNOWDONIA"></div>
+      <div class="ph fog" data-label="CLIFF HOUSE · ANTRIM"></div>
     </div>
   </div>
 </section>
@@ -304,42 +321,42 @@
 
     <div class="dest-grid">
       <a href="property.html" class="dest-card dest-1">
-        <div class="ph" style="background-image: url('https://images.unsplash.com/photo-1508873696983-2df519f0397d?auto=format&fit=crop&w=600&q=80')" data-label="THE LAKE DISTRICT · 214 STAYS"></div>
+        <div class="ph warm" data-label="THE LAKE DISTRICT · 214 STAYS"></div>
         <div class="meta">
           <div class="title">The <i style="font-style:italic">Lake District</i></div>
           <div class="sub">214 stays · from £95/night</div>
         </div>
       </a>
       <a href="property.html" class="dest-card dest-2">
-        <div class="ph" style="background-image: url('https://images.unsplash.com/photo-1529963183134-61a90db47eaf?auto=format&fit=crop&w=600&q=80')" data-label="ISLE OF SKYE · 67 STAYS"></div>
+        <div class="ph dusk" data-label="ISLE OF SKYE · 67 STAYS"></div>
         <div class="meta">
           <div class="title">Isle of <i>Skye</i></div>
           <div class="sub">67 stays · from £110</div>
         </div>
       </a>
       <a href="property.html" class="dest-card dest-3">
-        <div class="ph" style="background-image: url('https://images.unsplash.com/photo-1510146758428-e5e4b17b8b6a?auto=format&fit=crop&w=600&q=80')" data-label="CORNWALL · 198 STAYS"></div>
+        <div class="ph sage" data-label="CORNWALL · 198 STAYS"></div>
         <div class="meta">
           <div class="title"><i>Cornwall</i></div>
           <div class="sub">198 stays</div>
         </div>
       </a>
       <a href="property.html" class="dest-card dest-4">
-        <div class="ph" style="background-image: url('https://images.unsplash.com/photo-1543872084-c7bd3822856f?auto=format&fit=crop&w=600&q=80')" data-label="THE COTSWOLDS · 87 STAYS"></div>
+        <div class="ph fog" data-label="THE COTSWOLDS · 87 STAYS"></div>
         <div class="meta">
           <div class="title">The <i>Cotswolds</i></div>
           <div class="sub">87 stays</div>
         </div>
       </a>
       <a href="property.html" class="dest-card dest-5">
-        <div class="ph" style="background-image: url('https://images.unsplash.com/photo-1571879831330-40628ee43472?auto=format&fit=crop&w=600&q=80')" data-label="SNOWDONIA · 54 STAYS"></div>
+        <div class="ph ink" data-label="SNOWDONIA · 54 STAYS"></div>
         <div class="meta">
           <div class="title"><i>Snowdonia</i></div>
           <div class="sub">54 stays · from £120</div>
         </div>
       </a>
       <a href="property.html" class="dest-card dest-6">
-        <div class="ph" style="background-image: url('https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=600&q=80')" data-label="THE CAUSEWAY COAST · 29 STAYS"></div>
+        <div class="ph brick" data-label="THE CAUSEWAY COAST · 29 STAYS"></div>
         <div class="meta">
           <div class="title">Causeway <i>Coast</i></div>
           <div class="sub">29 stays</div>
@@ -353,48 +370,54 @@
   <div class="diff-inner">
     <div class="diff-head">
       <div>
-        <div class="eyebrow" style="color:var(--brick-2);margin-bottom:12px;opacity:0.85">02 &mdash; Stay</div>
-        <h2><i>Stay</i> direct &mdash;<br>not through middlemen.</h2>
+        <div class="eyebrow" style="color:var(--brick);margin-bottom:12px;">02 &mdash; Stay</div>
+        <h2><i>Zero</i> fees.<br>For guests &amp; hosts.</h2>
       </div>
-      <p>The big platforms take 15&ndash;22% out of every booking. We don't. Casa is a directory and an enquiry inbox &mdash; we put you face-to-face with the host. They pay a £19/month listing fee, and that's it.</p>
+      <p>The corporate platforms tack on hefty service markups and take a massive cut from the people doing the actual work. Casa strips away the middlemen completely: <strong>£0 booking fees</strong> for guests, and <strong>0% commission rules</strong> for property owners. Just a seamless, direct connection.</p>
     </div>
 
     <div class="compare">
       <div class="crow head">
-        <div class="h-label">Same property &mdash; £1,225 / week</div>
+        <div class="h-label">Same property &mdash; £175 / night</div>
         <div class="h-label">Booking.com</div>
         <div class="h-label">Airbnb</div>
         <div class="h-label"><span class="casa-pill">casa</span></div>
       </div>
       <div class="crow">
-        <div class="label-cell">Stay cost <span class="sub">£175 × 7 nights</span></div>
+        <div class="label-cell">Stay cost <span class="sub">£175 × 7 nights base rate</span></div>
         <div class="val">£1,225</div>
         <div class="val">£1,225</div>
         <div class="val">£1,225</div>
       </div>
       <div class="crow">
-        <div class="label-cell">Service / guest fee <span class="sub">platform commission</span></div>
-        <div class="val">£183</div>
-        <div class="val">£170</div>
-        <div class="val win"><svg viewBox="0 0 24 24"><path d="m4 12 5 5 11-11"/></svg> £0</div>
+        <div class="label-cell">Guest booking fee <span class="sub">Zero added platform service charges</span></div>
+        <div class="val">£183 markup</div>
+        <div class="val">£170 markup</div>
+        <div class="val win"><svg viewBox="0 0 24 24"><path d="m4 12 5 5 11-11"/></svg> £0 fee</div>
       </div>
       <div class="crow">
-        <div class="label-cell">Cleaning surcharge <span class="sub">often hidden until checkout</span></div>
-        <div class="val">£60</div>
-        <div class="val">£80</div>
-        <div class="val">Agreed with host</div>
+        <div class="label-cell">Host commission cut <span class="sub">Portions taken from property owners</span></div>
+        <div class="val">15% commission</div>
+        <div class="val">3% commission</div>
+        <div class="val win"><svg viewBox="0 0 24 24"><path d="m4 12 5 5 11-11"/></svg> 0% cut</div>
       </div>
       <div class="crow">
-        <div class="label-cell">Host receives <span class="sub">the people doing the work</span></div>
-        <div class="val">£955</div>
-        <div class="val">£980</div>
-        <div class="val win"><svg viewBox="0 0 24 24"><path d="m4 12 5 5 11-11"/></svg> £1,225</div>
+        <div class="label-cell">Cleaning fees <span class="sub">Transparency at the checkout step</span></div>
+        <div class="val">£60 hidden surcharge</div>
+        <div class="val">£80 hidden surcharge</div>
+        <div class="val win"><svg viewBox="0 0 24 24"><path d="m4 12 5 5 11-11"/></svg> Agreed direct</div>
       </div>
       <div class="crow">
-        <div class="label-cell">You talk to the host directly <span class="sub">before, during, after</span></div>
-        <div class="val lose">Through platform</div>
-        <div class="val lose">Through platform</div>
-        <div class="val win"><svg viewBox="0 0 24 24"><path d="m4 12 5 5 11-11"/></svg> Always</div>
+        <div class="label-cell">Total guest outlay <span class="sub">What leaves your bank account</span></div>
+        <div class="val">£1,468</div>
+        <div class="val">£1,475</div>
+        <div class="val win" style="font-weight:600;"><svg viewBox="0 0 24 24"><path d="m4 12 5 5 11-11"/></svg> £1,225</div>
+      </div>
+      <div class="crow">
+        <div class="label-cell">Property owner receives <span class="sub">Keeping 100% of the hard work</span></div>
+        <div class="val">£1,041</div>
+        <div class="val">£1,188</div>
+        <div class="val win" style="font-weight:600;"><svg viewBox="0 0 24 24"><path d="m4 12 5 5 11-11"/></svg> £1,225</div>
       </div>
     </div>
   </div>
@@ -402,84 +425,71 @@
 
 <section class="community">
   <div class="wrap">
-    <div style="border-bottom: 1px solid var(--rule); padding-bottom: 40px; margin-bottom: 48px;">
-      <div class="eyebrow" style="color:var(--brick); margin-bottom:12px;">03 &mdash; Our Space</div>
-      <h2 style="font-family: var(--serif); font-size: 48px; line-height: 1.1; letter-spacing: -0.025em; margin-bottom: 24px; max-width: 900px;">
-        An online community for people wanting to make a direct connection with place, property and person.
-      </h2>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
-        <p style="font-size: 16px; line-height: 1.6; color: var(--ink-2);">
-          Our mission is to create an online space that will allow users to research their next get-away through direct property searches, location research and visible conversations. We want to bring the holiday community to one place - Casa.
-        </p>
-        <p style="font-size: 16px; line-height: 1.6; color: var(--ink-2);">
-          Our aim is to make renting fairer and more transparent to those renting a property for their special holiday. No fees, no surprise costs and direct contact on both ends. We are trying to make renting fairer for all.
-        </p>
-      </div>
-    </div>
-
-    <div style="background: var(--surface); border: 1px solid var(--rule); border-radius: 20px; padding: 32px;">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; flex-wrap: wrap; gap: 16px;">
-        <div>
-          <h3 style="font-family: var(--serif); font-size: 32px; font-weight: 500; margin-bottom: 6px;">CasaFeed &mdash; <i>One connection away from your next adventure.</i></h3>
-          <p style="font-size: 14.5px; color: var(--ink-2); max-width: 700px;">An open space for you to have your say on your last holiday - leave a review, suggest a must-see or promote your property on the feed.</p>
-        </div>
-        <a href="feed.html" class="nav-link primary" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; font-size: 13.5px; border-radius: 10px; font-weight: 500;">
-          View Full Feed 
-          <svg viewBox="0 0 24 24" style="width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2.5;"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+    <div class="community-grid">
+      <div>
+        <div class="eyebrow" style="color:var(--brick);margin-bottom:12px">03 &mdash; Connect</div>
+        <h2><i>Connect</i> with the people<br>who run the places.</h2>
+        <p>Hosts post their stays. Guests share their reviews and ask questions. Conversations happen in the open &mdash; with hashtags, replies, and the people behind the listings. Follow a place, follow a host.</p>
+        <a href="feed.html" class="btn btn-ink btn-lg">
+          Open the community feed
+          <svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
         </a>
-      </div>
 
-      <div class="community-grid">
-        <div>
-          <div style="background: var(--paper); border: 1px solid var(--rule); border-radius: 14px; padding: 16px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);">
-            <textarea id="feed-composer" placeholder="Leave a review, tag a property, or share a recommendation..." style="width: 100%; min-height: 110px; border: none; resize: vertical; font-family: var(--sans); font-size: 14px; color: var(--ink); outline: none; background: transparent; line-height: 1.5;"></textarea>
-            <div style="display: flex; justify-content: flex-end; margin-top: 12px; border-top: 1px solid var(--rule); padding-top: 12px;">
-              <button onclick="postToProfileFeed()" class="search-go" style="padding: 8px 18px; font-size: 13.5px; border-radius: 8px;">Post to Profile</button>
-            </div>
-          </div>
-          
-          <div style="margin-top: 16px;">
-            <div style="font-family: var(--mono); font-size: 10px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;">Click to inject common hashtags:</div>
-            <div class="tag-wall">
-              <span class="ch" onclick="appendHashtag('#lakedistrict')"><span class="tag-name">#lakedistrict</span></span>
-              <span class="ch" onclick="appendHashtag('#cornwall')"><span class="tag-name">#cornwall</span></span>
-              <span class="ch" onclick="appendHashtag('#scottishhighlands')"><span class="tag-name">#scottishhighlands</span></span>
-              <span class="ch" onclick="appendHashtag('#norfolk')"><span class="tag-name">#norfolk</span></span>
-              <span class="ch" onclick="appendHashtag('#cotswolds')"><span class="tag-name">#cotswolds</span></span>
-              <span class="ch" onclick="appendHashtag('#snowdonia')"><span class="tag-name">#snowdonia</span></span>
-              <span class="ch" onclick="appendHashtag('#cottage')"><span class="tag-name">#cottage</span></span>
-              <span class="ch" onclick="appendHashtag('#seaview')"><span class="tag-name">#seaview</span></span>
-              <span class="ch" onclick="appendHashtag('#petfriendly')"><span class="tag-name">#petfriendly</span></span>
-            </div>
-          </div>
-        </div>
-
-        <div class="post-feed" id="profile-feed-stream">
-          <div class="post-mini">
-            <div class="pm-head">
-              <div class="av">S</div>
-              <div>
-                <div class="nm">Sarah R.</div>
-                <div class="mono" style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-4)">Host · Windermere</div>
-              </div>
-              <span class="when">2 hrs</span>
-            </div>
-            <div class="body">300-year-old stone cottage, sleeps 6. Wood burner, garden onto the fells. July is open. <i onclick="appendHashtag('#lakedistrict')">#lakedistrict</i> <i onclick="appendHashtag('#cottage')">#cottage</i></div>
-          </div>
-
-          <div class="post-mini">
-            <div class="pm-head">
-              <div class="av guest">M</div>
-              <div>
-                <div class="nm">Marcus J.</div>
-                <div class="mono" style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-4)">Guest · Trip review</div>
-              </div>
-              <span class="when">5 hrs</span>
-            </div>
-            <div class="body">Just back from a week in Cornwall &mdash; booked direct through Casa, saved about £180. Cannot recommend it enough. <i onclick="appendHashtag('#cornwall')">#cornwall</i> <i onclick="appendHashtag('#seaview')">#seaview</i></div>
-          </div>
+        <div class="tag-wall" style="margin-top: 40px;">
+          <span class="ch"><span class="tag-name">#lakedistrict</span><span class="ct">214</span></span>
+          <span class="ch"><span class="tag-name">#cornwall</span><span class="ct">198</span></span>
+          <span class="ch"><span class="tag-name">#scottishhighlands</span><span class="ct">145</span></span>
+          <span class="ch"><span class="tag-name">#norfolk</span><span class="ct">112</span></span>
+          <span class="ch"><span class="tag-name">#cotswolds</span><span class="ct">87</span></span>
+          <span class="ch"><span class="tag-name">#snowdonia</span><span class="ct">54</span></span>
+          <span class="ch"><span class="tag-name">#cottage</span><span class="ct">341</span></span>
+          <span class="ch"><span class="tag-name">#seaview</span><span class="ct">156</span></span>
+          <span class="ch"><span class="tag-name">#petfriendly</span><span class="ct">134</span></span>
+          <span class="ch"><span class="tag-name">#glamping</span><span class="ct">89</span></span>
+          <span class="ch"><span class="tag-name">#hottub</span><span class="ct">71</span></span>
+          <span class="ch"><span class="tag-name">#offgrid</span><span class="ct">62</span></span>
+          <span class="ch"><span class="tag-name">#causewaycoast</span><span class="ct">29</span></span>
         </div>
       </div>
+
+      <div class="post-feed">
+        <div class="post-mini">
+          <div class="pm-head">
+            <div class="av">S</div>
+            <div>
+              <div class="nm">Sarah R.</div>
+              <div class="mono" style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-4)">Host · Windermere</div>
+            </div>
+            <span class="when">2 hrs</span>
+          </div>
+          <div class="body">300-year-old stone cottage, sleeps 6. Wood burner, garden onto the fells. July is open. <i>#lakedistrict</i> <i>#cottage</i> <i>#familyfriendly</i></div>
+        </div>
+
+        <div class="post-mini">
+          <div class="pm-head">
+            <div class="av guest">M</div>
+            <div>
+              <div class="nm">Marcus J.</div>
+              <div class="mono" style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-4)">Guest · Trip review</div>
+            </div>
+            <span class="when">5 hrs</span>
+          </div>
+          <div class="body">Just back from a week in Cornwall &mdash; booked direct through Casa, saved about £180. Cannot recommend it enough. <i>#cornwall</i> <i>#seaview</i></div>
+        </div>
+
+        <div class="post-mini">
+          <div class="pm-head">
+            <div class="av">F</div>
+            <div>
+              <div class="nm">Fiona C.</div>
+              <div class="mono" style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-4)">Host · Isle of Skye</div>
+            </div>
+            <span class="when">Yest.</span>
+          </div>
+          <div class="body">Restored blackhouse on the Trotternish. Solar, wood-fired hot tub, views to the Old Man. <i>#isleofskye</i> <i>#offgrid</i></div>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
@@ -549,6 +559,7 @@
 
 <script>
 function goSearch() {
+  // Smooth visual feedback before navigating
   document.querySelectorAll('.search .seg').forEach(s => s.classList.remove('active'));
   event.currentTarget.classList.add('active');
 }
@@ -556,48 +567,6 @@ document.querySelector('.search-go').addEventListener('click', e => {
   e.stopPropagation();
   window.location.href = 'browse.html';
 });
-
-/* Interactive Feed Actions */
-function appendHashtag(tag) {
-  const box = document.getElementById('feed-composer');
-  if (box) {
-    if (box.value && !box.value.endsWith(' ')) {
-      box.value += ' ';
-    }
-    box.value += tag + ' ';
-    box.focus();
-  }
-}
-
-function postToProfileFeed() {
-  const box = document.getElementById('feed-composer');
-  const stream = document.getElementById('profile-feed-stream');
-  if (box && box.value.trim() !== '') {
-    const rawContent = box.value.trim();
-    
-    // Auto-wrap hashtags in style format
-    const styledContent = rawContent.replace(/(#[a-zA-Z0-9]+)/g, '<i onclick="appendHashtag(\'$1\')">$1</i>');
-    
-    const element = document.createElement('div');
-    element.className = 'post-mini';
-    element.style.borderLeft = '3px solid var(--brick)';
-    element.innerHTML = `
-      <div class="pm-head">
-        <div class="av guest">U</div>
-        <div>
-          <div class="nm">You</div>
-          <div class="mono" style="font-size:10px;text-transform:uppercase;color:var(--ink-4)">Guest · Profile Sync</div>
-        </div>
-        <span class="when">Just now</span>
-      </div>
-      <div class="body">${styledContent}</div>
-    `;
-    stream.insertBefore(element, stream.firstChild);
-    box.value = '';
-  } else {
-    alert('Please enter a thought or review before attempting to post.');
-  }
-}
 </script>
 
 <script src="casa.js"></script>
