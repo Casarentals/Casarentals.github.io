@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Enquire to book — Casa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="casa.css">
+<style>
+  .b-wrap { max-width: 1100px; margin: 0 auto; padding: 32px; display: grid; grid-template-columns: 1fr 380px; gap: 56px; align-items: start; }
+
+  /* Crumb */
+  .crumb { margin-bottom: 16px; font-size: 13px; color: var(--ink-3); }
+  .crumb a { color: var(--ink-3); text-decoration: none; }
+  .crumb a:hover { color: var(--brick); }
+  .crumb .sep { color: var(--ink-4); margin: 0 6px; }
+
+  /* Header */
+  .b-head { margin-bottom: 32px; }
+  .b-head h1 { font-family: var(--serif); font-size: 56px; line-height: 0.95; letter-spacing: -0.025em; margin-bottom: 12px; }
+  .b-head h1 i { font-style: italic; color: var(--brick); }
+  .b-head .lede { font-family: var(--serif); font-size: 20px; line-height: 1.5; color: var(--ink-2); max-width: 580px; }
+
+  /* Steps */
+  .steps { display: flex; gap: 0; margin: 36px 0 36px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--rule); border-radius: 14px; }
+  .step { display: flex; align-items: center; gap: 10px; padding-right: 24px; }
+  .step .num { width: 28px; height: 28px; border-radius: 50%; background: var(--paper-2); color: var(--ink-3); display: inline-flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 12px; font-weight: 500; flex-shrink: 0; }
+  .step.active .num { background: var(--brick); color: white; }
+  .step.done .num { background: var(--moss); color: white; }
+  .step.done .num::before { content: ''; width: 10px; height: 10px; background: white; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='m4 12 5 5 11-11'/></svg>") center / contain no-repeat; -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='m4 12 5 5 11-11'/></svg>") center / contain no-repeat; }
+  .step.done .num span { display: none; }
+  .step .lbl-wrap { display: flex; flex-direction: column; }
+  .step .lbl { font-size: 13.5px; color: var(--ink); font-weight: 500; }
+  .step.pending .lbl { color: var(--ink-3); font-weight: 400; }
+  .step .sub { font-size: 11px; color: var(--ink-4); font-family: var(--mono); letter-spacing: 0.06em; }
+  .step .line { flex: 1; height: 1px; background: var(--rule); margin: 0 14px; }
+
+  /* Section */
+  .b-sect { background: var(--surface); border: 1px solid var(--rule); border-radius: 18px; padding: 32px; margin-bottom: 16px; }
+  .b-sect .label-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 20px; }
+  .b-sect .num-tag { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; color: var(--brick); }
+  .b-sect h2 { font-family: var(--serif); font-size: 28px; line-height: 1; letter-spacing: -0.01em; }
+  .b-sect h2 i { font-style: italic; color: var(--brick); }
+  .b-sect .h-sub { font-size: 13.5px; color: var(--ink-3); margin-left: auto; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-2.cozy { gap: 12px; }
+  textarea.field-ta {
+    width: 100%; background: var(--paper); border: 1px solid var(--rule); border-radius: 12px;
+    padding: 14px 16px; font-family: var(--sans); font-size: 14.5px; color: var(--ink); resize: vertical;
+    min-height: 120px; outline: none; line-height: 1.6;
+    transition: border-color .12s, background .12s, box-shadow .12s;
+  }
+  textarea.field-ta:focus { border-color: var(--ink); background: white; box-shadow: 0 0 0 3px rgba(22,20,15,0.06); }
+  textarea.field-ta::placeholder { color: var(--ink-4); }
+
+  /* Safety / trust callout */
+  .trust-card { background: var(--moss-pale); border: 1px solid rgba(77,92,64,0.25); border-radius: 14px; padding: 18px 20px; display: flex; gap: 14px; }
+  .trust-card .ti { width: 36px; height: 36px; background: var(--moss); color: white; border-radius: 10px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
+  .trust-card .ti svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+  .trust-card h4 { font-family: var(--serif); font-size: 17px; color: var(--moss); font-style: italic; margin-bottom: 4px; }
+  .trust-card p { font-size: 13px; color: #3F4B36; line-height: 1.55; }
+
+  /* Consent rows */
+  .consent { display: flex; align-items: flex-start; gap: 10px; padding: 12px 0; }
+  .consent + .consent { border-top: 1px solid var(--rule-2); }
+  .consent input[type="checkbox"] {
+    width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px;
+    accent-color: var(--brick); cursor: pointer;
+  }
+  .consent span { font-size: 13.5px; color: var(--ink-2); line-height: 1.55; }
+  .consent a { color: var(--brick); text-decoration: underline; text-underline-offset: 2px; }
+
+  /* Submit */
+  .submit-row { display: flex; flex-direction: column; gap: 12px; align-items: stretch; margin-top: 8px; }
+  .submit-cta {
+    background: var(--brick); color: white; border: none; border-radius: 14px;
+    padding: 18px; font-family: var(--serif); font-style: italic; font-size: 22px; cursor: pointer;
+    transition: background .12s; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .submit-cta:hover { background: var(--brick-2); }
+  .submit-cta svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; }
+  .submit-note { text-align: center; font-size: 12.5px; color: var(--ink-3); }
+
+  /* SIDE — property summary */
+  .pside { position: sticky; top: 88px; }
+  .ps-card { background: var(--surface); border: 1px solid var(--rule); border-radius: 18px; overflow: hidden; }
+  .ps-img { aspect-ratio: 4/3; }
+  .ps-img .ph { width: 100%; height: 100%; }
+  .ps-body { padding: 20px 22px 8px; }
+  .ps-title { font-family: var(--serif); font-size: 22px; line-height: 1.1; margin-bottom: 4px; }
+  .ps-title i { font-style: italic; color: var(--brick); }
+  .ps-loc { font-size: 13px; color: var(--ink-3); display: flex; align-items: center; gap: 5px; margin-bottom: 14px; }
+  .ps-loc svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 1.6; }
+  .ps-host { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .ps-host .av { width: 36px; height: 36px; border-radius: 50%; background: var(--brick); color: white; display: inline-flex; align-items: center; justify-content: center; font-family: var(--serif); font-style: italic; font-size: 16px; flex-shrink: 0; }
+  .ps-host .info { font-size: 12.5px; flex: 1; min-width: 0; }
+  .ps-host .info .h { font-weight: 500; color: var(--ink); }
+  .ps-host .info .m { color: var(--ink-3); margin-top: 1px; }
+  .ps-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 14px 0; }
+  .ps-facts .pf { text-align: center; padding: 4px; }
+  .ps-facts .pf .n { font-family: var(--serif); font-style: italic; font-size: 20px; color: var(--ink); }
+  .ps-facts .pf .l { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-4); margin-top: 2px; }
+
+  .ps-price { background: var(--paper); padding: 18px 22px; border-top: 1px solid var(--rule); }
+  .ps-price .row { display: flex; justify-content: space-between; font-size: 13.5px; color: var(--ink-2); padding: 4px 0; }
+  .ps-price .row.zero { color: var(--moss); font-weight: 500; }
+  .ps-price .row.save { color: var(--moss); font-family: var(--serif); font-style: italic; font-size: 14px; }
+  .ps-price .row.total { font-weight: 500; color: var(--ink); font-size: 16px; padding-top: 8px; border-top: 1px solid var(--rule); margin-top: 6px; }
+  .ps-price .row.total .v { font-family: var(--serif); font-size: 22px; }
+  .ps-price .row.total .v i { font-style: italic; color: var(--brick); }
+
+  /* Success state */
+  .success { display: none; background: var(--surface); border: 1px solid var(--rule); border-radius: 24px; padding: 64px 48px; text-align: center; }
+  .success.visible { display: block; }
+  .success .check {
+    width: 80px; height: 80px; background: var(--moss); color: white; border-radius: 50%;
+    margin: 0 auto 24px; display: inline-flex; align-items: center; justify-content: center;
+  }
+  .success .check svg { width: 36px; height: 36px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+  .success h2 { font-family: var(--serif); font-size: 52px; line-height: 1; letter-spacing: -0.02em; margin-bottom: 12px; }
+  .success h2 i { font-style: italic; color: var(--brick); }
+  .success p.lead { font-family: var(--serif); font-size: 20px; color: var(--ink-2); line-height: 1.5; max-width: 480px; margin: 0 auto 32px; }
+  .success p.lead i { font-style: italic; color: var(--brick); }
+  .success .recap { background: var(--paper); border-radius: 14px; padding: 24px; text-align: left; max-width: 480px; margin: 0 auto 24px; }
+  .success .recap .r-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13.5px; border-bottom: 1px solid var(--rule-2); }
+  .success .recap .r-row:last-child { border-bottom: none; }
+  .success .recap .l { color: var(--ink-3); }
+  .success .recap .v { font-weight: 500; color: var(--ink); }
+  .success .next-steps { background: var(--paper); border-radius: 14px; padding: 24px; text-align: left; max-width: 480px; margin: 0 auto 32px; }
+  .success .next-steps h4 { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 14px; }
+  .success .next-steps ol { list-style: none; padding: 0; counter-reset: ns; }
+  .success .next-steps li { font-size: 14px; color: var(--ink-2); padding: 8px 0 8px 32px; position: relative; counter-increment: ns; }
+  .success .next-steps li::before { content: counter(ns); position: absolute; left: 0; top: 8px; width: 22px; height: 22px; border-radius: 50%; background: var(--brick); color: white; font-family: var(--mono); font-size: 11px; display: inline-flex; align-items: center; justify-content: center; }
+  .success .actions { display: flex; gap: 12px; justify-content: center; }
+
+  @media (max-width: 900px) {
+    .b-wrap { grid-template-columns: 1fr; }
+    .pside { position: relative; }
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="casa-nav">
+  <a class="brand-lockup" href="index.html">
+    <span class="casa-mark">casa</span><span class="casa-tld">.co.uk</span>
+  </a>
+  <div class="nav-right">
+    <a class="nav-link outline" href="property.html">
+      <svg class="i" viewBox="0 0 24 24"><path d="M19 12H5M11 5l-7 7 7 7"/></svg>
+      Back to property
+    </a>
+  </div>
+</nav>
+
+<div class="b-wrap" id="formWrap">
+
+  <div>
+    <div class="crumb">
+      <a href="index.html">Casa</a><span class="sep">/</span>
+      <a href="browse.html">Browse</a><span class="sep">/</span>
+      <a href="property.html">Stone Cottage, Windermere</a><span class="sep">/</span>
+      <span style="color:var(--ink)">Enquire</span>
+    </div>
+
+    <div class="b-head">
+      <h1>Send <i>Sarah</i> an enquiry.</h1>
+      <p class="lede">Your message goes straight to her inbox &mdash; not ours. There are no booking fees, and payment will be agreed between the two of you.</p>
+    </div>
+
+    <!-- STEPS -->
+    <div class="steps">
+      <div class="step done"><div class="num"><span></span></div><div class="lbl-wrap"><span class="lbl">Property</span><span class="sub">01</span></div></div>
+      <div class="line"></div>
+      <div class="step active"><div class="num">2</div><div class="lbl-wrap"><span class="lbl">Your details</span><span class="sub">02</span></div></div>
+      <div class="line"></div>
+      <div class="step pending"><div class="num">3</div><div class="lbl-wrap"><span class="lbl">Confirm</span><span class="sub">03</span></div></div>
+    </div>
+
+    <!-- SECTION 1: Contact -->
+    <div class="b-sect">
+      <div class="label-row">
+        <span class="num-tag">01</span>
+        <h2>Your <i>contact</i> details</h2>
+        <span class="h-sub">Used only to reach you about this stay</span>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>First name <span style="color:var(--brick)">*</span></label>
+          <input type="text" placeholder="James" id="fname">
+        </div>
+        <div class="field">
+          <label>Last name <span style="color:var(--brick)">*</span></label>
+          <input type="text" placeholder="Harrison" id="lname">
+        </div>
+      </div>
+      <div class="grid-2" style="margin-top: 16px;">
+        <div class="field">
+          <label>Email <span style="color:var(--brick)">*</span></label>
+          <input type="email" placeholder="you@example.com" id="email">
+          <span class="hint">Sarah will reply to this address</span>
+        </div>
+        <div class="field">
+          <label>Phone</label>
+          <input type="tel" placeholder="+44 7700 000000" id="phone">
+          <span class="hint">Optional &mdash; only if you'd like a call</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: Trip -->
+    <div class="b-sect">
+      <div class="label-row">
+        <span class="num-tag">02</span>
+        <h2>Your <i>trip</i></h2>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Check in <span style="color:var(--brick)">*</span></label>
+          <input type="date" id="cin" value="2026-07-12">
+        </div>
+        <div class="field">
+          <label>Check out <span style="color:var(--brick)">*</span></label>
+          <input type="date" id="cout" value="2026-07-19">
+        </div>
+      </div>
+      <div class="grid-2" style="margin-top: 16px;">
+        <div class="field">
+          <label>Guests <span style="color:var(--brick)">*</span></label>
+          <select id="guests">
+            <option>2 adults</option><option>3 adults</option><option>4 adults</option>
+            <option>2 adults, 1 child</option><option>2 adults, 2 children</option>
+            <option>3 adults, 1 child</option><option>4 adults, 2 children</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Pets</label>
+          <select id="pets">
+            <option>No pets</option><option>1 dog</option><option>2 dogs</option><option>Cat</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: Message -->
+    <div class="b-sect">
+      <div class="label-row">
+        <span class="num-tag">03</span>
+        <h2>A short <i>note</i> to Sarah</h2>
+      </div>
+      <div class="field">
+        <label>Tell her about you &amp; your trip <span style="color:var(--brick)">*</span></label>
+        <textarea class="field-ta" id="message" placeholder="Hi Sarah — we'd love to come and stay. We're a family of four with one (very well-behaved) Labrador. Hoping to walk a lot, eat the local pub out of pasties, and let the kids spend most of the holiday in your garden. Any questions for us?"></textarea>
+        <span class="hint">The more she knows, the easier it is to say yes.</span>
+      </div>
+      <div class="field" style="margin-top: 16px">
+        <label>Anything special to request?</label>
+        <textarea class="field-ta" id="special" style="min-height: 80px" placeholder="Early check-in, a cot, step-free access, etc."></textarea>
+      </div>
+    </div>
+
+    <!-- TRUST -->
+    <div class="b-sect">
+      <div class="label-row">
+        <span class="num-tag">04</span>
+        <h2>How <i>direct booking</i> works</h2>
+      </div>
+      <div class="trust-card" style="margin-bottom: 12px">
+        <div class="ti"><svg viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8.5 8 9 4.5-.5 8-4 8-9V6l-8-3z"/><path d="m9 12 2 2 4-4"/></svg></div>
+        <div>
+          <h4>Sarah is a verified host.</h4>
+          <p>Casa has confirmed her identity, her ownership of the property, and her bank details. You can read all 23 of her reviews on the property page.</p>
+        </div>
+      </div>
+      <div class="trust-card">
+        <div class="ti" style="background: var(--ink)"><svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+        <div>
+          <h4 style="color: var(--ink)">Your message is sent encrypted.</h4>
+          <p style="color: var(--ink-2)">Your contact details are only shared with Sarah. Payment will be agreed directly &mdash; bank transfer is most common; she'll send you her details after she accepts.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONSENT + SUBMIT -->
+    <div class="b-sect">
+      <div class="label-row">
+        <span class="num-tag">05</span>
+        <h2>Send the <i>enquiry</i></h2>
+      </div>
+
+      <div class="consent">
+        <input type="checkbox" id="c1">
+        <span>I agree to Casa's <a href="#">community guidelines</a> and <a href="#">terms of use</a>. I understand this is an enquiry &mdash; not a confirmed booking &mdash; until Sarah replies.</span>
+      </div>
+      <div class="consent">
+        <input type="checkbox" id="c2">
+        <span>I understand payment will be arranged <i style="font-family:var(--serif);font-style:italic">directly</i> with Sarah, and Casa does not hold or process funds.</span>
+      </div>
+      <div class="consent">
+        <input type="checkbox" id="c3">
+        <span>I'm happy for my contact details to be shared with Sarah for this enquiry. See our <a href="#">privacy policy</a>.</span>
+      </div>
+
+      <div class="submit-row" style="margin-top: 20px">
+        <button class="submit-cta" onclick="sendEnquiry()">
+          Send to Sarah
+          <svg viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg>
+        </button>
+        <div class="submit-note">No charge to enquire &mdash; Sarah usually replies in under 2 hours.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDE — PROPERTY SUMMARY -->
+  <aside class="pside">
+    <div class="ps-card">
+      <div class="ps-img"><div class="ph warm" data-label="STONE COTTAGE · WINDERMERE"></div></div>
+      <div class="ps-body">
+        <div class="ps-title">Stone Cottage, <i>Windermere</i></div>
+        <div class="ps-loc"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6-7-12a7 7 0 1 1 14 0c0 6-7 12-7 12z"/></svg> Windermere, Lake District</div>
+        <div class="ps-host">
+          <div class="av">S</div>
+          <div class="info">
+            <div class="h">Sarah R. <span class="badge moss" style="margin-left:4px"><svg class="i i-sm" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.6"><path d="m4 12 5 5 11-11"/></svg> Verified</span></div>
+            <div class="m">Host since 2024 · 4.9 ★ (23)</div>
+          </div>
+        </div>
+        <div class="ps-facts">
+          <div class="pf"><div class="n">6</div><div class="l">Guests</div></div>
+          <div class="pf"><div class="n">3</div><div class="l">Bedrooms</div></div>
+          <div class="pf"><div class="n">2</div><div class="l">Baths</div></div>
+        </div>
+      </div>
+      <div class="ps-price">
+        <div class="row"><span>£175 × 7 nights</span><span>£1,225</span></div>
+        <div class="row"><span>Cleaning (set by host)</span><span>£60</span></div>
+        <div class="row zero"><span>Casa booking fee</span><span>£0</span></div>
+        <div class="row save"><span>vs Booking.com</span><span>&minus; £243</span></div>
+        <div class="row total"><span>Total to Sarah</span><span class="v"><i>£1,285</i></span></div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- SUCCESS SCREEN -->
+<div class="b-wrap" id="successWrap" style="display:none">
+  <div class="success visible" style="grid-column: span 2">
+    <div class="check"><svg viewBox="0 0 24 24"><path d="m4 12 5 5 11-11"/></svg></div>
+    <h2>Your enquiry is <i>on its way</i> to Sarah.</h2>
+    <p class="lead">She'll be in touch within a few hours. We'll email you when she replies, and you can pick the conversation up <i>directly with her</i>.</p>
+
+    <div class="recap">
+      <div class="r-row"><span class="l">Property</span><span class="v">Stone Cottage, Windermere</span></div>
+      <div class="r-row"><span class="l">Host</span><span class="v">Sarah R.</span></div>
+      <div class="r-row"><span class="l">Dates</span><span class="v" id="rDates">Sat 12 – Sat 19 Jul 2026</span></div>
+      <div class="r-row"><span class="l">Guests</span><span class="v" id="rGuests">2 adults · 1 dog</span></div>
+      <div class="r-row"><span class="l">Sent to</span><span class="v" id="rEmail">—</span></div>
+      <div class="r-row"><span class="l">Reference</span><span class="v" id="rRef">—</span></div>
+    </div>
+
+    <div class="next-steps">
+      <h4>What happens next</h4>
+      <ol>
+        <li>Sarah confirms availability and replies in your Casa inbox.</li>
+        <li>You agree the final price &amp; payment method (most hosts use bank transfer).</li>
+        <li>You pay her directly. We never see or touch the money.</li>
+        <li>She sends you the address &amp; key collection details, 7 days before you arrive.</li>
+      </ol>
+    </div>
+
+    <div class="actions">
+      <a href="messages.html" class="btn btn-ink btn-lg">
+        <svg class="i" viewBox="0 0 24 24"><path d="M4 5h16v12H8l-4 4z"/></svg>
+        Open inbox
+      </a>
+      <a href="browse.html" class="btn btn-outline btn-lg">
+        Keep browsing
+        <svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+function sendEnquiry() {
+  const required = ['fname','lname','email','cin','cout','message'];
+  let ok = true;
+  required.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el.value.trim()) { el.style.borderColor = 'var(--brick)'; ok = false; }
+    else el.style.borderColor = '';
+  });
+  if (!ok) { alert('Please fill in your name, email, dates, and a short message.'); return; }
+  if (!document.getElementById('c1').checked || !document.getElementById('c2').checked || !document.getElementById('c3').checked) {
+    alert('Please tick the three consent boxes before sending.'); return;
+  }
+
+  const fmt = d => new Date(d).toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+  document.getElementById('rDates').textContent = fmt(document.getElementById('cin').value) + ' → ' + fmt(document.getElementById('cout').value);
+  document.getElementById('rGuests').textContent = document.getElementById('guests').value + (document.getElementById('pets').value !== 'No pets' ? ' · ' + document.getElementById('pets').value : '');
+  document.getElementById('rEmail').textContent = document.getElementById('email').value;
+  document.getElementById('rRef').textContent = 'CSA-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+
+  document.getElementById('formWrap').style.display = 'none';
+  document.getElementById('successWrap').style.display = 'grid';
+  window.scrollTo(0,0);
+}
+</script>
+
+<script src="casa.js"></script>
+</body>
+</html>

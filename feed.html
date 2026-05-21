@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Feed — Casa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="casa.css">
+<style>
+  /* ── Page head ── */
+  .feed-head { padding: 36px 0 24px; border-bottom: 1px solid var(--rule); }
+  .feed-head .top { display: flex; align-items: end; justify-content: space-between; gap: 32px; margin-bottom: 24px; flex-wrap: wrap; }
+  .feed-head h1 { font-family: var(--serif); font-size: 64px; line-height: 0.95; letter-spacing: -0.025em; }
+  .feed-head h1 i { font-style: italic; color: var(--brick); }
+  .feed-head .h-meta { font-size: 13.5px; color: var(--ink-3); text-align: right; }
+  .feed-head .h-meta .n { font-family: var(--serif); font-style: italic; color: var(--brick); font-size: 22px; }
+
+  /* County tabs — pill row */
+  .county-bar { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px 0; }
+  .county-bar::-webkit-scrollbar { display: none; }
+  .county-pill {
+    flex-shrink: 0; padding: 9px 16px; border-radius: 999px;
+    background: var(--surface); border: 1px solid var(--rule);
+    font-size: 13px; color: var(--ink-2); cursor: pointer; white-space: nowrap;
+    transition: all .12s; display: inline-flex; align-items: center; gap: 6px;
+    text-decoration: none;
+  }
+  .county-pill:hover { border-color: var(--ink); color: var(--ink); }
+  .county-pill.active { background: var(--ink); color: var(--paper); border-color: var(--ink); font-weight: 500; }
+  .county-pill .ct { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; opacity: 0.55; }
+
+  /* ── Layout ── */
+  .feed-layout { display: grid; grid-template-columns: 240px 1fr 320px; gap: 32px; padding: 28px 0 80px; }
+
+  /* LEFT — type filter + nation */
+  .feed-side { position: sticky; top: 88px; height: fit-content; }
+  .side-sect { margin-bottom: 28px; }
+  .side-sect h5 { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 10px; padding-left: 12px; }
+  .side-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; border-radius: 9px;
+    font-size: 13.5px; color: var(--ink-2); text-decoration: none;
+    transition: background .1s; cursor: pointer;
+    border: none; background: none; width: 100%; text-align: left;
+    font-family: var(--sans);
+  }
+  .side-link:hover { background: var(--surface); color: var(--ink); }
+  .side-link.active { background: var(--brick-pale); color: var(--brick-text); font-weight: 500; }
+  .side-link.active svg { color: var(--brick); }
+  .side-link svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.6; flex-shrink: 0; }
+  .side-link .ct { margin-left: auto; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; color: var(--ink-4); }
+  .side-link.active .ct { color: var(--brick); }
+
+  /* ── MIDDLE — feed ── */
+  .feed-col { min-width: 0; }
+
+  /* Compose */
+  .compose {
+    background: var(--surface); border: 1px solid var(--rule);
+    border-radius: 16px; padding: 18px 20px; margin-bottom: 20px;
+  }
+  .compose .row1 { display: flex; gap: 12px; align-items: flex-start; }
+  .compose .av { width: 40px; height: 40px; border-radius: 50%; background: var(--brick); color: white; display: inline-flex; align-items: center; justify-content: center; font-family: var(--serif); font-style: italic; font-size: 17px; flex-shrink: 0; }
+  .compose textarea {
+    flex: 1; border: none; background: transparent; outline: none; resize: none;
+    font-family: var(--sans); font-size: 14.5px; color: var(--ink); padding: 8px 0 4px;
+    min-height: 50px; line-height: 1.5;
+  }
+  .compose textarea::placeholder { color: var(--ink-4); }
+  .compose textarea::placeholder i { font-style: italic; color: var(--brick); }
+  .compose .row2 { display: flex; align-items: center; gap: 6px; padding-top: 10px; margin-top: 10px; border-top: 1px solid var(--rule); }
+  .compose .post-type-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 10px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--rule); background: transparent;
+    font-family: var(--sans); font-size: 12px; color: var(--ink-3);
+    transition: all .12s;
+  }
+  .compose .post-type-pill:hover { border-color: var(--ink); color: var(--ink); }
+  .compose .post-type-pill.on { background: var(--brick-pale); color: var(--brick-text); border-color: var(--brick); }
+  .compose .post-type-pill svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 1.6; }
+  .compose .post-btn {
+    margin-left: auto; background: var(--brick); color: white;
+    border: none; border-radius: 999px; padding: 8px 18px;
+    font-family: var(--sans); font-size: 13.5px; font-weight: 500; cursor: pointer;
+    transition: background .12s;
+  }
+  .compose .post-btn:hover { background: var(--brick-2); }
+
+  /* Tabs */
+  .feed-tabs {
+    display: flex; gap: 0; align-items: center; margin-bottom: 18px;
+    border-bottom: 1px solid var(--rule); padding-bottom: 0;
+  }
+  .feed-tab {
+    padding: 12px 18px; font-size: 13.5px; color: var(--ink-3);
+    cursor: pointer; border-bottom: 2px solid transparent;
+    margin-bottom: -1px; transition: color .12s, border-color .12s;
+    background: none; border-left: none; border-right: none; border-top: none;
+    font-family: var(--sans);
+  }
+  .feed-tab:hover { color: var(--ink); }
+  .feed-tab.active { color: var(--brick); border-bottom-color: var(--brick); font-weight: 500; }
+  .feed-tab .ct { font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; opacity: 0.55; margin-left: 4px; }
+  .feed-sort-spacer { flex: 1; }
+  .feed-sort { display: flex; align-items: center; gap: 6px; padding: 8px 12px; font-size: 12.5px; color: var(--ink-3); }
+  .feed-sort select { border: none; background: transparent; font-family: var(--sans); font-size: 12.5px; color: var(--ink); font-weight: 500; outline: none; cursor: pointer; }
+
+  /* Post card */
+  .post {
+    background: var(--surface); border: 1px solid var(--rule);
+    border-radius: 16px; margin-bottom: 14px; overflow: hidden;
+    transition: border-color .15s;
+  }
+  .post:hover { border-color: var(--rule-3); }
+  .post .ph-head { display: flex; align-items: center; gap: 12px; padding: 16px 20px 4px; }
+  .post .av {
+    width: 40px; height: 40px; border-radius: 50%; background: var(--brick); color: white;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--serif); font-style: italic; font-size: 16px; flex-shrink: 0;
+  }
+  .post .av.guest { background: var(--moss); }
+  .post .av.ink { background: var(--ink); }
+  .post .who { flex: 1; min-width: 0; }
+  .post .who .nm { display: flex; align-items: center; gap: 6px; font-size: 14px; flex-wrap: wrap; }
+  .post .who .nm .name { font-weight: 500; color: var(--ink); }
+  .post .who .nm .name i { font-style: italic; color: var(--brick); font-weight: 400; }
+  .post .who .meta-line { font-size: 11.5px; color: var(--ink-3); margin-top: 1px; display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+  .post .who .meta-line .when { font-family: var(--mono); letter-spacing: 0.06em; font-size: 10px; text-transform: uppercase; }
+  .post .who .meta-line .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--ink-4); }
+  .post .more-btn { background: none; border: none; color: var(--ink-4); cursor: pointer; padding: 6px; }
+  .post .more-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+
+  .post .body { padding: 6px 20px 14px; font-size: 14.5px; line-height: 1.55; color: var(--ink); }
+  .post .body i.tag { font-style: italic; color: var(--brick); cursor: pointer; font-weight: 400; }
+  .post .body i.tag:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .post .body p + p { margin-top: 6px; }
+
+  /* Post type — small label */
+  .post-type {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 4px; margin-right: 4px;
+  }
+  .post-type.avail { background: var(--brick-pale); color: var(--brick-text); }
+  .post-type.looking { background: var(--moss-pale); color: var(--moss); }
+  .post-type.review { background: rgba(184,150,86,0.18); color: #7C6432; }
+  .post-type.tip { background: rgba(22,20,15,0.08); color: var(--ink-2); }
+  .post-type.photo { background: rgba(176,85,51,0.16); color: var(--brick); }
+  .post-type svg { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+  /* Attached property */
+  .post-prop {
+    margin: 0 20px 14px; display: flex; gap: 12px;
+    background: var(--paper); border: 1px solid var(--rule); border-radius: 12px; padding: 10px;
+    text-decoration: none; color: inherit; cursor: pointer; transition: border-color .12s;
+  }
+  .post-prop:hover { border-color: var(--ink); }
+  .post-prop .pi { width: 80px; height: 64px; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
+  .post-prop .pi .ph { width: 100%; height: 100%; }
+  .post-prop .pinfo { flex: 1; min-width: 0; }
+  .post-prop .pname { font-family: var(--serif); font-size: 16px; line-height: 1.1; margin-bottom: 2px; }
+  .post-prop .pname i { font-style: italic; color: var(--brick); }
+  .post-prop .pdets { font-size: 11.5px; color: var(--ink-3); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .post-prop .pdets svg { width: 10px; height: 10px; stroke: currentColor; fill: none; stroke-width: 1.6; }
+  .post-prop .price-pill { font-family: var(--serif); font-size: 17px; align-self: center; padding: 0 6px; }
+  .post-prop .price-pill i { font-style: italic; color: var(--brick); }
+  .post-prop .price-pill .per { font-family: var(--sans); font-style: normal; font-size: 10px; color: var(--ink-3); margin-left: 2px; }
+
+  /* Image attachment */
+  .post-images { display: grid; gap: 4px; margin: 0 20px 14px; border-radius: 12px; overflow: hidden; }
+  .post-images.one { grid-template-columns: 1fr; }
+  .post-images.two { grid-template-columns: 1fr 1fr; }
+  .post-images.three { grid-template-columns: 1fr 1fr 1fr; }
+  .post-images.four { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+  .post-images .ph { aspect-ratio: 4/3; }
+  .post-images.one .ph { aspect-ratio: 16/9; }
+
+  /* Review specific */
+  .post-review {
+    margin: 0 20px 14px; padding: 14px 16px; background: var(--paper);
+    border-left: 3px solid var(--brick); border-radius: 0 12px 12px 0;
+  }
+  .post-review .rating { display: inline-flex; gap: 2px; margin-bottom: 8px; }
+  .post-review .rating svg { width: 14px; height: 14px; fill: var(--brick); stroke: none; }
+  .post-review p { font-family: var(--serif); font-size: 16px; line-height: 1.5; color: var(--ink); margin-bottom: 8px; }
+  .post-review p i { font-style: italic; color: var(--brick); }
+  .post-review .stayed-meta { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
+
+  /* Actions */
+  .post-actions { display: flex; align-items: center; padding: 6px 12px 10px; gap: 2px; border-top: 1px solid var(--rule-2); margin-top: 4px; }
+  .post-action {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 8px; cursor: pointer;
+    background: none; border: none; font-family: var(--sans); font-size: 12.5px;
+    color: var(--ink-3); transition: background .1s, color .1s;
+  }
+  .post-action:hover { background: var(--paper); color: var(--ink); }
+  .post-action.saved { color: var(--brick); }
+  .post-action svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.6; }
+  .post-action.liked svg { fill: var(--brick); stroke: var(--brick); }
+  .post-action .ct { font-family: var(--mono); font-size: 10px; letter-spacing: 0.04em; opacity: 0.7; }
+  .post-action.enquire { margin-left: auto; background: var(--brick); color: white; padding: 6px 14px; font-size: 12.5px; font-weight: 500; }
+  .post-action.enquire:hover { background: var(--brick-2); color: white; }
+
+  /* ── RIGHT — county info ── */
+  .feed-aside { position: sticky; top: 88px; height: fit-content; }
+  .county-card {
+    background: var(--ink); color: var(--paper);
+    border-radius: 18px; padding: 24px; margin-bottom: 14px;
+    position: relative; overflow: hidden;
+  }
+  .county-card::before {
+    content: ''; position: absolute; right: -40px; top: -40px;
+    width: 180px; height: 180px; border-radius: 50%;
+    background: radial-gradient(circle at center, rgba(176,85,51,0.22), transparent 65%);
+  }
+  .county-card .eye { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 8px; position: relative; }
+  .county-card h3 { font-family: var(--serif); font-size: 38px; line-height: 0.95; letter-spacing: -0.02em; margin-bottom: 8px; position: relative; }
+  .county-card h3 i { font-style: italic; color: var(--brick-2); }
+  .county-card p { font-size: 13.5px; line-height: 1.5; color: rgba(255,255,255,0.75); margin-bottom: 16px; position: relative; }
+  .county-card p i { font-style: italic; color: var(--brick-2); }
+  .county-card .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.12); position: relative; }
+  .county-card .stat .n { font-family: var(--serif); font-style: italic; color: var(--brick-2); font-size: 22px; line-height: 1; }
+  .county-card .stat .l { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-top: 4px; }
+
+  .aside-block { background: var(--surface); border: 1px solid var(--rule); border-radius: 14px; padding: 18px 20px; margin-bottom: 14px; }
+  .aside-block h4 { font-family: var(--serif); font-size: 18px; line-height: 1; margin-bottom: 12px; }
+  .aside-block h4 i { font-style: italic; color: var(--brick); }
+  .aside-block .trend-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; color: var(--ink-2); border-top: 1px solid var(--rule-2); cursor: pointer; }
+  .aside-block .trend-row:first-of-type { border-top: 1px solid var(--rule); padding-top: 10px; margin-top: 4px; }
+  .aside-block .trend-row:hover .tn { color: var(--brick); }
+  .aside-block .trend-row .tn { font-family: var(--serif); font-style: italic; color: var(--brick); transition: color .12s; }
+  .aside-block .trend-row .tc { font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; color: var(--ink-4); }
+
+  /* Active hosts */
+  .ah-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--rule-2); }
+  .ah-row:first-of-type { border-top: 1px solid var(--rule); padding-top: 10px; margin-top: 4px; }
+  .ah-row .av { width: 32px; height: 32px; border-radius: 50%; background: var(--brick); color: white; display: inline-flex; align-items: center; justify-content: center; font-family: var(--serif); font-style: italic; font-size: 13px; flex-shrink: 0; }
+  .ah-row .info { flex: 1; min-width: 0; }
+  .ah-row .info .n { font-size: 13px; font-weight: 500; }
+  .ah-row .info .n i { font-style: italic; color: var(--brick); font-weight: 400; }
+  .ah-row .info .m { font-size: 10.5px; color: var(--ink-3); font-family: var(--mono); letter-spacing: 0.06em; text-transform: uppercase; }
+  .ah-row .follow-btn { font-size: 11px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--rule-3); background: transparent; cursor: pointer; color: var(--ink-2); font-family: var(--sans); }
+  .ah-row .follow-btn:hover { background: var(--ink); color: white; border-color: var(--ink); }
+  .ah-row .follow-btn.following { background: var(--moss-pale); color: var(--moss); border-color: var(--moss-pale); }
+
+  /* Live notice */
+  .live-notice {
+    background: var(--brick); color: white;
+    border-radius: 14px; padding: 14px 16px; margin-bottom: 14px;
+    font-size: 13px; display: flex; gap: 10px; align-items: flex-start;
+  }
+  .live-notice .ic { width: 28px; height: 28px; background: rgba(255,255,255,0.15); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .live-notice .ic svg { width: 14px; height: 14px; stroke: white; fill: none; stroke-width: 1.8; }
+  .live-notice strong { font-family: var(--serif); font-style: italic; font-weight: 400; }
+
+  @media (max-width: 1100px) {
+    .feed-layout { grid-template-columns: 1fr; }
+    .feed-side { position: relative; }
+    .feed-aside { position: relative; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="casa-nav">
+  <a class="brand-lockup" href="index.html">
+    <span class="casa-mark">casa</span><span class="casa-tld">.co.uk</span>
+  </a>
+  <div class="nav-right">
+    <a class="nav-link" href="browse.html">Browse</a>
+    <a class="nav-link" href="map.html">Map</a>
+    <a class="nav-link" href="feed.html" style="color:var(--brick);font-weight:500">Feed</a>
+    <a class="nav-link" href="list.html">Become a host</a>
+    <a class="nav-link" href="messages.html"><svg class="i" viewBox="0 0 24 24"><path d="M4 5h16v12H8l-4 4z"/></svg></a>
+    <a class="nav-link" href="saved.html"><svg class="i" viewBox="0 0 24 24"><path d="M12 20s-7-4.5-9.5-9c-1.5-2.8.4-6 3.5-6 1.8 0 3.2 1 4 2.5C10.8 6 12.2 5 14 5c3.1 0 5 3.2 3.5 6C15 15.5 12 20 12 20z"/></svg></a>
+    <a class="nav-link" href="profile.html"><span class="nav-avatar">J</span></a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- HEAD -->
+  <div class="feed-head">
+    <div class="top">
+      <div>
+        <div class="eyebrow">Community feed &mdash; <a href="#" style="color:inherit;text-decoration:none">Cumbria</a> &mdash; Lake District</div>
+        <h1 style="margin-top:8px">The <i>Cumbria</i> feed.</h1>
+      </div>
+      <div class="h-meta">
+        <div><span class="n">214 stays</span> · 1,438 members · 312 active this week</div>
+        <div style="margin-top:6px;color:var(--ink-4);font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase">18 new posts today</div>
+      </div>
+    </div>
+
+    <!-- County row -->
+    <div class="county-bar">
+      <a class="county-pill" href="#">All UK <span class="ct">4,202</span></a>
+      <a class="county-pill active">Cumbria <span class="ct">214</span></a>
+      <a class="county-pill" href="#">Cornwall <span class="ct">198</span></a>
+      <a class="county-pill" href="#">Devon <span class="ct">76</span></a>
+      <a class="county-pill" href="#">Gloucestershire <span class="ct">87</span></a>
+      <a class="county-pill" href="#">Yorkshire <span class="ct">98</span></a>
+      <a class="county-pill" href="#">Norfolk <span class="ct">112</span></a>
+      <a class="county-pill" href="#">Kent <span class="ct">41</span></a>
+      <a class="county-pill" href="#">Sussex <span class="ct">63</span></a>
+      <a class="county-pill" href="#">Pembrokeshire <span class="ct">48</span></a>
+      <a class="county-pill" href="#">Gwynedd <span class="ct">54</span></a>
+      <a class="county-pill" href="#">Highland <span class="ct">145</span></a>
+      <a class="county-pill" href="#">Argyll <span class="ct">62</span></a>
+      <a class="county-pill" href="#">Antrim <span class="ct">29</span></a>
+    </div>
+  </div>
+
+  <!-- LAYOUT -->
+  <div class="feed-layout">
+
+    <!-- LEFT — type filter -->
+    <aside class="feed-side">
+      <div class="side-sect">
+        <h5>What you'll see</h5>
+        <button class="side-link active">
+          <svg viewBox="0 0 24 24"><path d="M3 10h18M5 10l2-5h10l2 5M5 10v9h14v-9M9 14h6"/></svg>
+          All posts
+          <span class="ct">312</span>
+        </button>
+        <button class="side-link">
+          <svg viewBox="0 0 24 24"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg>
+          Availability
+          <span class="ct">48</span>
+        </button>
+        <button class="side-link">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          Looking for
+          <span class="ct">26</span>
+        </button>
+        <button class="side-link">
+          <svg viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 1-5 5 1.5 7L12 18l-6.5 3.5L7 14.5l-5-5 7-1z"/></svg>
+          Reviews &amp; stays
+          <span class="ct">94</span>
+        </button>
+        <button class="side-link">
+          <svg viewBox="0 0 24 24"><path d="M3 20 9 10l4 6 2-3 6 7z"/></svg>
+          Local picks
+          <span class="ct">63</span>
+        </button>
+        <button class="side-link">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 16-6-6-9 11"/></svg>
+          Photos
+          <span class="ct">81</span>
+        </button>
+      </div>
+
+      <div class="side-sect">
+        <h5>Following</h5>
+        <button class="side-link">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.5"/><path d="M5 21c0-4 3-7 7-7s7 3 7 7"/></svg>
+          People you follow
+          <span class="ct">23</span>
+        </button>
+        <button class="side-link">
+          <svg viewBox="0 0 24 24"><path d="M3 6h2l3 12 2-8 4 12 2-12 2 8 3-12h2"/></svg>
+          Hashtags
+          <span class="ct">12</span>
+        </button>
+        <button class="side-link">
+          <svg viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>
+          Counties
+          <span class="ct">4</span>
+        </button>
+      </div>
+
+      <div class="side-sect">
+        <h5>Popular tags</h5>
+        <button class="side-link"><span style="font-family:var(--serif);font-style:italic;color:var(--brick)">#cottage</span><span class="ct">341</span></button>
+        <button class="side-link"><span style="font-family:var(--serif);font-style:italic;color:var(--brick)">#petfriendly</span><span class="ct">134</span></button>
+        <button class="side-link"><span style="font-family:var(--serif);font-style:italic;color:var(--brick)">#seaview</span><span class="ct">156</span></button>
+        <button class="side-link"><span style="font-family:var(--serif);font-style:italic;color:var(--brick)">#woodburner</span><span class="ct">71</span></button>
+        <button class="side-link"><span style="font-family:var(--serif);font-style:italic;color:var(--brick)">#offgrid</span><span class="ct">62</span></button>
+        <button class="side-link"><span style="font-family:var(--serif);font-style:italic;color:var(--brick)">#lastminute</span><span class="ct">67</span></button>
+      </div>
+    </aside>
+
+    <!-- MIDDLE — feed -->
+    <main class="feed-col">
+
+      <!-- Compose -->
+      <div class="compose">
+        <div class="row1">
+          <div class="av">J</div>
+          <textarea placeholder="Share something with the Cumbria community — availability, a tip, a place you loved…"></textarea>
+        </div>
+        <div class="row2">
+          <button class="post-type-pill on"><svg viewBox="0 0 24 24"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg> Availability</button>
+          <button class="post-type-pill"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg> Looking</button>
+          <button class="post-type-pill"><svg viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 1-5 5 1.5 7L12 18l-6.5 3.5L7 14.5l-5-5 7-1z"/></svg> Review</button>
+          <button class="post-type-pill"><svg viewBox="0 0 24 24"><path d="M3 20 9 10l4 6 2-3 6 7z"/></svg> Local tip</button>
+          <button class="post-type-pill"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 16-6-6-9 11"/></svg> Photo</button>
+          <button class="post-btn">Post</button>
+        </div>
+      </div>
+
+      <!-- Live notice -->
+      <div class="live-notice">
+        <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+        <div><strong>3 new posts</strong> in the last hour &mdash; refresh to load.</div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="feed-tabs">
+        <button class="feed-tab active">All <span class="ct">312</span></button>
+        <button class="feed-tab">For you <span class="ct">24</span></button>
+        <button class="feed-tab">From hosts <span class="ct">148</span></button>
+        <button class="feed-tab">From guests <span class="ct">164</span></button>
+        <span class="feed-sort-spacer"></span>
+        <div class="feed-sort">
+          <span>Sort by</span>
+          <select>
+            <option>Most recent</option>
+            <option>Most liked</option>
+            <option>Most replies</option>
+            <option>Hosts only</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- POST 1: Availability with property -->
+      <article class="post">
+        <div class="ph-head">
+          <div class="av">S</div>
+          <div class="who">
+            <div class="nm">
+              <span class="name">Sarah R. <i>Stone Cottage</i></span>
+              <span class="badge moss"><svg class="i i-sm" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.6"><path d="m4 12 5 5 11-11"/></svg> Host</span>
+            </div>
+            <div class="meta-line">
+              <span class="post-type avail"><svg viewBox="0 0 24 24"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg> Availability</span>
+              <span class="when">2 hrs ago</span>
+              <span class="dot"></span>
+              <span>Windermere, Cumbria</span>
+            </div>
+          </div>
+          <button class="more-btn"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/></svg></button>
+        </div>
+        <div class="body">
+          <p>Just got a cancellation &mdash; <i class="tag">12&ndash;19 July</i> is now open at Stone Cottage. Sleeps 6, wood burner, dogs welcome. <strong style="font-family:var(--serif);font-style:italic;color:var(--brick);font-weight:400">£175/night</strong> &mdash; pay direct, zero fees.</p>
+          <p style="margin-top:8px"><i class="tag">#lakedistrict</i> <i class="tag">#cottage</i> <i class="tag">#petfriendly</i> <i class="tag">#lastminute</i></p>
+        </div>
+        <a class="post-prop" href="property.html">
+          <div class="pi"><div class="ph warm" data-label="STONE COTTAGE"></div></div>
+          <div class="pinfo">
+            <div class="pname">Stone Cottage, <i>Windermere</i></div>
+            <div class="pdets">
+              <span><svg viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 1-5 5 1.5 7L12 18l-6.5 3.5L7 14.5l-5-5 7-1z" fill="currentColor" stroke="none"/></svg> 4.9</span>
+              <span>·</span><span>Sleeps 6 · 3 bed</span>
+              <span>·</span><span>Pets ok</span>
+            </div>
+          </div>
+          <div class="price-pill"><i>£175</i><span class="per">/night</span></div>
+        </a>
+        <div class="post-actions">
+          <button class="post-action liked"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.5-9.5-9c-1.5-2.8.4-6 3.5-6 1.8 0 3.2 1 4 2.5C10.8 6 12.2 5 14 5c3.1 0 5 3.2 3.5 6C15 15.5 12 20 12 20z"/></svg> <span class="ct">34</span></button>
+          <button class="post-action"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.4 7.3L4 21l1.7-5.6A8 8 0 1 1 21 12z"/></svg> <span class="ct">12 replies</span></button>
+          <button class="post-action"><svg viewBox="0 0 24 24"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg> Share</button>
+          <button class="post-action saved"><svg viewBox="0 0 24 24"><path d="M6 4h12v17l-6-4-6 4z" fill="currentColor"/></svg> Saved</button>
+          <a class="post-action enquire" href="booking.html">Enquire to book →</a>
+        </div>
+      </article>
+
+      <!-- POST 2: Looking for -->
+      <article class="post">
+        <div class="ph-head">
+          <div class="av guest">L</div>
+          <div class="who">
+            <div class="nm">
+              <span class="name">Laura P. <i>looking for August</i></span>
+              <span class="badge">Guest</span>
+            </div>
+            <div class="meta-line">
+              <span class="post-type looking"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg> Looking</span>
+              <span class="when">5 hrs ago</span>
+              <span class="dot"></span>
+              <span>Looking in Cumbria</span>
+            </div>
+          </div>
+          <button class="more-btn"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/></svg></button>
+        </div>
+        <div class="body">
+          <p>Group of 8 looking for a place in the Lakes for the <i class="tag">August bank holiday</i> (27&ndash;31 Aug). Needs to be dog-friendly (one Labrador), with parking for 3 cars and ideally walking distance to a pub. Budget ~<strong style="font-family:var(--serif);font-style:italic;color:var(--brick);font-weight:400">£250/night</strong>.</p>
+          <p style="margin-top:8px">Hosts &mdash; drop your links below 👇</p>
+          <p style="margin-top:8px"><i class="tag">#lakedistrict</i> <i class="tag">#groups</i> <i class="tag">#petfriendly</i></p>
+        </div>
+        <div class="post-actions">
+          <button class="post-action"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.5-9.5-9c-1.5-2.8.4-6 3.5-6 1.8 0 3.2 1 4 2.5C10.8 6 12.2 5 14 5c3.1 0 5 3.2 3.5 6C15 15.5 12 20 12 20z"/></svg> <span class="ct">8</span></button>
+          <button class="post-action"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.4 7.3L4 21l1.7-5.6A8 8 0 1 1 21 12z"/></svg> <span class="ct">17 replies</span></button>
+          <button class="post-action"><svg viewBox="0 0 24 24"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg> Share</button>
+          <button class="post-action"><svg viewBox="0 0 24 24"><path d="M6 4h12v17l-6-4-6 4z"/></svg> Save</button>
+          <button class="post-action enquire" style="background: var(--ink)">Reply with a listing →</button>
+        </div>
+      </article>
+
+      <!-- POST 3: Review -->
+      <article class="post">
+        <div class="ph-head">
+          <div class="av guest">M</div>
+          <div class="who">
+            <div class="nm">
+              <span class="name">Marcus J.</span>
+              <span class="badge">Guest</span>
+            </div>
+            <div class="meta-line">
+              <span class="post-type review"><svg viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 1-5 5 1.5 7L12 18l-6.5 3.5L7 14.5l-5-5 7-1z"/></svg> Review</span>
+              <span class="when">Yesterday</span>
+              <span class="dot"></span>
+              <span>Stayed at Granary, Hawkshead</span>
+            </div>
+          </div>
+        </div>
+        <div class="post-review">
+          <div class="rating">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 1-5 5 1.5 7L12 18l-6.5 3.5L7 14.5l-5-5 7-1z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 1-5 5 1.5 7L12 18l-6.5 3.5L7 14.5l-5-5 7-1z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 1-5 5 1.5 7L12 18l-6.5 3.5L7 14.5l-5-5 7-1z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 1-5 5 1.5 7L12 18l-6.5 3.5L7 14.5l-5-5 7-1z"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 1-5 5 1.5 7L12 18l-6.5 3.5L7 14.5l-5-5 7-1z"/></svg>
+          </div>
+          <p>"Just back from a week at <i>The Granary</i>. Hannah was the easiest host we've ever booked with &mdash; quick to reply, generous with local tips, and the cottage itself is exactly as photographed. The walk down to Tarn Hows is 20 minutes from the front door. <i>Cannot recommend this enough.</i>"</p>
+          <div class="stayed-meta">Stayed 22&ndash;29 Jun &middot; 4 adults, 1 dog &middot; £1,365 total</div>
+        </div>
+        <a class="post-prop" href="property.html">
+          <div class="pi"><div class="ph brick" data-label="THE GRANARY"></div></div>
+          <div class="pinfo">
+            <div class="pname">The Granary, <i>Hawkshead</i></div>
+            <div class="pdets">
+              <span><svg viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 1-5 5 1.5 7L12 18l-6.5 3.5L7 14.5l-5-5 7-1z" fill="currentColor" stroke="none"/></svg> 4.9 · 56</span>
+              <span>·</span><span>Sleeps 5</span>
+            </div>
+          </div>
+          <div class="price-pill"><i>£195</i><span class="per">/night</span></div>
+        </a>
+        <div class="post-actions">
+          <button class="post-action liked"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.5-9.5-9c-1.5-2.8.4-6 3.5-6 1.8 0 3.2 1 4 2.5C10.8 6 12.2 5 14 5c3.1 0 5 3.2 3.5 6C15 15.5 12 20 12 20z"/></svg> <span class="ct">52</span></button>
+          <button class="post-action"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.4 7.3L4 21l1.7-5.6A8 8 0 1 1 21 12z"/></svg> <span class="ct">9</span></button>
+          <button class="post-action"><svg viewBox="0 0 24 24"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg> Share</button>
+          <button class="post-action"><svg viewBox="0 0 24 24"><path d="M6 4h12v17l-6-4-6 4z"/></svg> Save</button>
+        </div>
+      </article>
+
+      <!-- POST 4: Photo / general -->
+      <article class="post">
+        <div class="ph-head">
+          <div class="av ink">T</div>
+          <div class="who">
+            <div class="nm">
+              <span class="name">Tom &amp; Anna <i>Shepherd's Hut</i></span>
+              <span class="badge moss"><svg class="i i-sm" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.6"><path d="m4 12 5 5 11-11"/></svg> Host</span>
+            </div>
+            <div class="meta-line">
+              <span class="post-type photo"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 16-6-6-9 11"/></svg> Photo</span>
+              <span class="when">Yesterday</span>
+              <span class="dot"></span>
+              <span>Buttermere, Cumbria</span>
+            </div>
+          </div>
+        </div>
+        <div class="body">
+          <p>Buttermere this morning &mdash; the fells in the cloud and not a soul on the lake. <i class="tag">June</i> here is the secret time. Hut is open from <i class="tag">15 July</i>.</p>
+          <p style="margin-top:8px"><i class="tag">#buttermere</i> <i class="tag">#lakedistrict</i> <i class="tag">#offgrid</i></p>
+        </div>
+        <div class="post-images three">
+          <div class="ph cool" data-label="LAKE · MORNING MIST"></div>
+          <div class="ph sage" data-label="HUT FROM ABOVE"></div>
+          <div class="ph dusk" data-label="FELLS · DUSK"></div>
+        </div>
+        <div class="post-actions">
+          <button class="post-action"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.5-9.5-9c-1.5-2.8.4-6 3.5-6 1.8 0 3.2 1 4 2.5C10.8 6 12.2 5 14 5c3.1 0 5 3.2 3.5 6C15 15.5 12 20 12 20z"/></svg> <span class="ct">87</span></button>
+          <button class="post-action"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.4 7.3L4 21l1.7-5.6A8 8 0 1 1 21 12z"/></svg> <span class="ct">14</span></button>
+          <button class="post-action"><svg viewBox="0 0 24 24"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg> Share</button>
+          <button class="post-action saved"><svg viewBox="0 0 24 24"><path d="M6 4h12v17l-6-4-6 4z" fill="currentColor"/></svg> Saved</button>
+          <a class="post-action enquire" href="property.html">View hut →</a>
+        </div>
+      </article>
+
+      <!-- POST 5: Local tip -->
+      <article class="post">
+        <div class="ph-head">
+          <div class="av guest">H</div>
+          <div class="who">
+            <div class="nm">
+              <span class="name">Hannah F.</span>
+              <span class="badge">Guest</span>
+            </div>
+            <div class="meta-line">
+              <span class="post-type tip"><svg viewBox="0 0 24 24"><path d="M3 20 9 10l4 6 2-3 6 7z"/></svg> Local pick</span>
+              <span class="when">2 days ago</span>
+              <span class="dot"></span>
+              <span>Coniston, Cumbria</span>
+            </div>
+          </div>
+        </div>
+        <div class="body">
+          <p>For anyone going to <i class="tag">Coniston</i> &mdash; if you can get there before 8am, the climb up the <i>Old Man</i> from Walna Scar is magic, almost empty, and you'll be back down for coffee at Black Bull by 11. Park at the top of Walna Scar Road (free), not the village (£10).</p>
+          <p style="margin-top:8px"><i class="tag">#coniston</i> <i class="tag">#oldmanofconiston</i> <i class="tag">#walks</i></p>
+        </div>
+        <div class="post-actions">
+          <button class="post-action liked"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.5-9.5-9c-1.5-2.8.4-6 3.5-6 1.8 0 3.2 1 4 2.5C10.8 6 12.2 5 14 5c3.1 0 5 3.2 3.5 6C15 15.5 12 20 12 20z"/></svg> <span class="ct">128</span></button>
+          <button class="post-action"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.4 7.3L4 21l1.7-5.6A8 8 0 1 1 21 12z"/></svg> <span class="ct">31</span></button>
+          <button class="post-action"><svg viewBox="0 0 24 24"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg> Share</button>
+          <button class="post-action"><svg viewBox="0 0 24 24"><path d="M6 4h12v17l-6-4-6 4z"/></svg> Save</button>
+        </div>
+      </article>
+
+      <!-- POST 6: Host quick availability without property card -->
+      <article class="post">
+        <div class="ph-head">
+          <div class="av">F</div>
+          <div class="who">
+            <div class="nm">
+              <span class="name">Fiona C.</span>
+              <span class="badge moss"><svg class="i i-sm" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.6"><path d="m4 12 5 5 11-11"/></svg> Host</span>
+            </div>
+            <div class="meta-line">
+              <span class="post-type avail"><svg viewBox="0 0 24 24"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg> Availability</span>
+              <span class="when">3 days ago</span>
+              <span class="dot"></span>
+              <span>Keswick, Cumbria</span>
+            </div>
+          </div>
+        </div>
+        <div class="body">
+          <p>Mid-week deals at the Keswick cottage all of <i class="tag">September</i> &mdash; 3 nights for the price of 2. Sleeps 4, family-friendly, walking distance to town. DM for dates. <i class="tag">#keswick</i> <i class="tag">#midweek</i></p>
+        </div>
+        <div class="post-actions">
+          <button class="post-action"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.5-9.5-9c-1.5-2.8.4-6 3.5-6 1.8 0 3.2 1 4 2.5C10.8 6 12.2 5 14 5c3.1 0 5 3.2 3.5 6C15 15.5 12 20 12 20z"/></svg> <span class="ct">18</span></button>
+          <button class="post-action"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.4 7.3L4 21l1.7-5.6A8 8 0 1 1 21 12z"/></svg> <span class="ct">5</span></button>
+          <button class="post-action"><svg viewBox="0 0 24 24"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v14"/></svg> Share</button>
+          <button class="post-action"><svg viewBox="0 0 24 24"><path d="M6 4h12v17l-6-4-6 4z"/></svg> Save</button>
+        </div>
+      </article>
+
+      <div style="text-align: center; margin-top: 24px;">
+        <button class="btn btn-outline">Load more posts</button>
+      </div>
+
+    </main>
+
+    <!-- RIGHT — county info -->
+    <aside class="feed-aside">
+
+      <div class="county-card">
+        <div class="eye">About this county</div>
+        <h3>Welcome to <i>Cumbria</i>.</h3>
+        <p>Home to the <i>Lake District</i> National Park &mdash; the highest fells in England, 16 lakes, and the deepest concentration of independent stays on Casa.</p>
+        <div class="stats">
+          <div class="stat"><div class="n">214</div><div class="l">Stays</div></div>
+          <div class="stat"><div class="n">1.4k</div><div class="l">Members</div></div>
+          <div class="stat"><div class="n">£85+</div><div class="l">From / night</div></div>
+        </div>
+      </div>
+
+      <div class="aside-block">
+        <h4>Trending <i>hashtags</i></h4>
+        <div class="trend-row"><span class="tn">#lakedistrict</span><span class="tc">214 posts</span></div>
+        <div class="trend-row"><span class="tn">#windermere</span><span class="tc">78 posts</span></div>
+        <div class="trend-row"><span class="tn">#cottage</span><span class="tc">61 posts</span></div>
+        <div class="trend-row"><span class="tn">#oldmanofconiston</span><span class="tc">48 posts</span></div>
+        <div class="trend-row"><span class="tn">#woodburner</span><span class="tc">42 posts</span></div>
+      </div>
+
+      <div class="aside-block">
+        <h4>Active <i>hosts</i> in Cumbria</h4>
+        <div class="ah-row">
+          <div class="av">S</div>
+          <div class="info"><div class="n"><i>Sarah</i> R.</div><div class="m">Stone Cottage · 4.9★</div></div>
+          <button class="follow-btn following">Following</button>
+        </div>
+        <div class="ah-row">
+          <div class="av">T</div>
+          <div class="info"><div class="n"><i>Tom &amp; Anna</i></div><div class="m">Shepherd's Hut · 4.7★</div></div>
+          <button class="follow-btn">Follow</button>
+        </div>
+        <div class="ah-row">
+          <div class="av">F</div>
+          <div class="info"><div class="n"><i>Fiona</i> C.</div><div class="m">Keswick cottage · 4.8★</div></div>
+          <button class="follow-btn">Follow</button>
+        </div>
+        <div class="ah-row">
+          <div class="av">H</div>
+          <div class="info"><div class="n"><i>Hannah</i> F.</div><div class="m">The Granary · 4.9★</div></div>
+          <button class="follow-btn following">Following</button>
+        </div>
+      </div>
+
+      <div class="aside-block">
+        <h4>Community <i>guidelines</i></h4>
+        <p style="font-size:12.5px;color:var(--ink-2);line-height:1.5">Casa Feed is for hosts and guests &mdash; not agencies, not bots. Keep it useful, kind, and on-topic. No spam, no off-platform booking links.</p>
+        <a href="#" style="font-size:12px;color:var(--brick);text-decoration:underline;text-underline-offset:2px;display:inline-block;margin-top:8px">Read the full guidelines →</a>
+      </div>
+
+    </aside>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="casa-foot">
+  <div class="inner">
+    <div class="top">
+      <div>
+        <div class="casa-mark-lg">casa</div>
+        <div class="pitch">A quieter place to find a holiday stay &mdash; <em>fee-free</em>, and direct with the host.</div>
+      </div>
+      <div><h5>Stays</h5><a href="browse.html">Browse all</a><a href="map.html">Map view</a><a href="feed.html">Community feed</a></div>
+      <div><h5>Hosts</h5><a href="list.html">List a property</a><a href="host.html">Host dashboard</a></div>
+      <div><h5>Account</h5><a href="profile.html">Profile</a><a href="saved.html">Saved</a><a href="messages.html">Messages</a></div>
+      <div><h5>Casa</h5><a href="#">Our story</a><a href="#">Help</a></div>
+    </div>
+    <div class="bot"><div>&copy; 2026 Casa.co.uk</div><div><a href="#">Privacy</a> · <a href="#">Terms</a></div></div>
+  </div>
+</footer>
+
+<script src="casa.js"></script>
+</body>
+</html>
