@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Map — Casa</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -10,1187 +11,639 @@
 <style>
   html, body { height: 100vh; overflow: hidden; }
 
-  /* Nav search — reused */
+  /* ── NAV SEARCH PILL ── */
   .nav-search {
     display: flex; align-items: stretch; background: var(--surface);
     border: 1px solid var(--rule); border-radius: 999px;
-    padding: 4px; min-width: 460px;
+    padding: 4px; gap: 0; min-width: 420px; cursor: pointer;
+    transition: box-shadow .12s;
   }
-  .nav-search:hover { box-shadow: 0 4px 18px rgba(22,20,15,0.06); border-color: var(--rule-3); }
-  .nav-search .seg { padding: 6px 16px; cursor: pointer; border-right: 1px solid var(--rule); display: flex; flex-direction: column; justify-content: center; }
+  .nav-search:hover { box-shadow: 0 4px 14px rgba(22,20,15,0.07); }
+  .nav-search .seg { padding: 5px 14px; border-right: 1px solid var(--rule); display: flex; flex-direction: column; justify-content: center; }
   .nav-search .seg:last-of-type { border-right: none; }
-  .nav-search .seg .l { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-4); }
+  .nav-search .seg .l { font-family: var(--mono); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-4); }
   .nav-search .seg .v { font-size: 13px; color: var(--ink); margin-top: 1px; }
-  .nav-search .go { width: 36px; height: 36px; border: none; background: var(--brick); color: white; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; margin: auto 4px auto auto; }
-  .nav-search .go svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+  .nav-search .go { width: 34px; height: 34px; border: none; background: var(--brick); color: white; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; margin: auto 2px auto auto; flex-shrink: 0; }
+  .nav-search .go svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+  .nav-divider { width: 1px; height: 20px; background: var(--rule); margin: 0 4px; }
 
-  /* Main layout */
-  .map-page {
-    display: grid; grid-template-columns: 460px 1fr;
-    height: calc(100vh - 64px);
-  }
+  /* ── FULL HEIGHT SPLIT ── */
+  .map-page { display: grid; grid-template-columns: 400px 1fr; height: calc(100vh - 64px); }
 
-  /* LEFT panel — kept compact */
-  .panel { border-right: 1px solid var(--rule); display: flex; flex-direction: column; background: var(--paper); min-height: 0; overflow: hidden; }
-  .panel-head { padding: 18px 22px 14px; border-bottom: 1px solid var(--rule); flex-shrink: 0; }
-  .panel-head h1 { font-family: var(--serif); font-size: 28px; line-height: 1; letter-spacing: -0.02em; }
+  /* ── LEFT PANEL ── */
+  .panel { border-right: 1px solid var(--rule); display: flex; flex-direction: column; overflow: hidden; background: var(--paper); }
+
+  .panel-head { padding: 20px 22px 14px; border-bottom: 1px solid var(--rule); flex-shrink: 0; }
+  .panel-head h1 { font-family: var(--serif); font-size: 32px; line-height: 1; letter-spacing: -.02em; margin-bottom: 6px; }
   .panel-head h1 i { font-style: italic; color: var(--brick); }
-  .panel-head .meta { font-size: 12.5px; color: var(--ink-3); margin-top: 6px; }
-  .panel-head .meta .n { font-family: var(--serif); font-style: italic; color: var(--brick); font-size: 16px; }
+  .panel-meta { font-size: 12.5px; color: var(--ink-3); display: flex; align-items: center; gap: 10px; }
+  .panel-meta .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--moss); flex-shrink: 0; }
 
-  .nation-tabs { display: flex; gap: 0; padding: 10px 14px 0; border-bottom: 1px solid var(--rule); background: var(--paper); flex-shrink: 0; }
-  .nation-tabs .tab { padding: 9px 14px; font-size: 12.5px; color: var(--ink-3); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color .12s, border-color .12s; background: none; border-left: none; border-right: none; border-top: none; font-family: var(--sans); }
-  .nation-tabs .tab:hover { color: var(--ink); }
-  .nation-tabs .tab.active { color: var(--brick); border-bottom-color: var(--brick); font-weight: 500; }
+  /* Nation tabs */
+  .nation-tabs { display: flex; border-bottom: 1px solid var(--rule); flex-shrink: 0; overflow-x: auto; scrollbar-width: none; padding: 0 8px; }
+  .nation-tabs::-webkit-scrollbar { display: none; }
+  .ntab { padding: 10px 14px; font-size: 12.5px; color: var(--ink-3); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; font-family: var(--sans); background: none; border-left: none; border-right: none; border-top: none; transition: color .12s; }
+  .ntab:hover { color: var(--ink); }
+  .ntab.active { color: var(--brick); border-bottom-color: var(--brick); font-weight: 500; }
 
-  .panel-filters {
-    display: flex; gap: 8px; padding: 12px 22px;
-    overflow-x: auto; scrollbar-width: none;
-    border-bottom: 1px solid var(--rule); flex-shrink: 0;
-    background: var(--paper);
-  }
-  .panel-filters::-webkit-scrollbar { display: none; }
-  .panel-filters .chip { background: var(--surface); padding: 6px 12px; font-size: 12px; }
+  /* Filter chips */
+  .filter-row { display: flex; gap: 6px; padding: 10px 14px; border-bottom: 1px solid var(--rule); overflow-x: auto; scrollbar-width: none; flex-shrink: 0; }
+  .filter-row::-webkit-scrollbar { display: none; }
+  .fchip { flex-shrink: 0; padding: 5px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--rule); font-size: 12px; color: var(--ink-2); cursor: pointer; transition: all .12s; font-family: var(--sans); }
+  .fchip:hover { border-color: var(--ink); color: var(--ink); }
+  .fchip.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 
-  .panel-result-bar { padding: 11px 22px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--ink-3); border-bottom: 1px solid var(--rule); background: var(--paper); flex-shrink: 0; }
-  .panel-result-bar .vc { color: var(--ink); font-weight: 500; }
-  .panel-result-bar select { background: transparent; border: none; font-size: 12px; color: var(--ink); font-weight: 500; outline: none; font-family: var(--sans); cursor: pointer; }
+  /* Results bar */
+  .results-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; border-bottom: 1px solid var(--rule); flex-shrink: 0; }
+  .results-bar .rc { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+  .results-bar select { font-family: var(--sans); font-size: 12px; color: var(--ink-2); border: none; background: transparent; outline: none; cursor: pointer; }
 
-  .results-scroll { flex: 1; overflow-y: auto; padding: 14px 22px 32px; display: flex; flex-direction: column; gap: 12px; }
+  /* Search in panel */
+  .panel-search { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--rule); flex-shrink: 0; }
+  .panel-search input { flex: 1; border: 1px solid var(--rule); background: var(--surface); border-radius: 8px; padding: 8px 12px; font-family: var(--sans); font-size: 13px; color: var(--ink); outline: none; }
+  .panel-search input::placeholder { color: var(--ink-4); }
+  .panel-search input:focus { border-color: var(--brick); }
+  .panel-search button { width: 34px; height: 34px; background: var(--brick); border: none; border-radius: 8px; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .panel-search button svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
 
-  /* mini cards */
-  .mc {
-    display: flex; gap: 10px; background: var(--surface); border: 1px solid var(--rule);
-    border-radius: 12px; padding: 8px; cursor: pointer; transition: border-color .15s, box-shadow .15s, transform .15s;
+  /* Property list */
+  .prop-list { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+  .prop-list::-webkit-scrollbar { width: 4px; }
+  .prop-list::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 2px; }
+
+  /* Property card in list */
+  .pc {
+    background: var(--paper); border: 1px solid var(--rule); border-radius: 12px;
+    overflow: hidden; cursor: pointer; display: flex; height: 100px;
+    transition: border-color .15s, box-shadow .15s, transform .15s;
     text-decoration: none; color: inherit;
   }
-  .mc:hover { border-color: var(--ink); }
-  .mc.active { border-color: var(--brick); box-shadow: 0 4px 18px rgba(176,85,51,0.18); }
-  .mc .mci { width: 100px; height: 90px; flex-shrink: 0; border-radius: 8px; overflow: hidden; position: relative; }
-  .mc .mci .ph { width: 100%; height: 100%; }
-  .mc .mci .save-heart { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; }
-  .mc .mci .save-heart svg { width: 11px; height: 11px; }
-  .mc .mcb { flex: 1; min-width: 0; padding: 2px 4px 2px 0; display: flex; flex-direction: column; justify-content: space-between; }
-  .mc .mcb .nm { font-family: var(--serif); font-size: 16px; line-height: 1.1; }
-  .mc .mcb .nm i { font-style: italic; color: var(--brick); }
-  .mc .mcb .loc { font-size: 11px; color: var(--ink-3); margin-top: 1px; }
-  .mc .mcb .tags { display: flex; gap: 4px; flex-wrap: wrap; margin: 3px 0 0; }
-  .mc .mcb .tags .t { font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
-  .mc .mcb .foot { display: flex; justify-content: space-between; align-items: end; margin-top: auto; }
-  .mc .mcb .price { font-family: var(--serif); font-size: 16px; }
-  .mc .mcb .price i { font-style: italic; color: var(--brick); }
-  .mc .mcb .price .pp { font-size: 10px; color: var(--ink-3); margin-left: 2px; }
-  .mc .mcb .rating { font-size: 10.5px; color: var(--ink); display: inline-flex; align-items: center; gap: 3px; }
-  .mc .mcb .rating svg { width: 10px; height: 10px; fill: var(--ink); stroke: none; }
+  .pc:hover { border-color: var(--brick); box-shadow: 0 2px 12px rgba(176,85,51,0.1); transform: translateX(2px); }
+  .pc.active { border-color: var(--brick); border-width: 2px; box-shadow: 0 2px 16px rgba(176,85,51,0.15); }
+  .pc-img { width: 100px; flex-shrink: 0; position: relative; }
+  .pc-img .ph { width: 100%; height: 100%; }
+  .pc-img .save-heart { position: absolute; top: 6px; right: 6px; }
+  .pc-body { flex: 1; padding: 10px 12px; display: flex; flex-direction: column; justify-content: space-between; min-width: 0; }
+  .pc-title { font-family: var(--serif); font-size: 16px; line-height: 1.1; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pc-title i { font-style: italic; color: var(--brick); }
+  .pc-loc { font-size: 11.5px; color: var(--ink-3); margin-top: 2px; }
+  .pc-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
+  .pc-tag { font-family: var(--mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; background: var(--brick-pale); color: var(--brick-text); padding: 2px 6px; border-radius: 4px; }
+  .pc-foot { display: flex; align-items: center; justify-content: space-between; }
+  .pc-price { font-family: var(--serif); font-size: 18px; }
+  .pc-price i { font-style: italic; color: var(--brick); }
+  .pc-price .per { font-family: var(--sans); font-size: 11px; color: var(--ink-3); }
+  .pc-rating { font-size: 11.5px; color: var(--ink-3); display: flex; align-items: center; gap: 3px; }
+  .pc-rating svg { width: 10px; height: 10px; fill: var(--ink); stroke: none; }
+  .pc-cta { font-family: var(--mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--brick); }
 
-  /* ─── MAP AREA ─── */
-  .map-area {
-    position: relative;
-    background: var(--paper-2);
-    overflow: hidden;
-    cursor: grab;
-    min-height: 0;
-    min-width: 0;
+  .no-results { padding: 40px 20px; text-align: center; }
+  .no-results h3 { font-family: var(--serif); font-style: italic; font-size: 22px; margin-bottom: 8px; }
+  .no-results p { font-size: 13px; color: var(--ink-3); }
+
+  /* ── MAP PANEL ── */
+  .map-panel {
+    position: relative; background: #EBE5D6; overflow: hidden;
   }
-  .map-area.grabbing { cursor: grabbing; }
-  .map-area.parchment { background: #E6DECD; }
-  .map-area.minimal { background: #F0EBE0; }
-  .map-area.dark { background: #1B1812; }
-  .map-area.satellite { background: #2C3E2B; }
-
-  /* Grid bg */
-  .grid-bg {
-    position: absolute; inset: 0; pointer-events: none;
-    background-image: linear-gradient(rgba(22,20,15,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(22,20,15,0.04) 1px, transparent 1px);
-    background-size: 28px 28px;
-    opacity: var(--grid-opacity, 1);
+  .map-bg {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(22,20,15,0.04) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(22,20,15,0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
   }
-  .map-area.dark .grid-bg { background-image: linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px); }
-
-  /* Canvas — this is what zooms and pans */
-  .map-canvas {
-    position: absolute; left: 0; top: 0;
-    width: 800px; height: 1100px;
-    transform-origin: 0 0;
-    transition: transform .25s cubic-bezier(.4,0,.2,1);
-    will-change: transform;
+  /* Vignette */
+  .map-bg::after {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(22,20,15,0.06) 100%);
   }
-  .map-canvas.no-transition { transition: none; }
-  .map-canvas svg.uk-map { width: 100%; height: 100%; display: block; filter: drop-shadow(0 4px 24px rgba(22,20,15,0.08)); }
 
-  /* Region styling */
-  .uk-region { fill: var(--region-fill, #D8CFBC); stroke: var(--paper); stroke-width: 1.5; transition: fill .25s; cursor: pointer; }
-  .uk-region:hover { fill: var(--region-hover, #C7B898); }
-  .uk-region.active { fill: var(--brick-pale); stroke: var(--brick); stroke-width: 2; }
-  .map-area.dark .uk-region { fill: #2F2A22; stroke: #1B1812; }
-  .map-area.dark .uk-region:hover { fill: #3A3329; }
-  .map-area.dark .uk-region.active { fill: var(--brick-dark); stroke: var(--brick); }
-  .map-area.satellite .uk-region { fill: #4A5A3F; stroke: #2C3E2B; }
-  .map-area.satellite .uk-region:hover { fill: #5A6E4D; }
-  .map-area.parchment .uk-region { fill: #C7B898; }
+  /* SVG UK */
+  .uk-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 32px; }
+  .uk-wrap svg { height: 94%; width: auto; max-width: 100%; filter: drop-shadow(0 8px 32px rgba(22,20,15,0.14)); }
 
-  /* Subregion */
-  .uk-subregion { fill: rgba(176,85,51,0); stroke: rgba(22,20,15,0.10); stroke-width: 0.8; stroke-dasharray: 3 3; transition: fill .2s; cursor: pointer; pointer-events: all; }
-  .uk-subregion:hover { fill: rgba(176,85,51,0.08); stroke: var(--brick); }
-  .uk-subregion.active { fill: rgba(176,85,51,0.18); stroke: var(--brick); stroke-dasharray: none; }
+  /* Map pins (SVG) */
+  .map-pin { cursor: pointer; transition: transform .2s; transform-origin: center; }
+  .map-pin:hover { transform: scale(1.15); }
+  .map-pin.active .pin-circle { fill: var(--ink); }
+  .map-pin.active .pin-pulse { display: block; }
+  .pin-circle { transition: fill .15s; }
+  .pin-pulse { display: none; }
 
-  /* Water rivers */
-  .uk-water { fill: none; stroke: rgba(22,20,15,0.10); stroke-width: 1; stroke-linecap: round; }
-  .map-area.dark .uk-water { stroke: rgba(255,255,255,0.10); }
-
-  /* Region labels */
-  .uk-label {
-    font-family: var(--serif); font-style: italic; fill: var(--ink-2);
-    pointer-events: none; text-anchor: middle;
+  /* Info overlay top-right */
+  .map-info {
+    position: absolute; top: 20px; right: 20px;
+    background: var(--paper); border: 1px solid var(--rule); border-radius: 16px;
+    padding: 16px 20px; min-width: 200px;
+    box-shadow: 0 4px 20px rgba(22,20,15,0.08);
+    transition: all .2s;
   }
-  .map-area.dark .uk-label { fill: rgba(255,255,255,0.65); }
-  .uk-label.nation { font-size: 24px; opacity: var(--label-nation, 1); transition: opacity .3s; }
-  .uk-label.region { font-size: 13px; fill: var(--brick); opacity: var(--label-region, 0); transition: opacity .3s; }
-  .uk-label.sub { font-size: 10px; opacity: var(--label-sub, 0); font-style: normal; font-family: var(--mono); letter-spacing: 0.08em; text-transform: uppercase; transition: opacity .3s; }
+  .mi-eyebrow { font-family: var(--mono); font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 6px; }
+  .mi-title { font-family: var(--serif); font-size: 26px; line-height: 1; letter-spacing: -.02em; margin-bottom: 4px; }
+  .mi-title i { font-style: italic; color: var(--brick); }
+  .mi-count { font-size: 12.5px; color: var(--ink-3); margin-bottom: 12px; }
+  .mi-cta { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--brick); text-decoration: none; font-weight: 500; }
+  .mi-cta:hover { text-decoration: underline; }
+  .mi-cta svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; }
 
-  /* Pin layer — sits on top, doesn't transform */
-  .pin-layer { position: absolute; inset: 0; pointer-events: none; }
-  .pin-layer > * { pointer-events: auto; }
-
-  /* Cluster pins (nation level) */
-  .pin-nation {
-    position: absolute; transform: translate(-50%, -50%);
-    background: var(--brick); color: white; border-radius: 50%;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    cursor: pointer; box-shadow: 0 6px 22px rgba(176,85,51,0.45);
-    transition: transform .2s, box-shadow .2s;
-    border: 3px solid rgba(255,255,255,0.4);
+  /* Map tooltip on hover */
+  .map-tooltip {
+    position: absolute; z-index: 100; background: var(--ink); color: var(--paper);
+    font-size: 12px; padding: 7px 12px; border-radius: 8px;
+    pointer-events: none; display: none; white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(22,20,15,0.2);
   }
-  .pin-nation:hover { transform: translate(-50%, -50%) scale(1.06); box-shadow: 0 8px 28px rgba(176,85,51,0.55); }
-  .pin-nation .n { font-family: var(--serif); font-style: italic; line-height: 1; }
-  .pin-nation .lab { font-family: var(--mono); letter-spacing: 0.1em; opacity: 0.9; text-transform: uppercase; margin-top: 2px; }
+  .map-tooltip .tt-name { font-family: var(--serif); font-style: italic; font-size: 14px; }
+  .map-tooltip .tt-count { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: rgba(250,248,244,0.55); margin-top: 2px; }
 
-  /* Cluster pins (region level) */
-  .pin-region {
-    position: absolute; transform: translate(-50%, -50%);
-    background: var(--ink); color: var(--paper);
-    padding: 8px 14px; border-radius: 999px;
-    font-family: var(--serif); font-size: 16px; line-height: 1;
-    cursor: pointer; transition: transform .2s, background .2s;
-    box-shadow: 0 4px 16px rgba(22,20,15,0.2);
-    white-space: nowrap; border: 1px solid rgba(255,255,255,0.1);
-    display: flex; align-items: center; gap: 8px;
+  /* Sub-region strip at bottom of map */
+  .sub-strip {
+    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: var(--paper); border: 1px solid var(--rule); border-radius: 14px;
+    padding: 8px 12px; display: flex; gap: 6px; align-items: center;
+    box-shadow: 0 4px 16px rgba(22,20,15,0.08);
+    max-width: calc(100% - 40px); overflow-x: auto; scrollbar-width: none;
   }
-  .pin-region:hover { transform: translate(-50%, -50%) scale(1.06); background: var(--brick); }
-  .pin-region .num { font-style: italic; color: var(--brick-2); }
-  .pin-region:hover .num { color: white; }
-  .pin-region .lab { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.7; font-style: normal; }
-
-  /* Price pin (property level) */
-  .pin-price {
-    position: absolute; transform: translate(-50%, -100%);
+  .sub-strip::-webkit-scrollbar { display: none; }
+  .sub-chip {
+    flex-shrink: 0; padding: 5px 12px; border-radius: 999px;
     background: var(--surface); border: 1px solid var(--rule);
-    padding: 5px 11px; border-radius: 999px;
-    font-family: var(--sans); font-weight: 500; font-size: 12.5px;
-    color: var(--ink); cursor: pointer;
-    transition: transform .15s, box-shadow .15s, background .15s, color .15s, border-color .15s;
-    box-shadow: 0 2px 10px rgba(22,20,15,0.12);
-    white-space: nowrap;
-    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; color: var(--ink-2); cursor: pointer;
+    transition: all .12s; white-space: nowrap; font-family: var(--sans);
   }
-  .pin-price:hover { transform: translate(-50%, -100%) scale(1.08); box-shadow: 0 4px 16px rgba(22,20,15,0.2); border-color: var(--ink); }
-  .pin-price.active { background: var(--ink); color: white; border-color: var(--ink); transform: translate(-50%, -100%) scale(1.15); z-index: 10; }
-  .pin-price.saved svg { width: 10px; height: 10px; fill: var(--brick); stroke: none; }
-  .pin-price.active.saved svg { fill: var(--brick-2); }
-
-  /* Preview card */
-  .preview-card {
-    position: absolute; width: 270px;
-    background: var(--surface); border: 1px solid var(--rule);
-    border-radius: 14px; padding: 10px; box-shadow: 0 12px 36px rgba(22,20,15,0.18);
-    z-index: 20; opacity: 0; visibility: hidden; transform: translateY(8px);
-    transition: opacity .2s, transform .2s, visibility 0s linear .2s;
-    text-decoration: none; color: inherit;
-    pointer-events: auto;
-  }
-  .preview-card.visible { opacity: 1; visibility: visible; transform: translateY(0); transition: opacity .2s, transform .2s; }
-  .preview-card .ppi { aspect-ratio: 4/3; border-radius: 10px; overflow: hidden; margin-bottom: 8px; position: relative; }
-  .preview-card .ppi .ph { width: 100%; height: 100%; }
-  .preview-card .pp-close { position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; background: rgba(22,20,15,0.6); border: none; border-radius: 50%; color: white; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
-  .preview-card .pp-close svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; }
-  .preview-card .pp-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
-  .preview-card .pp-nm { font-family: var(--serif); font-size: 18px; line-height: 1.05; }
-  .preview-card .pp-nm i { font-style: italic; color: var(--brick); }
-  .preview-card .pp-rate { font-size: 11px; }
-  .preview-card .pp-loc { font-size: 11.5px; color: var(--ink-3); margin: 2px 0 6px; }
-  .preview-card .pp-tags { display: flex; gap: 4px; margin-bottom: 8px; }
-  .preview-card .pp-tags .t { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
-  .preview-card .pp-price { font-family: var(--serif); font-size: 18px; padding-top: 8px; border-top: 1px solid var(--rule); display: flex; justify-content: space-between; align-items: baseline; }
-  .preview-card .pp-price i { font-style: italic; color: var(--brick); }
-  .preview-card .pp-price .pp-enq { font-family: var(--sans); font-style: normal; font-size: 11px; font-weight: 500; padding: 4px 10px; background: var(--brick); color: white; border-radius: 6px; text-decoration: none; }
-
-  /* Region card overlay (top-left contextual) */
-  .region-card {
-    position: absolute; top: 20px; left: 20px;
-    background: var(--surface); border: 1px solid var(--rule);
-    border-radius: 14px; padding: 14px 18px; max-width: 280px;
-    box-shadow: 0 4px 24px rgba(22,20,15,0.08);
-    z-index: 5;
-  }
-  .region-card .rc-eye { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 4px; }
-  .region-card h3 { font-family: var(--serif); font-size: 22px; line-height: 1; margin-bottom: 4px; }
-  .region-card h3 i { font-style: italic; color: var(--brick); }
-  .region-card .rc-meta { font-size: 12.5px; color: var(--ink-3); margin-bottom: 10px; }
-  .region-card .rc-row { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; font-size: 12px; color: var(--ink-2); border-top: 1px solid var(--rule-2); }
-  .region-card .rc-row:first-of-type { border-top: 1px solid var(--rule); padding-top: 8px; margin-top: 4px; }
-  .region-card .rc-row .v { font-family: var(--serif); font-style: italic; color: var(--brick); }
+  .sub-chip:hover { border-color: var(--ink); color: var(--ink); }
+  .sub-chip.active { background: var(--brick); color: white; border-color: var(--brick); }
 
   /* Zoom controls */
-  .map-controls {
-    position: absolute; bottom: 24px; right: 24px;
-    display: flex; flex-direction: column; gap: 6px;
-    z-index: 5;
+  .zoom-ctrl {
+    position: absolute; right: 20px; bottom: 20px;
+    display: flex; flex-direction: column; gap: 3px;
   }
-  .map-controls button {
-    background: var(--surface); border: 1px solid var(--rule); border-radius: 10px;
-    width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center;
-    cursor: pointer; color: var(--ink);
-    transition: background .12s, transform .15s;
+  .zoom-btn {
+    width: 36px; height: 36px; background: var(--paper); border: 1px solid var(--rule);
+    border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; color: var(--ink); transition: background .12s; line-height: 1;
+    font-family: var(--sans);
   }
-  .map-controls button:hover { background: var(--paper); }
-  .map-controls button:active { transform: scale(0.94); }
-  .map-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
-  .map-controls svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+  .zoom-btn:hover { background: var(--surface); }
 
-  /* Zoom level indicator */
-  .zoom-ind {
-    position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
-    background: var(--surface); border: 1px solid var(--rule); border-radius: 999px;
-    padding: 6px 16px; font-family: var(--mono); font-size: 11px;
-    letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-2);
-    z-index: 5; display: flex; align-items: center; gap: 10px;
+  /* Browse link button */
+  .browse-link {
+    position: absolute; top: 20px; left: 20px;
+    background: var(--paper); border: 1px solid var(--rule); border-radius: 999px;
+    padding: 9px 16px; font-size: 13px; color: var(--ink-2); text-decoration: none;
+    display: inline-flex; align-items: center; gap: 7px;
+    box-shadow: 0 2px 10px rgba(22,20,15,0.06); transition: all .12s;
   }
-  .zoom-ind .ind-level { color: var(--brick); font-weight: 500; }
-  .zoom-ind .ind-bar { width: 80px; height: 3px; background: var(--rule); border-radius: 2px; overflow: hidden; position: relative; }
-  .zoom-ind .ind-bar .fill { position: absolute; left: 0; top: 0; height: 100%; background: var(--brick); border-radius: 2px; transition: width .2s; }
+  .browse-link:hover { border-color: var(--ink); color: var(--ink); }
+  .browse-link svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 1.8; }
 
-  /* Search-this-area pill */
-  .search-area-btn {
-    position: absolute; top: 24px; left: 50%; transform: translateX(-50%);
-    background: var(--ink); color: var(--paper); border: none; border-radius: 999px;
-    padding: 10px 18px; font-family: var(--sans); font-size: 13px; font-weight: 500; cursor: pointer;
-    display: inline-flex; align-items: center; gap: 8px;
-    box-shadow: 0 6px 18px rgba(22,20,15,0.15); z-index: 5;
+  @media (max-width: 900px) {
+    .map-page { grid-template-columns: 1fr; grid-template-rows: 50vh 1fr; }
+    .map-panel { order: -1; }
+    html, body { overflow: auto; height: auto; }
+    .map-page { height: auto; }
   }
-  .search-area-btn:hover { background: var(--ink-2); }
-  .search-area-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
-
-  /* Hashtag pin */
-  .pin-hashtag {
-    position: absolute; transform: translate(-50%, -50%);
-    background: rgba(251,250,246,0.92); backdrop-filter: blur(6px);
-    border: 1px solid var(--rule-3); padding: 4px 9px; border-radius: 999px;
-    font-family: var(--serif); font-style: italic; font-size: 12px; color: var(--brick);
-    cursor: pointer; transition: transform .15s, background .15s;
-    box-shadow: 0 2px 6px rgba(22,20,15,0.08);
-  }
-  .pin-hashtag:hover { transform: translate(-50%, -50%) scale(1.1); background: var(--brick); color: white; }
-  .pin-hashtag .ct { font-family: var(--mono); font-size: 9px; font-style: normal; opacity: 0.7; margin-left: 4px; letter-spacing: 0.08em; }
-  .pin-hashtag:hover .ct { opacity: 0.9; }
-
-  /* Tweaks panel */
-  .tweaks-panel {
-    position: fixed; bottom: 20px; right: 20px;
-    width: 300px; background: var(--surface); border: 1px solid var(--rule);
-    border-radius: 16px; box-shadow: 0 18px 48px rgba(22,20,15,0.18);
-    z-index: 100; padding: 0;
-    display: none; flex-direction: column;
-    overflow: hidden;
-  }
-  .tweaks-panel.open { display: flex; }
-  .tweaks-panel .tp-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--rule); cursor: move; background: var(--paper); }
-  .tweaks-panel .tp-head .tp-ttl { font-family: var(--serif); font-style: italic; font-size: 18px; }
-  .tweaks-panel .tp-head .tp-ttl i { color: var(--brick); }
-  .tweaks-panel .tp-head .tp-close { background: none; border: none; cursor: pointer; padding: 4px; color: var(--ink-3); }
-  .tweaks-panel .tp-head .tp-close:hover { color: var(--ink); }
-  .tweaks-panel .tp-head .tp-close svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; }
-  .tweaks-panel .tp-body { padding: 16px 18px 20px; overflow-y: auto; max-height: 60vh; }
-  .tweaks-panel .tp-sect { margin-bottom: 18px; }
-  .tweaks-panel .tp-sect:last-child { margin-bottom: 0; }
-  .tweaks-panel .tp-sect h5 { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 10px; }
-  .tweak-radio { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; padding: 3px; background: var(--paper); border-radius: 10px; }
-  .tweak-radio.cols-3 { grid-template-columns: repeat(3, 1fr); }
-  .tweak-radio.cols-4 { grid-template-columns: repeat(4, 1fr); }
-  .tweak-radio button { padding: 8px 8px; border-radius: 7px; font-family: var(--sans); font-size: 12px; color: var(--ink-3); background: transparent; border: none; cursor: pointer; }
-  .tweak-radio button.active { background: var(--ink); color: var(--paper); font-weight: 500; }
-  .tweak-toggle { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; }
-  .tweak-toggle .lbl { font-size: 13px; color: var(--ink-2); }
-  .tweak-toggle .sw { width: 36px; height: 20px; background: var(--rule-3); border-radius: 999px; position: relative; cursor: pointer; transition: background .12s; }
-  .tweak-toggle .sw::after { content: ''; position: absolute; left: 2px; top: 2px; width: 16px; height: 16px; background: white; border-radius: 50%; transition: transform .15s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
-  .tweak-toggle .sw.on { background: var(--brick); }
-  .tweak-toggle .sw.on::after { transform: translateX(16px); }
-  .tweak-slider input[type="range"] { width: 100%; accent-color: var(--brick); }
-  .tweak-slider .row { display: flex; justify-content: space-between; align-items: center; }
-  .tweak-slider .row .lbl { font-size: 13px; color: var(--ink-2); }
-  .tweak-slider .row .val { font-family: var(--mono); font-size: 11px; color: var(--brick); }
-
-  /* Tweaks toggle button (when panel closed) */
-  .tweaks-fab {
-    position: fixed; bottom: 24px; left: 24px; z-index: 99;
-    background: var(--ink); color: var(--paper); border: none; border-radius: 999px;
-    padding: 10px 16px; font-family: var(--sans); font-size: 12.5px; font-weight: 500; cursor: pointer;
-    display: inline-flex; align-items: center; gap: 8px;
-    box-shadow: 0 6px 24px rgba(22,20,15,0.2);
-    transition: transform .15s, background .15s;
-  }
-  .tweaks-fab:hover { background: var(--ink-2); transform: translateY(-1px); }
-  .tweaks-fab svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; }
 </style>
 </head>
 <body>
 
+<!-- NAV -->
 <nav class="casa-nav">
   <a class="brand-lockup" href="index.html">
     <span class="casa-mark">casa</span><span class="casa-tld">.co.uk</span>
   </a>
   <div class="nav-search">
-    <div class="seg" style="flex:1.4">
-      <span class="l">Where</span><span class="v">All UK</span>
-    </div>
-    <div class="seg">
-      <span class="l">Dates</span><span class="v">12 – 19 Jul</span>
-    </div>
-    <div class="seg">
-      <span class="l">Guests</span><span class="v">2 adults</span>
-    </div>
+    <div class="seg" style="flex:1.4"><span class="l">Where</span><span class="v" id="navWhere">All UK</span></div>
+    <div class="seg"><span class="l">Dates</span><span class="v">Any</span></div>
+    <div class="seg"><span class="l">Guests</span><span class="v">Any</span></div>
     <button class="go"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
   </div>
   <div class="nav-right">
-    <a class="nav-link" href="browse.html">Grid view</a>
-    <a class="nav-link" href="messages.html"><svg class="i" viewBox="0 0 24 24"><path d="M4 5h16v12H8l-4 4z"/></svg></a>
-    <a class="nav-link" href="saved.html"><svg class="i" viewBox="0 0 24 24"><path d="M12 20s-7-4.5-9.5-9c-1.5-2.8.4-6 3.5-6 1.8 0 3.2 1 4 2.5C10.8 6 12.2 5 14 5c3.1 0 5 3.2 3.5 6C15 15.5 12 20 12 20z"/></svg></a>
-    <a class="nav-link" href="profile.html"><span class="nav-avatar">J</span></a>
+    <a class="nav-link" href="browse.html">Browse list</a>
+    <a class="nav-link" href="feed.html">Feed</a>
+    <a class="nav-link" href="list.html">List a property</a>
+    <div class="nav-divider"></div>
+    <a class="nav-link" href="saved.html">Saved</a>
+    <a class="nav-link" href="messages.html">Messages</a>
+    <div class="nav-divider"></div>
+    <a class="nav-link" href="signup.html">Sign in</a>
+    <a class="nav-link primary" href="signup.html">Join free</a>
   </div>
 </nav>
 
+<!-- SPLIT LAYOUT -->
 <div class="map-page">
 
-  <!-- LEFT PANEL -->
-  <aside class="panel">
+  <!-- LEFT: RESULTS PANEL -->
+  <div class="panel">
 
     <div class="panel-head">
-      <h1>Stays across <i>the UK</i></h1>
-      <div class="meta"><span class="n" id="resultCount">4,202 stays</span> · drag &amp; scroll the map</div>
+      <h1>Map of <i>UK stays</i></h1>
+      <div class="panel-meta">
+        <span class="live-dot"></span>
+        <span id="panelMeta">4,202 stays · fee-free · direct with hosts</span>
+      </div>
     </div>
 
+    <div class="panel-search">
+      <input type="text" id="mapSearchInput" placeholder="Search by place, county or #hashtag…">
+      <button onclick="runSearch()">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      </button>
+    </div>
+
+    <!-- Nation tabs -->
     <div class="nation-tabs">
-      <button class="tab active" data-nation="all" onclick="setNation(this)">All UK</button>
-      <button class="tab" data-nation="england" onclick="setNation(this)">England</button>
-      <button class="tab" data-nation="scotland" onclick="setNation(this)">Scotland</button>
-      <button class="tab" data-nation="wales" onclick="setNation(this)">Wales</button>
-      <button class="tab" data-nation="ni" onclick="setNation(this)">N. Ireland</button>
+      <button class="ntab active" data-nation="all" onclick="setNation(this)">🇬🇧 All UK</button>
+      <button class="ntab" data-nation="england" onclick="setNation(this)">🏴󠁧󠁢󠁥󠁮󠁧󠁿 England</button>
+      <button class="ntab" data-nation="scotland" onclick="setNation(this)">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland</button>
+      <button class="ntab" data-nation="wales" onclick="setNation(this)">🏴󠁧󠁢󠁷󠁬󠁳󠁿 Wales</button>
+      <button class="ntab" data-nation="ni" onclick="setNation(this)">🇬🇧 N. Ireland</button>
     </div>
 
-    <div class="panel-filters">
-      <span class="chip"><svg class="i i-sm" viewBox="0 0 24 24"><path d="M4 5h16l-6 8v6l-4-2v-4z"/></svg> Filters</span>
-      <span class="chip active">Pet friendly</span>
-      <span class="chip">Sea view</span>
-      <span class="chip">Hot tub</span>
-      <span class="chip">Wood burner</span>
-      <span class="chip">Off-grid</span>
+    <!-- Filter chips -->
+    <div class="filter-row">
+      <span class="fchip" onclick="toggleFilter(this,'pets')">🐾 Pets</span>
+      <span class="fchip" onclick="toggleFilter(this,'seaview')">🌊 Sea view</span>
+      <span class="fchip" onclick="toggleFilter(this,'woodburner')">🔥 Wood burner</span>
+      <span class="fchip" onclick="toggleFilter(this,'hottub')">♨️ Hot tub</span>
+      <span class="fchip" onclick="toggleFilter(this,'offgrid')">🌿 Off-grid</span>
+      <span class="fchip" onclick="toggleFilter(this,'glamping')">⛺ Glamping</span>
+      <span class="fchip" onclick="toggleFilter(this,'lastminute')">⚡ Last min</span>
     </div>
 
-    <div class="panel-result-bar">
-      <span><span class="vc" id="vcount">142 stays</span> in current view</span>
-      <select>
-        <option>Sort: Curated</option>
-        <option>Price · low to high</option>
-        <option>Top rated</option>
+    <!-- Results count + sort -->
+    <div class="results-bar">
+      <span class="rc" id="resultsCount">36 stays shown</span>
+      <select onchange="sortCards(this.value)">
+        <option value="curated">Sort: Curated</option>
+        <option value="price-asc">Price: low–high</option>
+        <option value="price-desc">Price: high–low</option>
+        <option value="rating">Top rated</option>
       </select>
     </div>
 
-    <div class="results-scroll" id="resultsList">
-      <!-- populated by JS -->
-    </div>
-  </aside>
+    <!-- Property cards -->
+    <div class="prop-list" id="propList"></div>
 
-  <!-- RIGHT — MAP AREA -->
-  <div class="map-area" id="mapArea">
-    <div class="grid-bg"></div>
+  </div>
 
-    <button class="search-area-btn">
-      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      Search this area
-    </button>
+  <!-- RIGHT: MAP PANEL -->
+  <div class="map-panel" id="mapPanel">
+    <div class="map-bg"></div>
 
-    <!-- Region info card -->
-    <div class="region-card" id="regionCard">
-      <div class="rc-eye">Casa &mdash; <span id="rcEye">All United Kingdom</span></div>
-      <h3 id="rcTitle">The <i>United Kingdom</i></h3>
-      <div class="rc-meta" id="rcMeta">4,202 stays · from £85/night</div>
-      <div class="rc-row"><span>England</span><span class="v">2,841</span></div>
-      <div class="rc-row"><span>Scotland</span><span class="v">892</span></div>
-      <div class="rc-row"><span>Wales</span><span class="v">341</span></div>
-      <div class="rc-row"><span>N. Ireland</span><span class="v">128</span></div>
-    </div>
+    <div class="uk-wrap">
+      <svg viewBox="0 0 320 540" xmlns="http://www.w3.org/2000/svg" id="ukSvg">
+        <!-- Scotland -->
+        <path d="M110,14 L158,12 L188,32 L196,62 L178,88 L190,118 L170,140 L145,148 L120,135 L100,115 L88,90 L95,58 Z"
+              fill="#D4C9B8" stroke="rgba(250,248,244,0.9)" stroke-width="2.5"/>
+        <!-- N Ireland -->
+        <path d="M70,138 L100,130 L110,154 L90,170 L66,162 Z"
+              fill="#D4C9B8" stroke="rgba(250,248,244,0.9)" stroke-width="2.5"/>
+        <!-- England -->
+        <path d="M122,148 L170,143 L194,168 L200,210 L192,252 L202,296 L196,334 L178,358 L164,392 L148,428 L134,436 L118,426 L110,398 L108,362 L100,326 L106,288 L96,250 L104,208 L96,170 Z"
+              fill="#D4C9B8" stroke="rgba(250,248,244,0.9)" stroke-width="2.5"/>
+        <!-- Wales -->
+        <path d="M96,170 L104,208 L98,250 L90,262 L78,250 L72,222 L80,198 L88,180 Z"
+              fill="#D4C9B8" stroke="rgba(250,248,244,0.9)" stroke-width="2.5"/>
 
-    <!-- The actual map (zooms & pans) -->
-    <div class="map-canvas" id="mapCanvas">
+        <!-- Region labels -->
+        <text x="145" y="78" font-size="9" fill="rgba(58,50,38,0.55)" text-anchor="middle" font-family="JetBrains Mono,monospace" letter-spacing="1">SCOTLAND</text>
+        <text x="150" y="280" font-size="9" fill="rgba(58,50,38,0.55)" text-anchor="middle" font-family="JetBrains Mono,monospace" letter-spacing="1">ENGLAND</text>
+        <text x="83" y="218" font-size="7.5" fill="rgba(58,50,38,0.55)" text-anchor="middle" font-family="JetBrains Mono,monospace" letter-spacing="0.5">WALES</text>
 
-      <svg class="uk-map" viewBox="0 0 800 1100" xmlns="http://www.w3.org/2000/svg">
+        <!-- ── REGION PINS ── -->
+        <!-- Scottish Highlands -->
+        <g class="map-pin" id="pin-highlands" onclick="pinClick('highlands')" data-name="Scottish Highlands" data-count="145 stays">
+          <circle cx="140" cy="52" r="20" fill="rgba(176,85,51,0.12)" class="pin-pulse"/>
+          <circle cx="140" cy="52" r="14" fill="var(--brick)" stroke="rgba(250,248,244,0.9)" stroke-width="2.5" class="pin-circle"/>
+          <text x="140" y="56" font-size="9" fill="white" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="500">145</text>
+        </g>
+        <text x="140" y="76" font-size="8.5" fill="rgba(58,50,38,0.8)" text-anchor="middle" font-family="Instrument Serif,serif" font-style="italic" pointer-events="none">Highlands</text>
 
-        <!-- Scotland (top, ~y=80-380) -->
-        <g id="scotland">
-          <!-- Mainland -->
-          <path class="uk-region" data-region="scotland" d="M 360 60 L 410 50 L 470 60 L 510 90 L 530 130 L 525 170 L 550 200 L 540 240 L 510 270 L 470 290 L 440 320 L 410 340 L 380 350 L 360 380 L 330 360 L 300 350 L 280 320 L 290 290 L 280 260 L 260 230 L 270 190 L 285 160 L 300 130 L 320 100 L 340 75 Z" />
-          <!-- West isles -->
-          <path class="uk-region" data-region="scotland" d="M 220 130 L 250 125 L 260 160 L 245 185 L 220 175 L 215 150 Z" />
-          <path class="uk-region" data-region="scotland" d="M 180 200 L 215 195 L 220 230 L 195 240 L 175 220 Z" />
-          <!-- Orkney -->
-          <path class="uk-region" data-region="scotland" d="M 430 30 L 465 25 L 470 50 L 445 55 Z" />
-          <!-- Shetland (offset further north) -->
-          <circle cx="500" cy="20" r="5" fill="#D8CFBC" stroke="#FBFAF6" stroke-width="1"/>
+        <!-- Isle of Skye -->
+        <g class="map-pin" id="pin-skye" onclick="pinClick('skye')" data-name="Isle of Skye" data-count="67 stays">
+          <circle cx="97" cy="66" r="18" fill="rgba(176,85,51,0.12)" class="pin-pulse"/>
+          <circle cx="97" cy="66" r="11" fill="var(--brick)" stroke="rgba(250,248,244,0.9)" stroke-width="2" class="pin-circle"/>
+          <text x="97" y="70" font-size="8" fill="white" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="500">67</text>
+        </g>
+        <text x="97" y="86" font-size="8" fill="rgba(58,50,38,0.8)" text-anchor="middle" font-family="Instrument Serif,serif" font-style="italic" pointer-events="none">Skye</text>
 
-          <!-- Subregions -->
-          <path class="uk-subregion" data-sub="highlands" data-name="Scottish Highlands" d="M 350 110 L 430 105 L 460 130 L 470 180 L 440 220 L 400 230 L 360 220 L 340 180 L 335 140 Z" />
-          <path class="uk-subregion" data-sub="skye" data-name="Isle of Skye" d="M 220 130 L 250 125 L 260 160 L 245 185 L 220 175 L 215 150 Z" />
-          <path class="uk-subregion" data-sub="edinburgh" data-name="Edinburgh" d="M 440 260 L 480 255 L 490 285 L 460 295 L 435 285 Z" />
-          <path class="uk-subregion" data-sub="cairngorms" data-name="Cairngorms" d="M 410 180 L 460 175 L 470 215 L 430 225 L 405 210 Z" />
-
-          <text class="uk-label nation" x="395" y="200">Scotland</text>
-          <text class="uk-label region" x="395" y="155">Highlands</text>
-          <text class="uk-label region" x="234" y="158">Skye</text>
-          <text class="uk-label region" x="462" y="280">Edinburgh</text>
-          <text class="uk-label region" x="438" y="205">Cairngorms</text>
+        <!-- N. Ireland -->
+        <g class="map-pin" id="pin-ni" onclick="pinClick('ni')" data-name="N. Ireland" data-count="29 stays">
+          <circle cx="83" cy="149" r="16" fill="rgba(176,85,51,0.1)" class="pin-pulse"/>
+          <circle cx="83" cy="149" r="10" fill="var(--brick)" stroke="rgba(250,248,244,0.9)" stroke-width="2" class="pin-circle"/>
+          <text x="83" y="153" font-size="7.5" fill="white" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="500">29</text>
         </g>
 
-        <!-- Northern Ireland (left, ~y=380-470) -->
-        <g id="northern-ireland">
-          <path class="uk-region" data-region="ni" d="M 130 390 L 175 380 L 215 395 L 230 430 L 215 465 L 175 475 L 140 460 L 120 430 Z" />
-          <path class="uk-subregion" data-sub="causewaycoast" data-name="Causeway Coast" d="M 145 385 L 200 380 L 215 410 L 195 420 L 155 415 L 135 400 Z" />
-          <path class="uk-subregion" data-sub="belfast" data-name="Belfast" d="M 195 420 L 230 425 L 230 455 L 200 460 L 185 440 Z" />
-
-          <text class="uk-label nation" x="180" y="430" style="font-size:18px">N. Ireland</text>
-          <text class="uk-label region" x="178" y="402" style="font-size:11px">Causeway Coast</text>
-          <text class="uk-label region" x="208" y="445" style="font-size:11px">Belfast</text>
+        <!-- Lake District -->
+        <g class="map-pin active" id="pin-lakedistrict" onclick="pinClick('lake-district')" data-name="Lake District" data-count="214 stays">
+          <circle cx="136" cy="230" r="22" fill="rgba(176,85,51,0.14)" class="pin-pulse"/>
+          <circle cx="136" cy="230" r="16" fill="var(--brick)" stroke="rgba(250,248,244,0.9)" stroke-width="2.5" class="pin-circle"/>
+          <text x="136" y="234" font-size="9.5" fill="white" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="500">214</text>
         </g>
+        <text x="136" y="254" font-size="8.5" fill="rgba(58,50,38,0.85)" text-anchor="middle" font-family="Instrument Serif,serif" font-style="italic" pointer-events="none">Lake District</text>
 
-        <!-- England + Wales mainland (~y=350-1000) -->
-        <g id="england-wales">
-          <!-- Mainland England + Wales as one outline -->
-          <path class="uk-region" data-region="england" d="
-            M 360 380
-            L 420 390
-            L 470 410
-            L 510 440
-            L 540 480
-            L 555 530
-            L 560 580
-            L 555 620
-            L 540 660
-            L 530 700
-            L 540 740
-            L 545 790
-            L 530 830
-            L 510 870
-            L 480 900
-            L 440 920
-            L 400 935
-            L 360 940
-            L 320 935
-            L 285 920
-            L 260 895
-            L 245 860
-            L 240 820
-            L 250 780
-            L 235 740
-            L 220 700
-            L 215 660
-            L 230 620
-            L 250 580
-            L 255 540
-            L 240 500
-            L 245 460
-            L 280 430
-            L 320 400
-            Z" />
-
-          <!-- Cornish southwest tail -->
-          <path class="uk-region" data-region="england" d="M 220 880 L 250 880 L 265 905 L 250 925 L 225 920 L 210 900 Z" />
-
-          <!-- Wales (carved into the west - inverse subregion area) -->
-          <path class="uk-subregion" data-sub="wales-zone" d="M 245 500 L 280 510 L 295 560 L 290 620 L 270 660 L 245 670 L 235 630 L 230 580 L 235 540 Z" fill="rgba(176,85,51,0.06)" stroke="rgba(22,20,15,0.12)" />
-
-          <!-- English regions -->
-          <path class="uk-subregion" data-sub="lakedistrict" data-name="Lake District" d="M 340 460 L 395 450 L 415 480 L 405 510 L 370 525 L 335 515 L 320 490 Z" />
-          <path class="uk-subregion" data-sub="yorkshire" data-name="Yorkshire" d="M 420 480 L 480 475 L 505 510 L 495 555 L 450 570 L 415 555 L 405 515 Z" />
-          <path class="uk-subregion" data-sub="peakdistrict" data-name="Peak District" d="M 380 555 L 430 550 L 440 580 L 420 605 L 385 605 L 370 580 Z" />
-          <path class="uk-subregion" data-sub="cotswolds" data-name="Cotswolds" d="M 360 700 L 420 695 L 435 730 L 415 760 L 370 760 L 350 730 Z" />
-          <path class="uk-subregion" data-sub="cornwall" data-name="Cornwall" d="M 200 870 L 270 860 L 295 890 L 275 920 L 220 925 L 195 905 Z" />
-          <path class="uk-subregion" data-sub="devon" data-name="Devon" d="M 275 825 L 335 820 L 350 855 L 330 880 L 280 880 L 265 855 Z" />
-          <path class="uk-subregion" data-sub="dorset" data-name="Dorset" d="M 360 855 L 420 850 L 435 880 L 415 905 L 370 905 L 350 880 Z" />
-          <path class="uk-subregion" data-sub="kent" data-name="Kent" d="M 480 800 L 540 795 L 555 825 L 535 850 L 490 845 L 475 820 Z" />
-          <path class="uk-subregion" data-sub="norfolk" data-name="Norfolk" d="M 490 600 L 545 595 L 560 635 L 540 665 L 495 660 L 480 625 Z" />
-          <path class="uk-subregion" data-sub="london" data-name="London" d="M 445 770 L 490 765 L 495 795 L 470 805 L 445 800 Z" />
-
-          <!-- Welsh regions -->
-          <path class="uk-subregion" data-sub="snowdonia" data-name="Snowdonia" d="M 235 530 L 280 525 L 295 555 L 280 580 L 245 580 L 225 555 Z" />
-          <path class="uk-subregion" data-sub="pembrokeshire" data-name="Pembrokeshire" d="M 225 620 L 265 615 L 280 645 L 260 670 L 225 665 L 215 640 Z" />
-
-          <!-- Rivers -->
-          <path class="uk-water" d="M 460 530 Q 470 580 480 620 Q 485 660 495 700" />
-          <path class="uk-water" d="M 410 590 Q 425 620 460 640" />
-
-          <!-- LABELS -->
-          <text class="uk-label nation" x="395" y="690">England</text>
-          <text class="uk-label nation" x="260" y="600" style="font-size:18px">Wales</text>
-
-          <!-- Region labels (sub) -->
-          <text class="uk-label region" x="367" y="490">Lake District</text>
-          <text class="uk-label region" x="460" y="520">Yorkshire</text>
-          <text class="uk-label region" x="405" y="580" style="font-size:11px">Peak Dist.</text>
-          <text class="uk-label region" x="390" y="732">Cotswolds</text>
-          <text class="uk-label region" x="245" y="898">Cornwall</text>
-          <text class="uk-label region" x="307" y="855" style="font-size:11px">Devon</text>
-          <text class="uk-label region" x="392" y="882" style="font-size:11px">Dorset</text>
-          <text class="uk-label region" x="515" y="828" style="font-size:11px">Kent</text>
-          <text class="uk-label region" x="520" y="635">Norfolk</text>
-          <text class="uk-label region" x="470" y="787" style="font-size:11px">London</text>
-          <text class="uk-label region" x="260" y="557" style="font-size:11px">Snowdonia</text>
-          <text class="uk-label region" x="248" y="645" style="font-size:11px">Pembs.</text>
-
-          <!-- Sub-labels (towns) -->
-          <text class="uk-label sub" x="380" y="465">Keswick</text>
-          <text class="uk-label sub" x="375" y="495">Windermere</text>
-          <text class="uk-label sub" x="250" y="912">St Ives</text>
-          <text class="uk-label sub" x="395" y="722">Stow</text>
-          <text class="uk-label sub" x="262" y="540">Snowdon</text>
+        <!-- Yorkshire -->
+        <g class="map-pin" id="pin-yorkshire" onclick="pinClick('yorkshire')" data-name="Yorkshire" data-count="98 stays">
+          <circle cx="170" cy="248" r="18" fill="rgba(176,85,51,0.12)" class="pin-pulse"/>
+          <circle cx="170" cy="248" r="13" fill="var(--brick)" stroke="rgba(250,248,244,0.9)" stroke-width="2" class="pin-circle"/>
+          <text x="170" y="252" font-size="8.5" fill="white" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="500">98</text>
         </g>
+        <text x="170" y="270" font-size="8" fill="rgba(58,50,38,0.8)" text-anchor="middle" font-family="Instrument Serif,serif" font-style="italic" pointer-events="none">Yorkshire</text>
 
-        <!-- Compass rose -->
-        <g transform="translate(740, 90)" opacity="0.4">
-          <circle r="22" fill="none" stroke="rgba(22,20,15,0.3)" stroke-width="0.5"/>
-          <path d="M 0 -18 L 4 0 L 0 4 L -4 0 Z" fill="#B05533"/>
-          <path d="M 0 18 L 4 0 L 0 -4 L -4 0 Z" fill="rgba(22,20,15,0.4)"/>
-          <text y="-26" text-anchor="middle" font-family="JetBrains Mono" font-size="9" letter-spacing="2" fill="rgba(22,20,15,0.6)">N</text>
+        <!-- Norfolk -->
+        <g class="map-pin" id="pin-norfolk" onclick="pinClick('norfolk')" data-name="Norfolk" data-count="112 stays">
+          <circle cx="196" cy="292" r="18" fill="rgba(176,85,51,0.12)" class="pin-pulse"/>
+          <circle cx="196" cy="292" r="13" fill="var(--brick)" stroke="rgba(250,248,244,0.9)" stroke-width="2" class="pin-circle"/>
+          <text x="196" y="296" font-size="8.5" fill="white" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="500">112</text>
         </g>
+        <text x="196" y="314" font-size="8" fill="rgba(58,50,38,0.8)" text-anchor="middle" font-family="Instrument Serif,serif" font-style="italic" pointer-events="none">Norfolk</text>
 
-        <!-- Scale bar -->
-        <g transform="translate(660, 1050)">
-          <line x1="0" y1="0" x2="80" y2="0" stroke="rgba(22,20,15,0.4)" stroke-width="1"/>
-          <line x1="0" y1="-4" x2="0" y2="4" stroke="rgba(22,20,15,0.4)" stroke-width="1"/>
-          <line x1="40" y1="-3" x2="40" y2="3" stroke="rgba(22,20,15,0.4)" stroke-width="1"/>
-          <line x1="80" y1="-4" x2="80" y2="4" stroke="rgba(22,20,15,0.4)" stroke-width="1"/>
-          <text x="40" y="16" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(22,20,15,0.6)" letter-spacing="1">100 MI</text>
+        <!-- Wales / Snowdonia / Pembrokeshire -->
+        <g class="map-pin" id="pin-wales" onclick="pinClick('snowdonia')" data-name="Wales" data-count="395 stays">
+          <circle cx="83" cy="222" r="16" fill="rgba(176,85,51,0.1)" class="pin-pulse"/>
+          <circle cx="83" cy="222" r="11" fill="var(--brick)" stroke="rgba(250,248,244,0.9)" stroke-width="2" class="pin-circle"/>
+          <text x="83" y="226" font-size="7.5" fill="white" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="500">102</text>
         </g>
+        <text x="83" y="242" font-size="8" fill="rgba(58,50,38,0.8)" text-anchor="middle" font-family="Instrument Serif,serif" font-style="italic" pointer-events="none">Wales</text>
+
+        <!-- Cotswolds -->
+        <g class="map-pin" id="pin-cotswolds" onclick="pinClick('cotswolds')" data-name="Cotswolds" data-count="87 stays">
+          <circle cx="148" cy="352" r="16" fill="rgba(176,85,51,0.1)" class="pin-pulse"/>
+          <circle cx="148" cy="352" r="11" fill="var(--brick)" stroke="rgba(250,248,244,0.9)" stroke-width="2" class="pin-circle"/>
+          <text x="148" y="356" font-size="7.5" fill="white" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="500">87</text>
+        </g>
+        <text x="148" y="372" font-size="8" fill="rgba(58,50,38,0.8)" text-anchor="middle" font-family="Instrument Serif,serif" font-style="italic" pointer-events="none">Cotswolds</text>
+
+        <!-- Cornwall -->
+        <g class="map-pin" id="pin-cornwall" onclick="pinClick('cornwall')" data-name="Cornwall" data-count="198 stays">
+          <circle cx="112" cy="426" r="20" fill="rgba(176,85,51,0.12)" class="pin-pulse"/>
+          <circle cx="112" cy="426" r="15" fill="var(--brick)" stroke="rgba(250,248,244,0.9)" stroke-width="2.5" class="pin-circle"/>
+          <text x="112" y="430" font-size="9" fill="white" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="500">198</text>
+        </g>
+        <text x="112" y="450" font-size="8.5" fill="rgba(58,50,38,0.85)" text-anchor="middle" font-family="Instrument Serif,serif" font-style="italic" pointer-events="none">Cornwall</text>
+
       </svg>
     </div>
 
-    <!-- Pin layer (outside canvas, positioned via JS) -->
-    <div class="pin-layer" id="pinLayer"></div>
-
-    <!-- Preview card -->
-    <a href="property.html" class="preview-card" id="previewCard">
-      <div class="ppi">
-        <div class="ph warm" data-label="" id="pcImg"></div>
-        <button class="pp-close" onclick="event.preventDefault();hidePreview();"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M6 18 18 6"/></svg></button>
-      </div>
-      <div class="pp-row">
-        <div class="pp-nm" id="pcName">Stone Cottage, <i>Windermere</i></div>
-        <div class="pp-rate stars">
-          <svg viewBox="0 0 24 24" fill="var(--ink)" stroke="none" width="11" height="11"><path d="M12 2l3 6.5 7 1-5 5 1.5 7L12 18l-6.5 3.5L7 14.5l-5-5 7-1z"/></svg>
-          <span id="pcRating">4.9</span>
-        </div>
-      </div>
-      <div class="pp-loc" id="pcLoc">Lake District · Sleeps 6 · Dogs ok</div>
-      <div class="pp-tags" id="pcTags"></div>
-      <div class="pp-price"><span><i id="pcPrice">£175</i> <span style="font-size:11px;color:var(--ink-3)">/ night · £0 fee</span></span><span class="pp-enq">Enquire →</span></div>
+    <!-- Browse link -->
+    <a href="browse.html" class="browse-link">
+      <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+      Browse as list
     </a>
 
-    <div class="zoom-ind">
-      <span>Zoom</span>
-      <span class="ind-level" id="zoomLevel">UK</span>
-      <span class="ind-bar"><span class="fill" id="zoomFill" style="width:14%"></span></span>
-      <span id="zoomNum">1×</span>
+    <!-- Region info overlay -->
+    <div class="map-info" id="mapInfo">
+      <div class="mi-eyebrow">Selected region</div>
+      <div class="mi-title" id="miTitle">All <i>UK</i></div>
+      <div class="mi-count" id="miCount">4,202 stays across the UK</div>
+      <a href="browse.html" class="mi-cta" id="miCta">
+        Browse stays
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
     </div>
 
-    <div class="map-controls">
-      <button id="zoomIn" title="Zoom in"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
-      <button id="zoomOut" title="Zoom out"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
-      <button id="recenter" title="Recenter"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2"/></svg></button>
+    <!-- Sub-region strip -->
+    <div class="sub-strip" id="subStrip">
+      <span class="sub-chip active" onclick="subChip(this,'all')">All UK</span>
+      <span class="sub-chip" onclick="subChip(this,'lake-district')">🏔️ Lake District</span>
+      <span class="sub-chip" onclick="subChip(this,'cornwall')">🌊 Cornwall</span>
+      <span class="sub-chip" onclick="subChip(this,'highlands')">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Highlands</span>
+      <span class="sub-chip" onclick="subChip(this,'yorkshire')">🐑 Yorkshire</span>
+      <span class="sub-chip" onclick="subChip(this,'cotswolds')">🌿 Cotswolds</span>
+      <span class="sub-chip" onclick="subChip(this,'skye')">⛵ Skye</span>
+      <span class="sub-chip" onclick="subChip(this,'norfolk')">🌾 Norfolk</span>
+      <span class="sub-chip" onclick="subChip(this,'snowdonia')">🏴󠁧󠁢󠁷󠁬󠁳󠁿 Snowdonia</span>
+      <span class="sub-chip" onclick="subChip(this,'pembrokeshire')">🌊 Pembrokeshire</span>
+      <span class="sub-chip" onclick="subChip(this,'causeway')">🇬🇧 Causeway Coast</span>
     </div>
 
-  </div>
-
-</div>
-
-<button class="tweaks-fab" onclick="toggleTweaks()">
-  <svg viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/><circle cx="9" cy="5" r="2" fill="var(--brick)" stroke="none"/><circle cx="15" cy="12" r="2" fill="var(--brick)" stroke="none"/><circle cx="7" cy="19" r="2" fill="var(--brick)" stroke="none"/></svg>
-  Tweaks
-</button>
-
-<!-- TWEAKS PANEL -->
-<div class="tweaks-panel" id="tweaksPanel">
-  <div class="tp-head">
-    <div class="tp-ttl"><i>Map</i> tweaks</div>
-    <button class="tp-close" onclick="toggleTweaks()"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M6 18 18 6"/></svg></button>
-  </div>
-  <div class="tp-body">
-
-    <div class="tp-sect">
-      <h5>Map style</h5>
-      <div class="tweak-radio cols-4" id="tw-style">
-        <button class="active" data-v="default">Paper</button>
-        <button data-v="parchment">Parchment</button>
-        <button data-v="minimal">Minimal</button>
-        <button data-v="dark">Dark</button>
-      </div>
+    <!-- Zoom -->
+    <div class="zoom-ctrl">
+      <button class="zoom-btn" title="Zoom in">+</button>
+      <button class="zoom-btn" title="Zoom out">−</button>
     </div>
 
-    <div class="tp-sect">
-      <h5>Pin density</h5>
-      <div class="tweak-radio cols-3" id="tw-density">
-        <button data-v="low">Sparse</button>
-        <button class="active" data-v="med">Balanced</button>
-        <button data-v="high">All</button>
-      </div>
-    </div>
-
-    <div class="tp-sect">
-      <h5>Show</h5>
-      <div class="tweak-toggle"><span class="lbl">Price labels</span><span class="sw on" data-key="prices" onclick="toggleSw(this)"></span></div>
-      <div class="tweak-toggle"><span class="lbl">Region boundaries</span><span class="sw on" data-key="regions" onclick="toggleSw(this)"></span></div>
-      <div class="tweak-toggle"><span class="lbl">Place labels</span><span class="sw on" data-key="labels" onclick="toggleSw(this)"></span></div>
-      <div class="tweak-toggle"><span class="lbl">Grid background</span><span class="sw on" data-key="grid" onclick="toggleSw(this)"></span></div>
-      <div class="tweak-toggle"><span class="lbl">Hashtag pins</span><span class="sw" data-key="hashtags" onclick="toggleSw(this)"></span></div>
-      <div class="tweak-toggle"><span class="lbl">Animated clusters</span><span class="sw on" data-key="anim" onclick="toggleSw(this)"></span></div>
-    </div>
-
-    <div class="tp-sect tweak-slider">
-      <h5>Zoom</h5>
-      <div class="row"><span class="lbl">Level</span><span class="val" id="zoomVal">1.0×</span></div>
-      <input type="range" min="100" max="700" value="100" id="zoomRange" oninput="setZoomFromSlider(this.value/100)">
-    </div>
-
-    <div class="tp-sect">
-      <h5>Quick jump</h5>
-      <div class="tweak-radio cols-3" id="tw-jump">
-        <button data-region="lakedistrict">Lake District</button>
-        <button data-region="cornwall">Cornwall</button>
-        <button data-region="skye">Skye</button>
-        <button data-region="cotswolds">Cotswolds</button>
-        <button data-region="snowdonia">Snowdonia</button>
-        <button data-region="highlands">Highlands</button>
-      </div>
+    <!-- Hover tooltip -->
+    <div class="map-tooltip" id="mapTooltip">
+      <div class="tt-name" id="ttName"></div>
+      <div class="tt-count" id="ttCount"></div>
     </div>
   </div>
+
 </div>
 
 <script>
-  /* ───────────── DATA ───────────── */
-  // Properties (x,y are SVG coordinates within the 800x1100 canvas)
-  const PROPERTIES = [
-    { id:'p1', x:380, y:495, price:'£175', name:'Stone Cottage, Windermere', loc:'Lake District · Sleeps 6 · Dogs ok', tags:['Cottage','Pet ok','Wood burner'], rating:4.9, img:'warm', region:'lakedistrict', nation:'england', saved:true },
-    { id:'p2', x:355, y:475, price:'£215', name:'Slate Barn, Ambleside', loc:'Lake District · Sleeps 4 · Sauna', tags:['Barn','Hot tub'], rating:4.8, img:'sage', region:'lakedistrict', nation:'england' },
-    { id:'p3', x:395, y:510, price:'£145', name:'Lakeside Cabin, Coniston', loc:'Lake District · Sleeps 2 · On water', tags:['Cabin','On water'], rating:5.0, img:'dusk', region:'lakedistrict', nation:'england' },
-    { id:'p4', x:340, y:490, price:'£240', name:'Georgian House, Keswick', loc:'Lake District · Sleeps 8', tags:['Georgian','Garden'], rating:4.9, img:'fog', region:'lakedistrict', nation:'england' },
-    { id:'p5', x:370, y:515, price:'£95',  name:'Shepherd\'s Hut, Buttermere', loc:'Lake District · Sleeps 2 · Off-grid', tags:['Hut','Off-grid'], rating:4.7, img:'cool', region:'lakedistrict', nation:'england' },
-    { id:'p6', x:385, y:485, price:'£195', name:'The Granary, Hawkshead', loc:'Lake District · Sleeps 5', tags:['Pet ok','Open fire'], rating:4.9, img:'brick', region:'lakedistrict', nation:'england' },
+// ══════════════════════════════════════════
+// DATA — shared with browse.html
+// ══════════════════════════════════════════
+const PROPS = [
+  {id:1,title:'Stone Cottage',loc:'Windermere',region:'lake-district',nation:'england',rLabel:'Lake District',type:'cottage',price:175,rating:4.9,reviews:23,sleeps:6,beds:3,tags:['woodburner','pets'],badge:'verified',col:'#C8A882'},
+  {id:2,title:'Slate Barn',loc:'Ambleside',region:'lake-district',nation:'england',rLabel:'Lake District',type:'barn',price:215,rating:4.8,reviews:11,sleeps:4,beds:2,tags:['hottub'],badge:'new',col:'#8DA88A'},
+  {id:3,title:'Lakeside Cabin',loc:'Coniston',region:'lake-district',nation:'england',rLabel:'Lake District',type:'cabin',price:145,rating:5.0,reviews:34,sleeps:2,beds:1,tags:[],col:'#8A7DB0'},
+  {id:4,title:'Georgian House',loc:'Keswick',region:'lake-district',nation:'england',rLabel:'Lake District',type:'cottage',price:240,rating:4.9,reviews:47,sleeps:8,beds:4,tags:['parking'],badge:'verified',col:'#A8B4C0'},
+  {id:5,title:"Shepherd's Hut",loc:'Buttermere',region:'lake-district',nation:'england',rLabel:'Lake District',type:'glamping',price:95,rating:4.7,reviews:8,sleeps:2,beds:1,tags:['offgrid'],col:'#7BA0B4'},
+  {id:6,title:"Miller's Cottage",loc:'Grasmere',region:'lake-district',nation:'england',rLabel:'Lake District',type:'cottage',price:165,rating:4.8,reviews:19,sleeps:4,beds:2,tags:['woodburner'],col:'#3C3830'},
+  {id:7,title:'The Granary',loc:'Hawkshead',region:'lake-district',nation:'england',rLabel:'Lake District',type:'farmhouse',price:195,rating:4.9,reviews:56,sleeps:5,beds:3,tags:['pets','woodburner'],badge:'editors',col:'#B05533'},
+  {id:8,title:'Hillside Farmhouse',loc:'Grizedale',region:'lake-district',nation:'england',rLabel:'Lake District',type:'farmhouse',price:385,rating:4.6,reviews:14,sleeps:10,beds:5,tags:['hottub'],col:'#C8A882'},
+  {id:9,title:'Cliffside Cottage',loc:'Porthcurno',region:'cornwall',nation:'england',rLabel:'Cornwall',type:'cottage',price:210,rating:4.9,reviews:41,sleeps:4,beds:2,tags:['seaview','woodburner'],badge:'verified',col:'#8A7DB0'},
+  {id:10,title:'Tregothnan Lodge',loc:'Truro',region:'cornwall',nation:'england',rLabel:'Cornwall',type:'cabin',price:320,rating:4.8,reviews:22,sleeps:8,beds:4,tags:['hottub','pets'],col:'#8DA88A'},
+  {id:11,title:'Harbour Cottage',loc:'Mousehole',region:'cornwall',nation:'england',rLabel:'Cornwall',type:'cottage',price:155,rating:4.9,reviews:63,sleeps:3,beds:2,tags:['seaview'],badge:'editors',col:'#7BA0B4'},
+  {id:12,title:'St Agnes Farmhouse',loc:'St Agnes',region:'cornwall',nation:'england',rLabel:'Cornwall',type:'farmhouse',price:185,rating:4.7,reviews:18,sleeps:6,beds:3,tags:['woodburner','pets'],col:'#C8A882'},
+  {id:13,title:'The Boathouse',loc:'Fowey',region:'cornwall',nation:'england',rLabel:'Cornwall',type:'houseboat',price:175,rating:5.0,reviews:29,sleeps:2,beds:1,tags:['seaview'],badge:'verified',col:'#A8B4C0'},
+  {id:14,title:'Mizen Shepherd Hut',loc:'Zennor',region:'cornwall',nation:'england',rLabel:'Cornwall',type:'glamping',price:115,rating:4.8,reviews:12,sleeps:2,beds:1,tags:['offgrid','seaview'],col:'#8A7DB0'},
+  {id:15,title:'Restored Blackhouse',loc:'Trotternish',region:'highlands',nation:'scotland',rLabel:'Isle of Skye',type:'cottage',price:195,rating:4.9,reviews:31,sleeps:4,beds:2,tags:['offgrid','hottub','seaview'],badge:'verified',col:'#7BA0B4'},
+  {id:16,title:'Glen Coe Bothy',loc:'Glencoe',region:'highlands',nation:'scotland',rLabel:'Highlands',type:'cabin',price:130,rating:4.7,reviews:15,sleeps:3,beds:2,tags:['woodburner','offgrid'],col:'#A8B4C0'},
+  {id:17,title:'Loch Ness Lodge',loc:'Drumnadrochit',region:'highlands',nation:'scotland',rLabel:'Highlands',type:'cabin',price:280,rating:4.8,reviews:44,sleeps:6,beds:3,tags:['seaview','hottub'],col:'#8DA88A'},
+  {id:18,title:'Croft House',loc:'Torridon',region:'highlands',nation:'scotland',rLabel:'Highlands',type:'farmhouse',price:165,rating:4.9,reviews:27,sleeps:4,beds:2,tags:['woodburner','pets'],badge:'verified',col:'#C8A882'},
+  {id:19,title:'Isle of Skye Hideaway',loc:'Portree',region:'skye',nation:'scotland',rLabel:'Isle of Skye',type:'cottage',price:220,rating:5.0,reviews:38,sleeps:2,beds:1,tags:['seaview','offgrid'],badge:'editors',col:'#8A7DB0'},
+  {id:20,title:'Burnham Overy Barn',loc:'Burnham Overy',region:'norfolk',nation:'england',rLabel:'Norfolk',type:'barn',price:195,rating:4.8,reviews:33,sleeps:6,beds:3,tags:['seaview','pets'],badge:'verified',col:'#C8A882'},
+  {id:21,title:'The Granary',loc:'Wells-next-the-Sea',region:'norfolk',nation:'england',rLabel:'Norfolk',type:'farmhouse',price:145,rating:4.7,reviews:21,sleeps:4,beds:2,tags:['woodburner'],col:'#8DA88A'},
+  {id:22,title:'Saltmarsh Cabin',loc:'Blakeney',region:'norfolk',nation:'england',rLabel:'Norfolk',type:'cabin',price:110,rating:4.6,reviews:9,sleeps:2,beds:1,tags:['seaview','offgrid'],col:'#7BA0B4'},
+  {id:23,title:'Brancaster Hall',loc:'Brancaster',region:'norfolk',nation:'england',rLabel:'Norfolk',type:'manor',price:450,rating:4.9,reviews:17,sleeps:12,beds:6,tags:['hottub'],badge:'editors',col:'#3C3830'},
+  {id:24,title:'Moorland Cottage',loc:'Goathland',region:'yorkshire',nation:'england',rLabel:'N. Yorkshire',type:'cottage',price:160,rating:4.8,reviews:28,sleeps:4,beds:2,tags:['woodburner','pets'],badge:'verified',col:'#C8A882'},
+  {id:25,title:'Dales Farmhouse',loc:'Wharfedale',region:'yorkshire',nation:'england',rLabel:'Yorkshire Dales',type:'farmhouse',price:225,rating:4.9,reviews:52,sleeps:8,beds:4,tags:['hottub','pets'],badge:'editors',col:'#8A7DB0'},
+  {id:26,title:'The Old Forge',loc:'Whitby',region:'yorkshire',nation:'england',rLabel:'N. Yorkshire',type:'cottage',price:135,rating:4.7,reviews:14,sleeps:3,beds:2,tags:['seaview','woodburner'],col:'#A8B4C0'},
+  {id:27,title:'Honeysuckle Cottage',loc:'Bourton-on-the-Water',region:'cotswolds',nation:'england',rLabel:'Cotswolds',type:'cottage',price:195,rating:4.9,reviews:44,sleeps:4,beds:2,tags:['woodburner'],badge:'verified',col:'#C8A882'},
+  {id:28,title:'Chipping Manor',loc:'Chipping Campden',region:'cotswolds',nation:'england',rLabel:'Cotswolds',type:'manor',price:550,rating:5.0,reviews:19,sleeps:14,beds:7,tags:['hottub'],badge:'editors',col:'#8DA88A'},
+  {id:29,title:'The Old Mill',loc:'Bourton-on-the-Hill',region:'cotswolds',nation:'england',rLabel:'Cotswolds',type:'farmhouse',price:175,rating:4.8,reviews:31,sleeps:5,beds:3,tags:['woodburner','pets'],col:'#8A7DB0'},
+  {id:30,title:'Pembroke Cliffside',loc:'St Davids',region:'pembrokeshire',nation:'wales',rLabel:'Pembrokeshire',type:'cottage',price:175,rating:4.9,reviews:36,sleeps:4,beds:2,tags:['seaview','woodburner'],badge:'verified',col:'#7BA0B4'},
+  {id:31,title:'The Boathouse',loc:'Solva',region:'pembrokeshire',nation:'wales',rLabel:'Pembrokeshire',type:'houseboat',price:155,rating:4.8,reviews:18,sleeps:2,beds:1,tags:['seaview'],col:'#8A7DB0'},
+  {id:32,title:'Coast Path Glamping',loc:'Marloes',region:'pembrokeshire',nation:'wales',rLabel:'Pembrokeshire',type:'glamping',price:90,rating:4.7,reviews:11,sleeps:2,beds:1,tags:['seaview','offgrid'],col:'#8DA88A'},
+  {id:33,title:'Hafod Cottage',loc:'Betws-y-Coed',region:'snowdonia',nation:'wales',rLabel:'Snowdonia',type:'cottage',price:145,rating:4.8,reviews:24,sleeps:4,beds:2,tags:['woodburner','pets'],badge:'verified',col:'#C8A882'},
+  {id:34,title:'Llyn Padarn Cabin',loc:'Llanberis',region:'snowdonia',nation:'wales',rLabel:'Snowdonia',type:'cabin',price:185,rating:4.9,reviews:39,sleeps:4,beds:2,tags:['seaview','hottub'],badge:'editors',col:'#7BA0B4'},
+  {id:35,title:"Giant's Causeway Cottage",loc:'Bushmills',region:'causeway',nation:'ni',rLabel:'Causeway Coast',type:'cottage',price:165,rating:4.9,reviews:22,sleeps:4,beds:2,tags:['seaview','woodburner'],badge:'verified',col:'#A8B4C0'},
+  {id:36,title:'Dark Hedges Farmhouse',loc:'Armoy',region:'causeway',nation:'ni',rLabel:'Antrim',type:'farmhouse',price:190,rating:4.8,reviews:15,sleeps:6,beds:3,tags:['woodburner','pets'],col:'#C8A882'},
+];
 
-    { id:'p7', x:234, y:158, price:'£195', name:'Blackhouse, Trotternish', loc:'Isle of Skye · Sleeps 4 · Hot tub', tags:['Off-grid','Hot tub'], rating:5.0, img:'dusk', region:'skye', nation:'scotland', saved:true },
-    { id:'p8', x:226, y:170, price:'£165', name:'Stone Bothy, Skye', loc:'Isle of Skye · Sleeps 2', tags:['Off-grid'], rating:4.8, img:'ink', region:'skye', nation:'scotland' },
-    { id:'p9', x:438, y:200, price:'£220', name:'Geodome, Cairngorms', loc:'Scottish Highlands · Glamping', tags:['Glamping','Hot tub'], rating:5.0, img:'cool', region:'cairngorms', nation:'scotland' },
-    { id:'p10', x:462, y:275, price:'£185', name:'Old Town Flat, Edinburgh', loc:'Edinburgh · Sleeps 4', tags:['City','Walk-up'], rating:4.7, img:'fog', region:'edinburgh', nation:'scotland' },
-    { id:'p11', x:395, y:155, price:'£275', name:'Highland Lodge', loc:'Scottish Highlands · Sleeps 6', tags:['Lodge','Pet ok'], rating:4.9, img:'sage', region:'highlands', nation:'scotland' },
+const REGION_INFO = {
+  'all':          {title:'All <i>UK</i>',count:'4,202 stays across the UK',href:'browse.html'},
+  'lake-district':{title:'<i>Lake District</i>',count:'214 stays · Cumbria, England',href:'browse.html?region=lake-district'},
+  'cornwall':     {title:'<i>Cornwall</i>',count:'198 stays · South West England',href:'browse.html?region=cornwall'},
+  'highlands':    {title:'Scottish <i>Highlands</i>',count:'145 stays · Scotland',href:'browse.html?region=highlands'},
+  'norfolk':      {title:'<i>Norfolk</i>',count:'112 stays · East Anglia',href:'browse.html?region=norfolk'},
+  'yorkshire':    {title:'<i>Yorkshire</i>',count:'98 stays · Northern England',href:'browse.html?region=yorkshire'},
+  'cotswolds':    {title:'The <i>Cotswolds</i>',count:'87 stays · Gloucestershire',href:'browse.html?region=cotswolds'},
+  'skye':         {title:'Isle of <i>Skye</i>',count:'67 stays · Scotland',href:'browse.html?region=skye'},
+  'snowdonia':    {title:'<i>Snowdonia</i>',count:'54 stays · Wales',href:'browse.html?region=snowdonia'},
+  'pembrokeshire':{title:'<i>Pembrokeshire</i>',count:'48 stays · Wales',href:'browse.html?region=pembrokeshire'},
+  'causeway':     {title:'Causeway <i>Coast</i>',count:'29 stays · N. Ireland',href:'browse.html?region=causeway'},
+};
 
-    { id:'p12', x:240, y:890, price:'£155', name:'Clifftop Cottage, St Ives', loc:'Cornwall · Sea view · Sleeps 4', tags:['Sea view','Pet ok'], rating:4.8, img:'cool', region:'cornwall', nation:'england' },
-    { id:'p13', x:255, y:905, price:'£135', name:'Surf House, Newquay', loc:'Cornwall · Sleeps 6', tags:['Sea view'], rating:4.6, img:'dusk', region:'cornwall', nation:'england' },
-    { id:'p14', x:220, y:900, price:'£185', name:'Lighthouse Keeper\'s, Lizard', loc:'Cornwall · Sleeps 3', tags:['Unique','Sea view'], rating:5.0, img:'ink', region:'cornwall', nation:'england' },
+const TAG_LABELS = {woodburner:'Wood burner',hottub:'Hot tub',pets:'Pets ok',seaview:'Sea view',offgrid:'Off-grid',glamping:'Glamping',lastminute:'Last min'};
+const BADGE_CFG  = {verified:{cls:'moss',text:'✓ Verified'},editors:{cls:'',text:"Editor's pick"},new:{cls:'ink',text:'New'}};
 
-    { id:'p15', x:262, y:560, price:'£210', name:'Stone Farmhouse, Betws-y-Coed', loc:'Snowdonia · Sleeps 8', tags:['Farmhouse','Pet ok'], rating:4.7, img:'sage', region:'snowdonia', nation:'wales' },
-    { id:'p16', x:248, y:545, price:'£165', name:'Slate Cottage, Llanberis', loc:'Snowdonia · Sleeps 4', tags:['Cottage'], rating:4.8, img:'fog', region:'snowdonia', nation:'wales' },
+let state = { nation:'all', region:'all', filters:new Set(), sort:'curated' };
 
-    { id:'p17', x:385, y:725, price:'£195', name:'Cotswold Stone House, Stow', loc:'Cotswolds · Sleeps 6', tags:['Cotswold','Garden'], rating:4.9, img:'warm', region:'cotswolds', nation:'england' },
-    { id:'p18', x:405, y:735, price:'£245', name:'Manor Wing, Bibury', loc:'Cotswolds · Sleeps 8', tags:['Historic'], rating:4.8, img:'fog', region:'cotswolds', nation:'england' },
-
-    { id:'p19', x:178, y:400, price:'£140', name:'Cliffside Cottage, Portrush', loc:'Causeway Coast · Sleeps 5', tags:['Sea view','Open fire'], rating:4.9, img:'fog', region:'causewaycoast', nation:'ni', saved:true },
-    { id:'p20', x:215, y:445, price:'£125', name:'Townhouse, Belfast', loc:'Belfast · Sleeps 4', tags:['City'], rating:4.6, img:'ink', region:'belfast', nation:'ni' },
-
-    { id:'p21', x:520, y:625, price:'£175', name:'Coastal Barn, Holkham', loc:'Norfolk · Sea view · Sleeps 6', tags:['Sea view','Barn'], rating:4.7, img:'cool', region:'norfolk', nation:'england' },
-    { id:'p22', x:307, y:855, price:'£165', name:'Riverside Cottage, Totnes', loc:'Devon · Sleeps 4', tags:['Riverside'], rating:4.7, img:'sage', region:'devon', nation:'england' },
-  ];
-
-  // Regions
-  const REGIONS = {
-    lakedistrict: { name: 'Lake District', cx: 367, cy: 488, nation: 'england', count: 214 },
-    yorkshire:    { name: 'Yorkshire',     cx: 460, cy: 520, nation: 'england', count: 98 },
-    peakdistrict: { name: 'Peak District', cx: 405, cy: 580, nation: 'england', count: 64 },
-    cotswolds:    { name: 'Cotswolds',     cx: 390, cy: 728, nation: 'england', count: 87 },
-    cornwall:     { name: 'Cornwall',      cx: 245, cy: 895, nation: 'england', count: 198 },
-    devon:        { name: 'Devon',         cx: 307, cy: 850, nation: 'england', count: 76 },
-    dorset:       { name: 'Dorset',        cx: 390, cy: 877, nation: 'england', count: 52 },
-    norfolk:      { name: 'Norfolk',       cx: 520, cy: 628, nation: 'england', count: 112 },
-    london:       { name: 'London',        cx: 470, cy: 785, nation: 'england', count: 318 },
-    kent:         { name: 'Kent',          cx: 515, cy: 822, nation: 'england', count: 41 },
-    highlands:    { name: 'Highlands',     cx: 395, cy: 165, nation: 'scotland', count: 145 },
-    skye:         { name: 'Isle of Skye',  cx: 234, cy: 158, nation: 'scotland', count: 67 },
-    edinburgh:    { name: 'Edinburgh',     cx: 462, cy: 275, nation: 'scotland', count: 98 },
-    cairngorms:   { name: 'Cairngorms',    cx: 438, cy: 200, nation: 'scotland', count: 43 },
-    snowdonia:    { name: 'Snowdonia',     cx: 260, cy: 555, nation: 'wales', count: 54 },
-    pembrokeshire:{ name: 'Pembrokeshire', cx: 248, cy: 645, nation: 'wales', count: 48 },
-    causewaycoast:{ name: 'Causeway Coast',cx: 178, cy: 400, nation: 'ni', count: 29 },
-    belfast:      { name: 'Belfast',       cx: 212, cy: 445, nation: 'ni', count: 38 },
-  };
-
-  const NATIONS = {
-    england:  { name: 'England',  cx: 395, cy: 690, count: 2841 },
-    scotland: { name: 'Scotland', cx: 395, cy: 200, count: 892 },
-    wales:    { name: 'Wales',    cx: 260, cy: 600, count: 341 },
-    ni:       { name: 'N. Ireland', cx: 180, cy: 430, count: 128 },
-  };
-
-  const HASHTAGS = [
-    { name: 'seaview', cx: 200, cy: 870, count: 156 },
-    { name: 'mountain', cx: 380, cy: 470, count: 89 },
-    { name: 'offgrid', cx: 234, cy: 175, count: 62 },
-    { name: 'cottage', cx: 390, cy: 720, count: 341 },
-    { name: 'glamping', cx: 440, cy: 210, count: 89 },
-    { name: 'hottub', cx: 460, cy: 280, count: 71 },
-  ];
-
-  /* ───────────── ZOOM/PAN STATE ───────────── */
-  const CANVAS_W = 800, CANVAS_H = 1100;
-  let zoom = 1, tx = 0, ty = 0;
-  let activeRegion = null, activeNation = 'all';
-  let activeFilters = ['petfriendly'];
-  let tweaks = {
-    style: 'default',
-    density: 'med',
-    prices: true,
-    regions: true,
-    labels: true,
-    grid: true,
-    hashtags: false,
-    anim: true,
-  };
-
-  const mapArea = document.getElementById('mapArea');
-  const canvas = document.getElementById('mapCanvas');
-  const pinLayer = document.getElementById('pinLayer');
-
-  function applyTransform(animate = true) {
-    if (!animate) canvas.classList.add('no-transition');
-    canvas.style.transform = `translate(${tx}px, ${ty}px) scale(${zoom})`;
-    if (!animate) requestAnimationFrame(() => canvas.classList.remove('no-transition'));
-    renderPins();
-    updateZoomLabel();
-  }
-
-  function updateZoomLabel() {
-    const lvl = zoom < 1.5 ? 'UK' : zoom < 2.5 ? 'Nation' : zoom < 4 ? 'Region' : 'Local';
-    document.getElementById('zoomLevel').textContent = lvl;
-    document.getElementById('zoomNum').textContent = zoom.toFixed(1) + '×';
-    document.getElementById('zoomVal').textContent = zoom.toFixed(1) + '×';
-    const pct = ((zoom - 1) / 6) * 100;
-    document.getElementById('zoomFill').style.width = Math.min(100, pct) + '%';
-    document.getElementById('zoomRange').value = zoom * 100;
-  }
-
-  /* Convert SVG coords to screen coords */
-  function svgToScreen(x, y) {
-    const areaRect = mapArea.getBoundingClientRect();
-    // Canvas position: scaled then translated. Canvas at (0,0) with width CANVAS_W * zoom
-    return {
-      sx: tx + x * zoom,
-      sy: ty + y * zoom,
-      visible: true,
-    };
-  }
-
-  /* ───────────── PIN RENDERING ───────────── */
-  function renderPins() {
-    pinLayer.innerHTML = '';
-
-    // Decide what to show by zoom level
-    if (zoom < 1.5) {
-      // Nation clusters
-      Object.entries(NATIONS).forEach(([key, nation]) => {
-        if (activeNation !== 'all' && activeNation !== key) return;
-        const { sx, sy } = svgToScreen(nation.cx, nation.cy);
-        const isPrimary = nation.count > 800;
-        const size = isPrimary ? 76 : 56;
-        const el = document.createElement('div');
-        el.className = 'pin-nation';
-        el.style.cssText = `left:${sx}px;top:${sy}px;width:${size}px;height:${size}px`;
-        el.innerHTML = `<div class="n" style="font-size:${isPrimary?28:20}px">${nation.count}</div><div class="lab" style="font-size:${isPrimary?9:8}px">${nation.name.slice(0,6)}</div>`;
-        el.onclick = () => jumpToNation(key);
-        pinLayer.appendChild(el);
-      });
-    } else if (zoom < 3) {
-      // Region clusters
-      Object.entries(REGIONS).forEach(([key, region]) => {
-        if (activeNation !== 'all' && region.nation !== activeNation) return;
-        const { sx, sy } = svgToScreen(region.cx, region.cy);
-        const el = document.createElement('div');
-        el.className = 'pin-region';
-        el.innerHTML = `<span class="num">${region.count}</span> <span style="font-style:italic">${region.name}</span>`;
-        el.style.cssText = `left:${sx}px;top:${sy}px`;
-        el.onclick = () => jumpToRegion(key);
-        pinLayer.appendChild(el);
-      });
-    } else {
-      // Individual price pins
-      if (tweaks.prices) {
-        const density = tweaks.density;
-        let pinSet = PROPERTIES;
-        if (density === 'low') pinSet = PROPERTIES.filter((p,i) => i % 3 === 0);
-        else if (density === 'med') pinSet = PROPERTIES.filter((p,i) => i % 2 === 0 || p.saved);
-
-        pinSet.forEach(prop => {
-          if (activeRegion && prop.region !== activeRegion) return;
-          if (activeNation !== 'all' && prop.nation !== activeNation) return;
-          const { sx, sy } = svgToScreen(prop.x, prop.y);
-          const el = document.createElement('div');
-          el.className = 'pin-price' + (prop.saved ? ' saved' : '');
-          el.innerHTML = (prop.saved ? '<svg viewBox="0 0 24 24"><path d="M12 20s-7-4.5-9.5-9c-1.5-2.8.4-6 3.5-6 1.8 0 3.2 1 4 2.5C10.8 6 12.2 5 14 5c3.1 0 5 3.2 3.5 6C15 15.5 12 20 12 20z"/></svg>' : '') + prop.price;
-          el.style.cssText = `left:${sx}px;top:${sy}px`;
-          el.onclick = () => showProperty(prop, el);
-          pinLayer.appendChild(el);
-        });
-      }
-    }
-
-    // Hashtag pins
-    if (tweaks.hashtags) {
-      HASHTAGS.forEach(ht => {
-        const { sx, sy } = svgToScreen(ht.cx, ht.cy);
-        const el = document.createElement('div');
-        el.className = 'pin-hashtag';
-        el.innerHTML = `#${ht.name} <span class="ct">${ht.count}</span>`;
-        el.style.cssText = `left:${sx}px;top:${sy}px`;
-        pinLayer.appendChild(el);
-      });
-    }
-
-    // Label visibility
-    document.documentElement.style.setProperty('--label-nation', zoom < 1.6 ? 1 : 0);
-    document.documentElement.style.setProperty('--label-region', zoom >= 1.6 && zoom < 4 && tweaks.labels ? 1 : 0);
-    document.documentElement.style.setProperty('--label-sub', zoom >= 4 && tweaks.labels ? 1 : 0);
-  }
-
-  function showProperty(prop, el) {
-    document.querySelectorAll('.pin-price').forEach(p => p.classList.remove('active'));
-    el.classList.add('active');
-
-    const pc = document.getElementById('previewCard');
-    const rect = el.getBoundingClientRect();
-    const mapRect = mapArea.getBoundingClientRect();
-    let left = rect.left - mapRect.left + 24;
-    let top = rect.top - mapRect.top - 280;
-    // keep on-screen
-    if (top < 16) top = rect.bottom - mapRect.top + 16;
-    if (left + 290 > mapRect.width) left = mapRect.width - 290;
-    if (left < 16) left = 16;
-    pc.style.left = left + 'px';
-    pc.style.top = top + 'px';
-
-    document.getElementById('pcImg').dataset.label = prop.name;
-    document.getElementById('pcImg').className = 'ph ' + prop.img;
-    const nameParts = prop.name.split(', ');
-    document.getElementById('pcName').innerHTML = nameParts.length>1 ? `${nameParts[0]}, <i>${nameParts[1]}</i>` : `<i>${prop.name}</i>`;
-    document.getElementById('pcRating').textContent = prop.rating;
-    document.getElementById('pcLoc').textContent = prop.loc;
-    document.getElementById('pcTags').innerHTML = prop.tags.map(t => `<span class="t">${t}</span>`).join('<span class="t">·</span>');
-    document.getElementById('pcPrice').textContent = prop.price;
-
-    pc.classList.add('visible');
-
-    // Also highlight in list
-    document.querySelectorAll('.mc').forEach(c => c.classList.toggle('active', c.dataset.id === prop.id));
-    const listItem = document.querySelector(`.mc[data-id="${prop.id}"]`);
-    if (listItem) listItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-  }
-
-  function hidePreview() {
-    document.getElementById('previewCard').classList.remove('visible');
-    document.querySelectorAll('.pin-price').forEach(p => p.classList.remove('active'));
-  }
-
-  /* ───────────── JUMP FUNCTIONS ───────────── */
-  function centerOn(svgX, svgY, targetZoom) {
-    const rect = mapArea.getBoundingClientRect();
-    zoom = targetZoom;
-    tx = rect.width / 2 - svgX * zoom;
-    ty = rect.height / 2 - svgY * zoom;
-    clampPan();
-    applyTransform();
-  }
-
-  function jumpToNation(key) {
-    const n = NATIONS[key];
-    centerOn(n.cx, n.cy, 2.2);
-    activeNation = key;
-    activeRegion = null;
-    document.querySelectorAll('.nation-tabs .tab').forEach(t => t.classList.toggle('active', t.dataset.nation === key));
-    updateRegionCard(n.name, n.count + ' stays', 'casa &mdash; ' + n.name);
-    document.querySelectorAll('.uk-region').forEach(r => r.classList.toggle('active', r.dataset.region === key));
-    updateResultsList();
-  }
-
-  function jumpToRegion(key) {
-    const r = REGIONS[key];
-    centerOn(r.cx, r.cy, 4.5);
-    activeRegion = key;
-    activeNation = r.nation;
-    document.querySelectorAll('.uk-subregion').forEach(el => el.classList.toggle('active', el.dataset.sub === key));
-    updateRegionCard(r.name, r.count + ' stays · from £85/night', 'casa &mdash; ' + REGIONS[key].name);
-    updateResultsList();
-  }
-
-  function setNation(btn) {
-    document.querySelectorAll('.nation-tabs .tab').forEach(t => t.classList.remove('active'));
-    btn.classList.add('active');
-    const key = btn.dataset.nation;
-    if (key === 'all') {
-      activeNation = 'all'; activeRegion = null;
-      zoom = 1; tx = 0; ty = 0;
-      document.querySelectorAll('.uk-region').forEach(r => r.classList.remove('active'));
-      updateRegionCard('The <i>United Kingdom</i>', '4,202 stays · from £85/night', 'All United Kingdom', true);
-      clampPan();
-      applyTransform();
-    } else {
-      jumpToNation(key);
-    }
-  }
-
-  function updateRegionCard(title, meta, eye, withRows = false) {
-    document.getElementById('rcTitle').innerHTML = title.includes('<i>') ? title : `<i>${title}</i>`;
-    document.getElementById('rcMeta').textContent = meta;
-    document.getElementById('rcEye').textContent = eye.replace(/&mdash;/g,'—').replace(/<[^>]+>/g,'');
-    document.querySelectorAll('.region-card .rc-row').forEach(r => r.style.display = withRows ? 'flex' : 'none');
-  }
-
-  /* ───────────── PAN ───────────── */
-  function clampPan() {
-    const rect = mapArea.getBoundingClientRect();
-    const minTx = rect.width - CANVAS_W * zoom;
-    const minTy = rect.height - CANVAS_H * zoom;
-    if (CANVAS_W * zoom < rect.width) tx = (rect.width - CANVAS_W * zoom) / 2;
-    else tx = Math.max(minTx, Math.min(0, tx));
-    if (CANVAS_H * zoom < rect.height) ty = (rect.height - CANVAS_H * zoom) / 2;
-    else ty = Math.max(minTy, Math.min(0, ty));
-  }
-
-  let dragging = false, lastX = 0, lastY = 0;
-  mapArea.addEventListener('mousedown', e => {
-    if (e.target.closest('.pin-layer') || e.target.closest('.region-card') || e.target.closest('.map-controls') || e.target.closest('.zoom-ind') || e.target.closest('.search-area-btn')) return;
-    dragging = true; lastX = e.clientX; lastY = e.clientY;
-    mapArea.classList.add('grabbing');
-    canvas.classList.add('no-transition');
+// ── RENDER ──
+function getFiltered() {
+  let p = PROPS.slice();
+  if (state.nation !== 'all') p = p.filter(x => x.nation === state.nation);
+  if (state.region !== 'all') p = p.filter(x => x.region === state.region);
+  state.filters.forEach(f => {
+    if (f==='pets')      p = p.filter(x => x.tags.includes('pets'));
+    if (f==='seaview')   p = p.filter(x => x.tags.includes('seaview'));
+    if (f==='woodburner')p = p.filter(x => x.tags.includes('woodburner'));
+    if (f==='hottub')    p = p.filter(x => x.tags.includes('hottub'));
+    if (f==='offgrid')   p = p.filter(x => x.tags.includes('offgrid'));
+    if (f==='glamping')  p = p.filter(x => x.type === 'glamping');
+    if (f==='lastminute')p = p.filter((x,i) => i%4===0); // simulated
   });
-  window.addEventListener('mousemove', e => {
-    if (!dragging) return;
-    tx += e.clientX - lastX;
-    ty += e.clientY - lastY;
-    lastX = e.clientX; lastY = e.clientY;
-    clampPan();
-    canvas.style.transform = `translate(${tx}px, ${ty}px) scale(${zoom})`;
-    renderPins();
-  });
-  window.addEventListener('mouseup', () => {
-    dragging = false;
-    mapArea.classList.remove('grabbing');
-    canvas.classList.remove('no-transition');
-  });
+  if (state.sort==='price-asc')  p = [...p].sort((a,b)=>a.price-b.price);
+  if (state.sort==='price-desc') p = [...p].sort((a,b)=>b.price-a.price);
+  if (state.sort==='rating')     p = [...p].sort((a,b)=>b.rating-a.rating);
+  return p;
+}
 
-  /* Wheel zoom */
-  mapArea.addEventListener('wheel', e => {
-    e.preventDefault();
-    const factor = e.deltaY < 0 ? 1.12 : 0.89;
-    const rect = mapArea.getBoundingClientRect();
-    const cx = e.clientX - rect.left;
-    const cy = e.clientY - rect.top;
-    // World coords under cursor before zoom
-    const wx = (cx - tx) / zoom;
-    const wy = (cy - ty) / zoom;
-    zoom = Math.min(7, Math.max(0.7, zoom * factor));
-    // Adjust pan so the cursor stays over the same world point
-    tx = cx - wx * zoom;
-    ty = cy - wy * zoom;
-    clampPan();
-    applyTransform(false);
-  }, { passive: false });
-
-  /* Buttons */
-  document.getElementById('zoomIn').onclick = () => {
-    zoom = Math.min(7, zoom * 1.4);
-    // Zoom around centre
-    const rect = mapArea.getBoundingClientRect();
-    const cx = rect.width / 2, cy = rect.height / 2;
-    const wx = (cx - tx) / (zoom/1.4);
-    const wy = (cy - ty) / (zoom/1.4);
-    tx = cx - wx * zoom;
-    ty = cy - wy * zoom;
-    clampPan();
-    applyTransform();
-  };
-  document.getElementById('zoomOut').onclick = () => {
-    const oldZ = zoom;
-    zoom = Math.max(0.7, zoom * 0.7);
-    const rect = mapArea.getBoundingClientRect();
-    const cx = rect.width / 2, cy = rect.height / 2;
-    const wx = (cx - tx) / oldZ;
-    const wy = (cy - ty) / oldZ;
-    tx = cx - wx * zoom;
-    ty = cy - wy * zoom;
-    clampPan();
-    applyTransform();
-  };
-  document.getElementById('recenter').onclick = () => {
-    zoom = 1; tx = 0; ty = 0;
-    activeNation = 'all'; activeRegion = null;
-    document.querySelectorAll('.uk-region, .uk-subregion').forEach(r => r.classList.remove('active'));
-    document.querySelectorAll('.nation-tabs .tab').forEach(t => t.classList.remove('active'));
-    document.querySelector('.nation-tabs .tab').classList.add('active');
-    updateRegionCard('The <i>United Kingdom</i>', '4,202 stays · from £85/night', 'All United Kingdom', true);
-    hidePreview();
-    clampPan();
-    applyTransform();
-    updateResultsList();
-  };
-
-  function setZoomFromSlider(v) {
-    const oldZ = zoom;
-    zoom = v;
-    const rect = mapArea.getBoundingClientRect();
-    const cx = rect.width / 2, cy = rect.height / 2;
-    const wx = (cx - tx) / oldZ;
-    const wy = (cy - ty) / oldZ;
-    tx = cx - wx * zoom;
-    ty = cy - wy * zoom;
-    clampPan();
-    applyTransform(false);
+function renderCards() {
+  const list = document.getElementById('propList');
+  const props = getFiltered();
+  document.getElementById('resultsCount').textContent = props.length + ' stays shown';
+  if (!props.length) {
+    list.innerHTML = `<div class="no-results"><h3>No stays found.</h3><p>Try removing a filter or browse a different region.</p></div>`;
+    return;
   }
-
-  /* SVG click handlers */
-  document.querySelectorAll('.uk-region').forEach(r => {
-    r.addEventListener('click', () => {
-      if (zoom < 2.2) jumpToNation(r.dataset.region);
-    });
-  });
-  document.querySelectorAll('.uk-subregion').forEach(r => {
-    r.addEventListener('click', e => {
-      e.stopPropagation();
-      if (r.dataset.sub && REGIONS[r.dataset.sub]) jumpToRegion(r.dataset.sub);
-    });
-  });
-
-  /* Results list */
-  function updateResultsList() {
-    const list = document.getElementById('resultsList');
-    let props = PROPERTIES;
-    if (activeNation !== 'all') props = props.filter(p => p.nation === activeNation);
-    if (activeRegion) props = props.filter(p => p.region === activeRegion);
-    document.getElementById('vcount').textContent = props.length + ' stays';
-
-    list.innerHTML = props.map(p => {
-      const [main, sub] = p.name.split(', ');
-      const tags = p.tags.slice(0,3).map(t => `<span class="t">${t}</span>`).join(' <span class="t">·</span> ');
-      return `<a class="mc" data-id="${p.id}" href="property.html" onmouseenter="hoverProp('${p.id}')" onclick="event.preventDefault();const el=document.querySelectorAll('.pin-price'); /* find pin */">
-        <div class="mci">
-          <div class="ph ${p.img}" data-label="${p.name.toUpperCase()}"></div>
-          <button class="save-heart ${p.saved?'saved':''}" onclick="event.preventDefault();this.classList.toggle('saved')"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.5-9.5-9c-1.5-2.8.4-6 3.5-6 1.8 0 3.2 1 4 2.5C10.8 6 12.2 5 14 5c3.1 0 5 3.2 3.5 6C15 15.5 12 20 12 20z"/></svg></button>
+  list.innerHTML = props.map(p => {
+    const tags = p.tags.slice(0,2).map(t => `<span class="pc-tag">${TAG_LABELS[t]||t}</span>`).join('');
+    const bdg = p.badge ? `<span class="badge ${BADGE_CFG[p.badge].cls}" style="font-size:9px;padding:2px 6px">${BADGE_CFG[p.badge].text}</span>` : '';
+    return `<a class="pc" href="property.html" data-region="${p.region}">
+      <div class="pc-img"><div style="width:100px;height:100%;background:${p.col};display:flex;align-items:flex-end;padding:6px"><span style="font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.7);line-height:1.2">${p.type.toUpperCase()}</span></div></div>
+      <div class="pc-body">
+        <div>
+          <div class="pc-title">${p.title}, <i>${p.loc}</i> ${bdg}</div>
+          <div class="pc-loc">${p.rLabel} · Sleeps ${p.sleeps} · ${p.beds} bed</div>
+          <div class="pc-tags">${tags}</div>
         </div>
-        <div class="mcb">
-          <div>
-            <div class="nm">${main}${sub ? ', <i>'+sub+'</i>' : ''}</div>
-            <div class="loc">${p.loc}</div>
-            <div class="tags">${tags}</div>
-          </div>
-          <div class="foot">
-            <div class="price"><i>${p.price}</i><span class="pp">/night</span></div>
-            <div class="rating"><svg viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 1-5 5 1.5 7L12 18l-6.5 3.5L7 14.5l-5-5 7-1z"/></svg> ${p.rating}</div>
-          </div>
+        <div class="pc-foot">
+          <div class="pc-price"><i>£${p.price}</i><span class="per"> / night</span></div>
+          <div class="pc-rating"><svg viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 1-5 5 1.5 7L12 18l-6.5 3.5L7 14.5l-5-5 7-1z"/></svg>${p.rating}</div>
+          <span class="pc-cta">Enquire →</span>
         </div>
-      </a>`;
-    }).join('');
-  }
+      </div>
+    </a>`;
+  }).join('');
+}
 
-  function hoverProp(id) {
-    document.querySelectorAll('.mc').forEach(c => c.classList.toggle('active', c.dataset.id === id));
-  }
+// ── INTERACTIONS ──
+function setNation(btn) {
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  state.nation = btn.dataset.nation;
+  state.region = 'all';
+  document.querySelectorAll('.sub-chip').forEach(c=>c.classList.remove('active'));
+  document.querySelector('.sub-chip[onclick*="\'all\'"]')?.classList.add('active');
+  updateInfo('all');
+  renderCards();
+}
 
-  /* ───────────── TWEAKS ───────────── */
-  function toggleTweaks() {
-    document.getElementById('tweaksPanel').classList.toggle('open');
+function toggleFilter(chip, filter) {
+  chip.classList.toggle('active');
+  state.filters.has(filter) ? state.filters.delete(filter) : state.filters.add(filter);
+  renderCards();
+}
+
+function sortCards(val) {
+  state.sort = val;
+  renderCards();
+}
+
+function pinClick(region) {
+  // Activate pin
+  document.querySelectorAll('.map-pin').forEach(p=>p.classList.remove('active'));
+  const pinId = 'pin-' + (region==='lake-district'?'lakedistrict':region==='highlights'?'highlands':region);
+  const pin = document.getElementById(pinId) || document.getElementById('pin-'+region.replace('-',''));
+  if (pin) pin.classList.add('active');
+
+  state.region = region;
+  // Activate sub chip
+  document.querySelectorAll('.sub-chip').forEach(c=>c.classList.remove('active'));
+  const chip = document.querySelector(`.sub-chip[onclick*="'${region}'"]`);
+  if (chip) chip.classList.add('active');
+
+  updateInfo(region);
+  renderCards();
+  document.getElementById('navWhere').textContent = REGION_INFO[region]?.title.replace(/<[^>]+>/g,'') || region;
+}
+
+function subChip(chip, region) {
+  document.querySelectorAll('.sub-chip').forEach(c=>c.classList.remove('active'));
+  chip.classList.add('active');
+
+  if (region === 'all') {
+    state.region = 'all';
+    document.querySelectorAll('.map-pin').forEach(p=>p.classList.remove('active'));
+    updateInfo('all');
+    document.getElementById('navWhere').textContent = 'All UK';
+  } else {
+    pinClick(region);
   }
-  function toggleSw(el) {
-    el.classList.toggle('on');
-    const key = el.dataset.key;
-    tweaks[key] = el.classList.contains('on');
-    applyTweaks();
-    renderPins();
-  }
-  function applyTweaks() {
-    mapArea.classList.toggle('parchment', tweaks.style === 'parchment');
-    mapArea.classList.toggle('minimal', tweaks.style === 'minimal');
-    mapArea.classList.toggle('dark', tweaks.style === 'dark');
-    document.documentElement.style.setProperty('--grid-opacity', tweaks.grid ? '1' : '0');
-    document.querySelectorAll('.uk-subregion').forEach(s => s.style.display = tweaks.regions ? '' : 'none');
-  }
-  // Radio handlers
-  document.getElementById('tw-style').addEventListener('click', e => {
-    const b = e.target.closest('button[data-v]'); if (!b) return;
-    e.target.closest('.tweak-radio').querySelectorAll('button').forEach(x => x.classList.remove('active'));
-    b.classList.add('active');
-    tweaks.style = b.dataset.v;
-    applyTweaks();
+  renderCards();
+}
+
+function updateInfo(region) {
+  const info = REGION_INFO[region] || REGION_INFO['all'];
+  document.getElementById('miTitle').innerHTML = info.title;
+  document.getElementById('miCount').textContent = info.count;
+  document.getElementById('miCta').href = info.href;
+}
+
+function runSearch() {
+  const val = document.getElementById('mapSearchInput').value.trim().toLowerCase();
+  if (!val) return;
+  const match = Object.keys(REGION_INFO).find(k =>
+    REGION_INFO[k].title.toLowerCase().includes(val) ||
+    k.includes(val.replace(/\s+/g,'-')) ||
+    PROPS.some(p => p.loc.toLowerCase().includes(val) && p.region===k)
+  );
+  if (match && match !== 'all') pinClick(match);
+  else { state.region='all'; renderCards(); }
+}
+
+document.getElementById('mapSearchInput').addEventListener('keydown', e => { if(e.key==='Enter') runSearch(); });
+
+// ── MAP PIN TOOLTIPS ──
+document.querySelectorAll('.map-pin').forEach(pin => {
+  pin.addEventListener('mouseenter', e => {
+    const tip = document.getElementById('mapTooltip');
+    document.getElementById('ttName').textContent = pin.dataset.name || '';
+    document.getElementById('ttCount').textContent = pin.dataset.count || '';
+    tip.style.display = 'block';
   });
-  document.getElementById('tw-density').addEventListener('click', e => {
-    const b = e.target.closest('button[data-v]'); if (!b) return;
-    e.target.closest('.tweak-radio').querySelectorAll('button').forEach(x => x.classList.remove('active'));
-    b.classList.add('active');
-    tweaks.density = b.dataset.v;
-    renderPins();
+  pin.addEventListener('mousemove', e => {
+    const panel = document.getElementById('mapPanel').getBoundingClientRect();
+    const tip = document.getElementById('mapTooltip');
+    tip.style.left = (e.clientX - panel.left + 14) + 'px';
+    tip.style.top  = (e.clientY - panel.top - 56) + 'px';
   });
-  document.getElementById('tw-jump').addEventListener('click', e => {
-    const b = e.target.closest('button[data-region]'); if (!b) return;
-    jumpToRegion(b.dataset.region);
+  pin.addEventListener('mouseleave', () => {
+    document.getElementById('mapTooltip').style.display = 'none';
   });
+});
 
-  /* Tweaks panel drag */
-  (function(){
-    const panel = document.getElementById('tweaksPanel');
-    const head = panel.querySelector('.tp-head');
-    let pd = false, px = 0, py = 0;
-    head.addEventListener('mousedown', e => { pd = true; px = e.clientX; py = e.clientY; });
-    window.addEventListener('mousemove', e => {
-      if (!pd) return;
-      const cs = getComputedStyle(panel);
-      const r = panel.style.right ? parseFloat(panel.style.right) : 20;
-      const b = panel.style.bottom ? parseFloat(panel.style.bottom) : 20;
-      panel.style.right = (r - (e.clientX - px)) + 'px';
-      panel.style.bottom = (b - (e.clientY - py)) + 'px';
-      px = e.clientX; py = e.clientY;
-    });
-    window.addEventListener('mouseup', () => pd = false);
-  })();
-
-  /* Initial */
-  function init() {
-    updateResultsList();
-    clampPan();
-    applyTransform();
-    applyTweaks();
-    // Auto-show preview for the saved Windermere property on first load
-    setTimeout(() => {
-      const pin = pinLayer.querySelector('.pin-price');
-      if (pin) {
-        const props = PROPERTIES.find(p => p.id === 'p1');
-        if (props && pin) {} // we'll skip auto-popup
-      }
-    }, 600);
-  }
-  init();
-  // re-render on resize
-  window.addEventListener('resize', () => { clampPan(); applyTransform(); });
+// Init
+renderCards();
 </script>
-
 <script src="casa.js"></script>
 </body>
 </html>
