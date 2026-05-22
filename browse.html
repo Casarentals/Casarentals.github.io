@@ -1,205 +1,519 @@
-(function () {
-  const qs = new URLSearchParams(window.location.search);
+eed.html">Community feed</a>
+    <a class="nav-text-link" href="host.html">Host dashboard</a>
+    <span class="nav-divider"></span>
+    <a class="nav-signin" href="signup.html">Sign in</a>
+    <a class="nav-join" href="signup.html">Join free</a>
+  </div>
+</nav>
 
-  function toast(message) {
-    let el = document.querySelector('.casa-toast');
-    if (!el) {
-      el = document.createElement('div');
-      el.className = 'casa-toast';
-      document.body.appendChild(el);
+<main class="browse-hero">
+  <div class="bh-eyebrow">Fee-free &amp; Direct</div>
+  <h1 class="bh-title">Find a quieter <i>holiday stay</i></h1>
+  <p class="bh-sub">Connect directly with verified independent hosts. No middleman commission, no booking fees, just genuine travel.</p>
+  
+  <div class="search-card">
+    <div class="sc-top">
+      <div class="sc-seg loc" onclick="document.getElementById('loc-input').focus()">
+        <span class="lbl">Where</span>
+        <input type="text" id="loc-input" placeholder="Try 'Lake District' or 'Cornwall'...">
+      </div>
+      <div class="sc-seg dates" onclick="document.getElementById('cin-input').focus()">
+        <span class="lbl">Arrive</span>
+        <input type="text" id="cin-input" placeholder="Add dates" onfocus="(this.type='date')" onblur="if(!this.value) this.type='text'">
+      </div>
+      <div class="sc-seg dates" onclick="document.getElementById('cout-input').focus()">
+        <span class="lbl">Depart</span>
+        <input type="text" id="cout-input" placeholder="Add dates" onfocus="(this.type='date')" onblur="if(!this.value) this.type='text'">
+      </div>
+      <div class="sc-seg guests">
+        <span class="lbl">Who</span>
+        <select id="guests-select">
+          <option>1 guest</option>
+          <option selected>2 guests</option>
+          <option>3 guests</option>
+          <option>4+ guests</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="sc-bottom">
+      <span class="sc-type-lbl">Stay Type:</span>
+      <button class="sc-type-chip active">
+        <svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        All stays
+      </button>
+      <button class="sc-type-chip">
+        <svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/></svg>
+        Cottages
+      </button>
+      <button class="sc-type-chip">
+        <svg viewBox="0 0 24 24"><path d="M2 20h20M5 17V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v10M9 9h6M9 13h6"/></svg>
+        Barns
+      </button>
+      <button class="sc-type-chip">
+        <svg viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zM12 6v6l4 2"/></svg>
+        Cabins
+      </button>
+    </div>
+    
+    <div class="sc-amenities">
+      <span class="sc-am-label">Features:</span>
+      <button class="sc-am-chip active">Dog friendly</button>
+      <button class="sc-am-chip">Hot tub</button>
+      <button class="sc-am-chip">Open fire</button>
+      <button class="sc-am-chip">EV charger</button>
+      <button class="sc-am-chip">Sea view</button>
+    </div>
+    
+    <div class="sc-action">
+      <button class="sc-clear-btn" onclick="clearSearch()">Clear all</button>
+      <button class="sc-search-btn" onclick="triggerSearch()">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        Search stays
+      </button>
+    </div>
+  </div>
+  
+  <div class="bh-regions">
+    <button class="bh-region" onclick="searchRegion('Lake District')"><span class="flag">⛰️</span> Lake District</button>
+    <button class="bh-region" onclick="searchRegion('Cornwall')"><span class="flag">🌊</span> Cornwall</button>
+    <button class="bh-region" onclick="searchRegion('Cotswolds')"><span class="flag">🏡</span> Cotswolds</button>
+    <button class="bh-region" onclick="searchRegion('Scottish Highlands')"><span class="flag">🏰</span> Highlands</button>
+    <button class="bh-region" onclick="searchRegion('Pembrokeshire')"><span class="flag">🏖️</span> Pembrokeshire</button>
+  </div>
+  
+  <div class="bh-promise">
+    <div class="bh-promise-item">
+      <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+      <span>100% Direct with Hosts</span>
+    </div>
+    <div class="bh-promise-item">
+      <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+      <span>Zero Commission or Guest Fees</span>
+    </div>
+    <div class="bh-promise-item">
+      <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+      <span>Verified Independent Properties</span>
+    </div>
+  </div>
+</main>
+
+
+<div class="results-view">
+  
+  <div class="results-bar">
+    <div class="rb-inner">
+      <button class="rb-back" onclick="goHome()">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back
+      </button>
+      <div class="rb-sep"></div>
+      
+      <div class="rb-search">
+        <div class="rb-seg" style="flex: 1.5;">
+          <input type="text" id="rb-loc" value="Lake District">
+        </div>
+        <div class="rb-seg">
+          <input type="text" id="rb-dates" value="12–19 Jul">
+        </div>
+        <div class="rb-seg">
+          <input type="text" id="rb-guests" value="2 adults">
+        </div>
+        <button class="rb-go" onclick="triggerSearch()">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        </button>
+      </div>
+      
+      <div class="rb-filters">
+        <button class="rb-pill" onclick="openFilters()">
+          <svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+          Filters
+        </button>
+        <button class="rb-pill">Price</button>
+        <button class="rb-pill">Instant Book</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="cat-bar-wrap">
+    <div class="cat-bar">
+      <a class="cat-tile active" href="#">
+        <svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <span>All stays</span>
+      </a>
+      <a class="cat-tile" href="#">
+        <svg viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/></svg>
+        <span>Cottages</span>
+      </a>
+      <a class="cat-tile" href="#">
+        <svg viewBox="0 0 24 24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zM12 6v6l4 2"/></svg>
+        <span>Cabins</span>
+      </a>
+      <a class="cat-tile" href="#">
+        <svg viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16M8 7h2M8 11h2M14 7h2M14 11h2M12 17v4"/></svg>
+        <span>Barns</span>
+      </a>
+    </div>
+  </div>
+  
+  <div class="active-chips">
+    <div class="active-chip">
+      <span>Dog friendly</span>
+      <span class="x">&times;</span>
+    </div>
+    <div class="active-chip">
+      <span>Under £150/night</span>
+      <span class="x">&times;</span>
+    </div>
+  </div>
+  
+  <div class="results-head">
+    <div>
+      <h2 class="rh-title">Stays in <i id="dynamic-target">Lake District</i></h2>
+      <div class="rh-meta">12 available independent stays · No platform commissions</div>
+    </div>
+  </div>
+  
+  <div class="results-layout">
+    
+    <div class="cards-grid">
+      
+      <a class="pc highlighted" href="booking.html">
+        <div class="pc-image">
+          <div class="ph" style="background: #EBE4D5; background-image: radial-gradient(#D6CDBD 15%, transparent 15%); background-size: 12px 12px;"></div>
+          <div class="badge-row">
+            <span style="background: var(--ink); color: var(--paper); padding: 4px 8px; border-radius: 4px; font-size: 10px; font-family: var(--mono); text-transform: uppercase;">Rare find</span>
+          </div>
+          <div class="save-heart">
+            <svg viewBox="0 0 24 24" style="width:19px; height:19px; stroke: white; fill: rgba(22,20,15,0.25); stroke-width: 2;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </div>
+          <div class="img-nav">
+            <div class="dt on"></div>
+            <div class="dt"></div>
+            <div class="dt"></div>
+          </div>
+        </div>
+        <div class="pc-body">
+          <div class="pc-row1">
+            <h3 class="pc-title">The Old <i>Stone Cottage</i></h3>
+            <div class="pc-rating">
+              <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <span>4.95</span> <span class="ct">(42)</span>
+            </div>
+          </div>
+          <div class="pc-loc">
+            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Ambleside, Cumbria
+          </div>
+          <div class="pc-meta">
+            <span>4 guests</span>·<span>2 bedrooms</span>·<span>Dog friendly</span>
+          </div>
+          <div class="pc-price">
+            <div>
+              <span class="p-amt">£120</span><span class="p-per">/ night</span>
+            </div>
+            <div class="p-fee">Direct rate</div>
+          </div>
+          <div class="pc-host">
+            <div class="pc-host-av">S</div>
+            <div class="pc-host-name">Hosted by Sarah M.</div>
+            <div class="pc-host-verified">Verified Host</div>
+            <div class="pc-quick-actions">
+              <button class="pqa-btn" onclick="event.preventDefault(); alert('Opening conversational threads.')">Message</button>
+              <button class="pqa-btn follow" onclick="event.preventDefault(); this.textContent='Following'">Follow</button>
+            </div>
+          </div>
+        </div>
+      </a>
+
+      <a class="pc" href="booking.html">
+        <div class="pc-image">
+          <div class="ph" style="background: #E4DFD3; background-image: repeating-linear-gradient(45deg, #DDD6C4 0, #DDD6C4 1px, transparent 0, transparent 50%), repeating-linear-gradient(-45deg, #DDD6C4 0, #DDD6C4 1px, #E4DFD3 0, #E4DFD3 50%); background-size: 16px 16px;"></div>
+          <div class="save-heart">
+            <svg viewBox="0 0 24 24" style="width:19px; height:19px; stroke: white; fill: rgba(22,20,15,0.25); stroke-width: 2;"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </div>
+          <div class="img-nav">
+            <div class="dt on"></div>
+            <div class="dt"></div>
+          </div>
+        </div>
+        <div class="pc-body">
+          <div class="pc-row1">
+            <h3 class="pc-title">Lakeside <i>Cabin &amp; Spa</i></h3>
+            <div class="pc-rating">
+              <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <span>5.0</span> <span class="ct">(19)</span>
+            </div>
+          </div>
+          <div class="pc-loc">
+            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Windermere
+          </div>
+          <div class="pc-meta">
+            <span>2 guests</span>·<span>1 bedroom</span>·<span>Hot tub</span>
+          </div>
+          <div class="pc-price">
+            <div>
+              <span class="p-amt">£165</span><span class="p-per">/ night</span>
+            </div>
+            <div class="p-fee">Direct rate</div>
+          </div>
+          <div class="pc-host">
+            <div class="pc-host-av">J</div>
+            <div class="pc-host-name">Hosted by Marcus J.</div>
+            <div class="pc-host-verified">Verified Host</div>
+            <div class="pc-quick-actions">
+              <button class="pqa-btn" onclick="event.preventDefault()">Message</button>
+              <button class="pqa-btn follow" onclick="event.preventDefault()">Follow</button>
+            </div>
+          </div>
+        </div>
+      </a>
+
+      <div class="near-miss">
+        <div class="nm-head">
+          <h2>Nearby <i>alternatives</i></h2>
+          <p>Slightly outside the chosen geographic area but highly matching your features.</p>
+        </div>
+        <div class="nm-strip">
+          <a class="nm-card" href="#">
+            <div class="nm-img">
+              <div class="ph" style="background: #DDD6C4;"></div>
+            </div>
+            <div class="nm-name">The <i>Orchard Barn</i></div>
+            <div class="nm-detail">Keswick · £140/night</div>
+          </a>
+          <a class="nm-card" href="#">
+            <div class="nm-img">
+              <div class="ph" style="background: #D2C9B5;"></div>
+            </div>
+            <div class="nm-name">River <i>Nook Hideaway</i></div>
+            <div class="nm-detail">Coniston · £95/night</div>
+          </a>
+        </div>
+      </div>
+      
+    </div>
+
+    <aside class="map-side">
+      <div class="map-canvas">
+        <div class="map-terrain"></div>
+        <div class="map-roads"></div>
+        <div class="map-green" style="width: 160px; height: 160px; top: 30px; left: 40px;"></div>
+        <div class="map-water" style="width: 220px; height: 100px; bottom: 40px; right: 20px;"></div>
+        
+        <div class="map-viewport">
+          <div class="map-region-lbl" style="top: 25px; left: 30px;">Lake District National Park</div>
+          
+          <div class="map-pin active" style="top: 45%; left: 40%;">£120</div>
+          <div class="map-pin" style="top: 62%; left: 68%;">£165</div>
+          <div class="map-pin cluster" style="top: 25%; left: 75%;">3 stays</div>
+        </div>
+
+        <div class="map-popup show" style="bottom: 12px; left: 12px; right: 12px; width: auto; max-width: calc(100% - 24px);">
+          <button class="map-close" onclick="this.parentElement.classList.remove('show')">&times;</button>
+          <div class="mp-body">
+            <div class="mp-title">The Old <i>Stone Cottage</i></div>
+            <div class="mp-meta">Ambleside · 4.95 ★</div>
+            <div class="mp-price">£120<i>/night</i></div>
+            <div class="mp-host">
+              <div class="mp-host-av">S</div>
+              <div class="mp-host-name">Sarah M.</div>
+              <button class="mp-follow" onclick="this.textContent='Following'">Follow</button>
+            </div>
+            <div class="mp-actions">
+              <a class="mp-btn primary" href="booking.html">Enquire</a>
+              <button class="mp-btn ghost" onclick="alert('Viewing comprehensive content details.')">View Details</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="map-overlay-top">
+          <div class="mot-title">Viewing <i>Cumbria</i></div>
+          <div class="mot-count">12 locations found</div>
+        </div>
+
+        <div class="map-controls">
+          <button class="mc-btn" aria-label="Zoom in">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <button class="mc-btn" aria-label="Zoom out">
+            <svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg>
+          </button>
+        </div>
+
+        <button class="map-open-btn" onclick="window.location.href='map.html'">
+          <svg viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg>
+          Open full map
+        </button>
+
+        <div class="map-compass">
+          <svg viewBox="0 0 24 24">
+            <polygon points="12 2 16 12 12 9 8 12 12 2" style="fill: var(--brick); stroke: var(--brick);"/>
+            <polygon points="12 22 16 12 12 15 8 12 12 22" style="fill: var(--ink-4); stroke: var(--ink-4);"/>
+          </svg>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+
+<div class="filter-overlay" id="filterModal">
+  <div class="filter-drawer">
+    <div class="fd-head">
+      <h2>Filters</h2>
+      <button class="fd-close" onclick="closeFilters()">&times;</button>
+    </div>
+    
+    <div class="fd-sec">
+      <h3>Price range (per night)</h3>
+      <div class="fd-range-wrap">
+        <input type="range" class="fd-range" min="40" max="400" value="150" id="priceRange" oninput="document.getElementById('maxPriceLabel').textContent = 'Max: £' + this.value">
+        <div class="fd-range-labels">
+          <span>£40</span>
+          <span id="maxPriceLabel" style="font-weight: 500; color: var(--brick-text)">Max: £150</span>
+          <span>£400+</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="fd-sec">
+      <h3>Minimum Bedrooms</h3>
+      <div class="fd-sleeps">
+        <button class="fd-sl-btn active" onclick="toggleSleep(this)">Any</button>
+        <button class="fd-sl-btn" onclick="toggleSleep(this)">1</button>
+        <button class="fd-sl-btn" onclick="toggleSleep(this)">2</button>
+        <button class="fd-sl-btn" onclick="toggleSleep(this)">3</button>
+        <button class="fd-sl-btn" onclick="toggleSleep(this)">4+</button>
+      </div>
+    </div>
+    
+    <div class="fd-sec">
+      <h3>Ambiance &amp; Features</h3>
+      <div class="fd-chips">
+        <button class="fd-chip active" onclick="this.classList.toggle('active')">Dog friendly</button>
+        <button class="fd-chip" onclick="this.classList.toggle('active')">Coastal setting</button>
+        <button class="fd-chip" onclick="this.classList.toggle('active')">Hot tub</button>
+        <button class="fd-chip" onclick="this.classList.toggle('active')">Open wood fire</button>
+        <button class="fd-chip" onclick="this.classList.toggle('active')">EV charger</button>
+        <button class="fd-chip" onclick="this.classList.toggle('active')">Rural isolation</button>
+      </div>
+    </div>
+    
+    <div class="fd-footer">
+      <span class="fd-clear" onclick="clearFilters()">Clear all</span>
+      <button class="sc-search-btn" style="padding: 10px 22px; font-size: 13.5px" onclick="closeFilters()">Show 12 stays</button>
+    </div>
+  </div>
+</div>
+
+
+<footer class="casa-foot">
+  <div class="foot-inner">
+    <div class="foot-brand">
+      <div>
+        <div class="casa-mark-lg">casa</div>
+        <div class="pitch">A quieter place to find a holiday stay &mdash; <em>fee-free</em>, and direct with the host.</div>
+      </div>
+    </div>
+    
+    <div class="foot-links">
+      <div class="foot-col">
+        <h5>Stays</h5>
+        <a href="browse.html">Browse all stays</a>
+        <a href="map.html">Map view</a>
+        <a href="#">Last minute offers</a>
+        <a href="#">Long-term stays</a>
+      </div>
+      <div class="foot-col">
+        <h5>Hosts</h5>
+        <a href="list.html">List a property</a>
+        <a href="host.html">Host dashboard</a>
+        <a href="#">Community resources</a>
+      </div>
+      <div class="foot-col">
+        <h5>Account</h5>
+        <a href="signup.html">Sign in</a>
+        <a href="signup.html">Join free</a>
+        <a href="saved.html">Saved properties</a>
+        <a href="messages.html">Messages</a>
+      </div>
+      <div class="foot-col">
+        <h5>Casa</h5>
+        <a href="#">Our story</a>
+        <a href="#">Careers</a>
+        <a href="#">Help &amp; contact</a>
+      </div>
+    </div>
+    
+    <div class="foot-bot">
+      <div>&copy; 2026 Casa.co.uk &mdash; <em style="font-family:var(--serif);font-style:italic">a quieter way to book.</em></div>
+      <div><a href="#">Privacy</a> · <a href="#">Terms</a> · <a href="#">Cookies</a></div>
+    </div>
+  </div>
+</footer>
+
+
+<div class="casa-toast" id="systemToast">Search view initialized</div>
+
+<script>
+  // Mode View Toggling Methods
+  function triggerSearch() {
+    document.body.className = "mode-results";
+    const userLoc = document.getElementById('loc-input').value.trim();
+    if (userLoc) {
+      document.getElementById('rb-loc').value = userLoc;
+      document.getElementById('dynamic-target').textContent = userLoc;
     }
-    el.textContent = message;
-    el.classList.add('show');
-    clearTimeout(el._timer);
-    el._timer = setTimeout(() => el.classList.remove('show'), 2200);
+    showToast("Displaying matching direct properties");
   }
 
-  function pageName() {
-    return location.pathname.split('/').pop() || 'index.html';
+  function searchRegion(regionName) {
+    document.getElementById('loc-input').value = regionName;
+    triggerSearch();
   }
 
-  function collectSearch() {
-    const search = document.querySelector('.search');
-    const nav = document.querySelector('.nav-search');
-    const whereInput = search?.querySelector('input[type="text"]');
-    const whereText = nav?.querySelector('.seg .v')?.textContent;
-    return {
-      where: (whereInput?.value || qs.get('where') || whereText || 'Lake District').trim(),
-      dates: qs.get('dates') || '12-19 Jul',
-      guests: qs.get('guests') || '2 adults'
-    };
+  function goHome() {
+    document.body.className = "mode-home";
   }
 
-  function goToBrowse(overrides = {}) {
-    const state = { ...collectSearch(), ...overrides };
-    const next = new URL('browse.html', window.location.href);
-    Object.entries(state).forEach(([key, value]) => {
-      if (value) next.searchParams.set(key, value);
-    });
-    window.location.href = next.pathname + next.search;
+  // Filter Drawer Interaction Controls
+  function openFilters() {
+    document.getElementById('filterModal').classList.add('open');
   }
 
-  window.goSearch = function (ev) {
-    if (ev?.currentTarget?.classList?.contains('seg')) {
-      document.querySelectorAll('.search .seg').forEach((seg) => seg.classList.remove('active'));
-      ev.currentTarget.classList.add('active');
-      return;
-    }
-    goToBrowse();
-  };
-
-  function hydrateSearchText() {
-    const where = qs.get('where');
-    const dates = qs.get('dates');
-    const guests = qs.get('guests');
-    const navSearch = document.querySelector('.nav-search');
-    if (navSearch) {
-      const values = navSearch.querySelectorAll('.seg .v');
-      if (where && values[0]) values[0].textContent = where;
-      if (dates && values[1]) values[1].textContent = dates.replace('-', ' - ');
-      if (guests && values[2]) values[2].textContent = guests;
-      navSearch.addEventListener('click', () => goToBrowse());
-    }
-    const heroInput = document.querySelector('.search input[type="text"]');
-    if (heroInput && where) heroInput.value = where;
+  function closeFilters() {
+    document.getElementById('filterModal').classList.remove('open');
   }
 
-  function setupSearch() {
-    hydrateSearchText();
-    document.querySelectorAll('.search .seg').forEach((seg) => {
-      seg.addEventListener('click', (ev) => window.goSearch(ev));
-    });
-    document.querySelectorAll('.search-go, .nav-search .go').forEach((button) => {
-      button.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
-        goToBrowse();
-      });
-    });
-    document.querySelectorAll('.search input[type="text"]').forEach((input) => {
-      input.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter') goToBrowse({ where: input.value.trim() });
-      });
-    });
+  function clearSearch() {
+    document.getElementById('loc-input').value = '';
+    document.getElementById('cin-input').value = '';
+    document.getElementById('cout-input').value = '';
+    document.getElementById('cin-input').type = 'text';
+    document.getElementById('cout-input').type = 'text';
   }
 
-  function saveKey(button) {
-    const card = button.closest('.pc, .title-row, .post-prop, .gallery, .ps-card') || button.parentElement;
-    const label = card?.querySelector('.pc-title, h1, .pname, .ps-title')?.textContent?.trim()
-      || card?.querySelector('.ph')?.dataset?.label
-      || pageName();
-    return 'casa:saved:' + label.toLowerCase().replace(/\s+/g, '-');
+  function clearFilters() {
+    document.querySelectorAll('.fd-chip, .fd-sl-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('priceRange').value = 150;
+    document.getElementById('maxPriceLabel').textContent = 'Max: £150';
   }
 
-  function setupSaves() {
-    document.querySelectorAll('.save-heart, .save-btn').forEach((button) => {
-      const key = saveKey(button);
-      if (localStorage.getItem(key) === '1') button.classList.add('saved');
-      button.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
-        button.classList.toggle('saved');
-        localStorage.setItem(key, button.classList.contains('saved') ? '1' : '0');
-        const label = button.querySelector('span');
-        if (label) label.textContent = button.classList.contains('saved') ? 'Saved' : 'Save';
-        toast(button.classList.contains('saved') ? 'Saved to your list' : 'Removed from saved');
-      });
-    });
+  function toggleSleep(btnElement) {
+    document.querySelectorAll('.fd-sleeps .fd-sl-btn').forEach(btn => btn.classList.remove('active'));
+    btnElement.classList.add('active');
   }
 
-  function setupFilterLinks() {
-    document.querySelectorAll('.qf .chip, .tag-wall .ch, .county-pill, .cat-tile, .fb-pill').forEach((el) => {
-      el.addEventListener('click', (ev) => {
-        const href = el.getAttribute('href');
-        if (href && href !== '#') return;
-        ev.preventDefault();
-        const text = el.textContent.trim().replace(/\s+/g, ' ');
-        if (pageName() === 'feed.html') {
-          toast('Showing ' + text);
-          document.querySelectorAll('.county-pill, .side-link, .feed-tab').forEach((x) => x.classList.remove('active'));
-          el.classList.add('active');
-        } else {
-          goToBrowse({ where: text.replace(/^#/, '') });
-        }
-      });
-    });
+  // Visual System Notification Feedback
+  function showToast(message) {
+    const toast = document.getElementById('systemToast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2400);
   }
-
-  function setupBrowseControls() {
-    if (pageName() !== 'browse.html') return;
-    const activeWhere = qs.get('where');
-    if (activeWhere) {
-      const h = document.querySelector('.head-strip h1');
-      const meta = document.querySelector('.head-strip .h-meta');
-      if (h) h.innerHTML = `Stays around <i>${activeWhere}</i>`;
-      if (meta) meta.innerHTML = `<span class="n">214</span> matching stays<br>fee-free direct booking`;
-    }
-    document.querySelectorAll('.mini-map .pin').forEach((pin) => {
-      pin.addEventListener('click', () => {
-        document.querySelectorAll('.mini-map .pin').forEach((p) => p.classList.remove('active'));
-        pin.classList.add('active');
-        toast('Highlighted stay at ' + pin.textContent.trim() + ' per night');
-      });
-    });
-  }
-
-  function setupFeed() {
-    if (pageName() !== 'feed.html') return;
-    document.querySelectorAll('.post-type-pill, .feed-tab, .side-link').forEach((button) => {
-      button.addEventListener('click', () => {
-        const group = button.classList.contains('feed-tab') ? '.feed-tab'
-          : button.classList.contains('side-link') ? '.side-link'
-          : '.post-type-pill';
-        document.querySelectorAll(group).forEach((x) => x.classList.remove(group === '.post-type-pill' ? 'on' : 'active'));
-        button.classList.add(group === '.post-type-pill' ? 'on' : 'active');
-      });
-    });
-    const postButton = document.querySelector('.post-btn');
-    const textarea = document.querySelector('.compose textarea');
-    postButton?.addEventListener('click', () => {
-      const text = textarea?.value.trim();
-      if (!text) {
-        toast('Write a quick post first');
-        return;
-      }
-      const card = document.createElement('article');
-      card.className = 'post';
-      card.innerHTML = `<div class="ph-head"><div class="av guest">J</div><div class="who"><div class="nm"><span class="name">James</span><span class="badge">New post</span></div><div class="meta-line"><span class="when">Just now</span><span class="dot"></span><span>Casa member</span></div></div></div><div class="body">${text.replace(/[<>&]/g, (c) => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</div>`;
-      document.querySelector('.feed-col .feed-tabs')?.after(card);
-      textarea.value = '';
-      toast('Posted to the community feed');
-    });
-  }
-
-  function setupAuth() {
-    document.querySelectorAll('.submit-btn').forEach((button) => {
-      button.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        localStorage.setItem('casa:joined', '1');
-        toast(button.textContent.toLowerCase().includes('sign') ? 'Welcome back' : 'Account created for the prototype');
-        setTimeout(() => {
-          window.location.href = document.querySelector('.role-card.sel')?.textContent.includes('host') ? 'list.html' : 'profile.html';
-        }, 550);
-      });
-    });
-  }
-
-  function setupPrototypeLinks() {
-    document.querySelectorAll('a[href="#"]').forEach((link) => {
-      link.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        toast('Prototype placeholder - this page comes next');
-      });
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    setupSearch();
-    setupSaves();
-    setupFilterLinks();
-    setupBrowseControls();
-    setupFeed();
-    setupAuth();
-    setupPrototypeLinks();
-  });
-})();
+</script>
+</body>
+</html>
