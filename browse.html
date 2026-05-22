@@ -18,7 +18,6 @@
     return location.pathname.split('/').pop() || 'index.html';
   }
 
-  /* ─── SEARCH & ROUTING NAVIGATION ─── */
   function collectSearch() {
     const search = document.querySelector('.search');
     const nav = document.querySelector('.nav-search');
@@ -84,7 +83,6 @@
     });
   }
 
-  /* ─── SAVES & WISHLISTS ─── */
   function saveKey(button) {
     const card = button.closest('.pc, .title-row, .post-prop, .gallery, .ps-card') || button.parentElement;
     const label = card?.querySelector('.pc-title, h1, .pname, .ps-title')?.textContent?.trim()
@@ -109,16 +107,11 @@
     });
   }
 
-  /* ─── CHIPS & GLOBAL LINK ROUTING ─── */
   function setupFilterLinks() {
     document.querySelectorAll('.qf .chip, .tag-wall .ch, .county-pill, .cat-tile, .fb-pill').forEach((el) => {
       el.addEventListener('click', (ev) => {
         const href = el.getAttribute('href');
         if (href && href !== '#') return;
-        
-        // Let browse controls handle live sorting/filtering on browse.html internally
-        if (pageName() === 'browse.html' && el.classList.contains('fb-pill')) return;
-
         ev.preventDefault();
         const text = el.textContent.trim().replace(/\s+/g, ' ');
         if (pageName() === 'feed.html') {
@@ -132,157 +125,24 @@
     });
   }
 
-  /* ─── BROWSE CONTROLS (DYNAMIC FILTER, SORT, MAP SYNC) ─── */
   function setupBrowseControls() {
     if (pageName() !== 'browse.html') return;
-
     const activeWhere = qs.get('where');
     if (activeWhere) {
       const h = document.querySelector('.head-strip h1');
+      const meta = document.querySelector('.head-strip .h-meta');
       if (h) h.innerHTML = `Stays around <i>${activeWhere}</i>`;
+      if (meta) meta.innerHTML = `<span class="n">214</span> matching stays<br>fee-free direct booking`;
     }
-
-    const cardsContainer = document.querySelector('.results');
-    if (!cardsContainer) return;
-
-    const cards = Array.from(cardsContainer.querySelectorAll('.pc'));
-    const sortSelect = document.querySelector('.fb-sort select');
-    const filterPills = document.querySelectorAll('.fb-pill');
-
-    // Central Filter and Sort Execution Engine
-    function updateResults() {
-      let visibleCards = [...cards];
-
-      // 1. Dynamic Match Filtering via data-category
-      const activePill = document.querySelector('.fb-pill.active');
-      if (activePill && activePill.dataset.category) {
-        const targetCategory = activePill.dataset.category;
-        visibleCards = visibleCards.filter(card => card.dataset.category === targetCategory);
-      }
-
-      // 2. Client-side Sorting Engine (Price & Ratings)
-      const sortBy = sortSelect?.value;
-      visibleCards.sort((a, b) => {
-        if (sortBy === 'price-low') {
-          return parseFloat(a.dataset.price || 0) - parseFloat(b.dataset.price || 0);
-        } else if (sortBy === 'price-high') {
-          return parseFloat(b.dataset.price || 0) - parseFloat(a.dataset.price || 0);
-        } else if (sortBy === 'rating') {
-          return parseFloat(b.dataset.rating || 0) - parseFloat(a.dataset.rating || 0);
-        }
-        return 0; // Maintain natural ordering
-      });
-
-      // 3. Smooth Grid Component Re-Append
-      cards.forEach(card => card.style.display = 'none');
-      visibleCards.forEach(card => {
-        card.style.display = 'block';
-        cardsContainer.appendChild(card);
-      });
-
-      // 4. Update Header Count Matching Metric Live
-      const counter = document.querySelector('.head-strip .h-meta .n');
-      if (counter) counter.textContent = visibleCards.length;
-    }
-
-    // Interactive Trigger Listeners
-    sortSelect?.addEventListener('change', updateResults);
-
-    filterPills.forEach(pill => {
-      pill.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
-
-        const wasActive = pill.classList.contains('active');
-        filterPills.forEach(p => p.classList.remove('active'));
-
-        if (!wasActive) {
-          pill.classList.add('active');
-        }
-        updateResults();
-      });
-    });
-
-    // Bidirectional Sync: Card Hover Highlights Map Pin
-    cards.forEach(card => {
-      const cardId = card.dataset.id;
-      if (!cardId) return;
-      const matchingPin = document.querySelector(`.mini-map .pin[data-id="${cardId}"]`);
-
-      card.addEventListener('mouseenter', () => {
-        if (matchingPin) matchingPin.classList.add('active');
-      });
-      card.addEventListener('mouseleave', () => {
-        if (matchingPin) matchingPin.classList.remove('active');
-      });
-    });
-
-    // Bidirectional Sync: Map Pin Click Scroll-To-Card Focus
     document.querySelectorAll('.mini-map .pin').forEach((pin) => {
       pin.addEventListener('click', () => {
         document.querySelectorAll('.mini-map .pin').forEach((p) => p.classList.remove('active'));
         pin.classList.add('active');
-        
-        const pinId = pin.dataset.id;
         toast('Highlighted stay at ' + pin.textContent.trim() + ' per night');
-
-        if (pinId) {
-          const matchingCard = document.querySelector(`.results .pc[data-id="${pinId}"]`);
-          if (matchingCard) {
-            matchingCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            
-            // Quiet editorial selection accent flare
-            matchingCard.style.outline = '1px solid var(--brick)';
-            setTimeout(() => matchingCard.style.outline = 'none', 1200);
-          }
-        }
       });
     });
   }
 
-  /* ─── INLINE PROPERTY COMPONENT CAROUSELS ─── */
-  function setupCardCarousels() {
-    document.querySelectorAll('.pc').forEach(card => {
-      const track = card.querySelector('.img-track');
-      const dots = card.querySelectorAll('.img-nav .dt');
-      const totalImages = dots.length;
-      let currentIndex = 0;
-
-      if (!track || totalImages <= 1) return;
-
-      function goToImage(index) {
-        currentIndex = (index + totalImages) % totalImages;
-        track.style.transform = `translateX(-${currentIndex * 100}%)`;
-        
-        dots.forEach((dot, idx) => {
-          dot.classList.toggle('on', idx === currentIndex);
-        });
-      }
-
-      card.querySelector('.carousel-arrow.next')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        goToImage(currentIndex + 1);
-      });
-
-      card.querySelector('.carousel-arrow.prev')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        goToImage(currentIndex - 1);
-      });
-      
-      dots.forEach((dot, idx) => {
-        dot.style.cursor = 'pointer';
-        dot.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          goToImage(idx);
-        });
-      });
-    });
-  }
-
-  /* ─── COMMUNITY SOCIAL FEED ─── */
   function setupFeed() {
     if (pageName() !== 'feed.html') return;
     document.querySelectorAll('.post-type-pill, .feed-tab, .side-link').forEach((button) => {
@@ -294,7 +154,6 @@
         button.classList.add(group === '.post-type-pill' ? 'on' : 'active');
       });
     });
-    
     const postButton = document.querySelector('.post-btn');
     const textarea = document.querySelector('.compose textarea');
     postButton?.addEventListener('click', () => {
@@ -312,7 +171,6 @@
     });
   }
 
-  /* ─── PROTOTYPE AUTHENTICATION MOCK ─── */
   function setupAuth() {
     document.querySelectorAll('.submit-btn').forEach((button) => {
       button.addEventListener('click', (ev) => {
@@ -326,7 +184,6 @@
     });
   }
 
-  /* ─── FALLBACK PROTOTYPE INTERACTION PLACEHOLDERS ─── */
   function setupPrototypeLinks() {
     document.querySelectorAll('a[href="#"]').forEach((link) => {
       link.addEventListener('click', (ev) => {
@@ -336,13 +193,11 @@
     });
   }
 
-  /* ─── CORE DOM LIFE INITIALIZATION ─── */
   document.addEventListener('DOMContentLoaded', () => {
     setupSearch();
     setupSaves();
     setupFilterLinks();
     setupBrowseControls();
-    setupCardCarousels();
     setupFeed();
     setupAuth();
     setupPrototypeLinks();
