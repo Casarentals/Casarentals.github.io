@@ -724,3 +724,70 @@
 <script src="casa.js"></script>
 </body>
 </html>
+/* ─── Community Feed Extensions ─── */
+  
+  /* Inline Reply/Comment Drawer */
+  .reply-thread {
+    background: var(--paper); border-top: 1px solid var(--rule-2);
+    padding: 16px 20px; display: none; flex-direction: column; gap: 12px;
+  }
+  .reply-thread.open { display: flex; }
+  .reply-card { display: flex; gap: 10px; font-size: 13px; line-height: 1.45; }
+  .reply-card .av { width: 26px; height: 26px; font-size: 11px; }
+  .reply-card .r-content { flex: 1; color: var(--ink); }
+  .reply-card .r-meta { font-size: 11px; color: var(--ink-4); font-family: var(--mono); margin-top: 2px; }
+  
+  .reply-form { display: flex; gap: 10px; margin-top: 6px; border-top: 1px solid var(--rule); padding-top: 12px; }
+  .reply-form input {
+    flex: 1; border: 1px solid var(--rule-3); background: var(--surface);
+    border-radius: 999px; padding: 6px 14px; font-size: 13px; outline: none;
+    font-family: var(--sans); color: var(--ink); transition: border-color 0.12s;
+  }
+  .reply-form input:focus { border-color: var(--brick); }
+  .reply-form button {
+    background: var(--ink); color: var(--paper); border: none; border-radius: 999px;
+    padding: 6px 14px; font-size: 12.5px; font-weight: 500; cursor: pointer; font-family: var(--sans);
+  }
+
+  /* Right-hand Authentic Profile Drawer */
+  .profile-drawer-overlay {
+    position: fixed; inset: 0; background: rgba(22, 20, 15, 0.35);
+    backdrop-filter: blur(4px); z-index: 2000; opacity: 0; pointer-events: none;
+    transition: opacity 0.28s ease;
+  }
+  .profile-drawer-overlay.open { opacity: 1; pointer-events: auto; }
+  .profile-drawer {
+    position: fixed; top: 0; right: -420px; width: 420px; height: 100%;
+    background: var(--paper); box-shadow: -6px 0 32px rgba(0,0,0,0.06);
+    z-index: 2001; transition: right 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 40px; display: flex; flex-direction: column; overflow-y: auto;
+  }
+  .profile-drawer.open { right: 0; }
+  .drawer-close {
+    position: absolute; top: 24px; left: 24px; background: none; border: none;
+    font-size: 20px; color: var(--ink-3); cursor: pointer; padding: 4px;
+  }
+  .drawer-close:hover { color: var(--ink); }
+
+  /* Direct Booking/Message Modal */
+  .casa-modal-overlay {
+    position: fixed; inset: 0; background: rgba(22, 20, 15, 0.45);
+    backdrop-filter: blur(3px); z-index: 3000; display: none; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.2s ease;
+  }
+  .casa-modal-overlay.open { display: flex; opacity: 1; }
+  .casa-modal {
+    background: var(--paper); border: 1px solid var(--rule); width: 100%; max-width: 480px;
+    border-radius: 20px; padding: 28px; box-shadow: 0 12px 36px rgba(0,0,0,0.1);
+    position: relative; transform: scale(0.95); transition: transform 0.2s ease;
+  }
+  .casa-modal-overlay.open .casa-modal { transform: scale(1); }
+  
+  /* Toast Notification */
+  .casa-toast {
+    position: fixed; bottom: 24px; right: 24px; background: var(--ink); color: var(--paper);
+    padding: 12px 20px; border-radius: 12px; font-family: var(--sans); font-size: 13px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1); z-index: 4000; transform: translateY(100px);
+    opacity: 0; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .casa-toast.show { transform: translateY(0); opacity: 1; }
