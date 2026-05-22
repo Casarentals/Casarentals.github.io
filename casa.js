@@ -1,205 +1,207 @@
-(function () {
-  const qs = new URLSearchParams(window.location.search);
+document.addEventListener('DOMContentLoaded', () => {
 
-  function toast(message) {
-    let el = document.querySelector('.casa-toast');
-    if (!el) {
-      el = document.createElement('div');
-      el.className = 'casa-toast';
-      document.body.appendChild(el);
-    }
-    el.textContent = message;
-    el.classList.add('show');
-    clearTimeout(el._timer);
-    el._timer = setTimeout(() => el.classList.remove('show'), 2200);
-  }
-
-  function pageName() {
-    return location.pathname.split('/').pop() || 'index.html';
-  }
-
-  function collectSearch() {
-    const search = document.querySelector('.search');
-    const nav = document.querySelector('.nav-search');
-    const whereInput = search?.querySelector('input[type="text"]');
-    const whereText = nav?.querySelector('.seg .v')?.textContent;
-    return {
-      where: (whereInput?.value || qs.get('where') || whereText || 'Lake District').trim(),
-      dates: qs.get('dates') || '12-19 Jul',
-      guests: qs.get('guests') || '2 adults'
-    };
-  }
-
-  function goToBrowse(overrides = {}) {
-    const state = { ...collectSearch(), ...overrides };
-    const next = new URL('browse.html', window.location.href);
-    Object.entries(state).forEach(([key, value]) => {
-      if (value) next.searchParams.set(key, value);
-    });
-    window.location.href = next.pathname + next.search;
-  }
-
-  window.goSearch = function (ev) {
-    if (ev?.currentTarget?.classList?.contains('seg')) {
-      document.querySelectorAll('.search .seg').forEach((seg) => seg.classList.remove('active'));
-      ev.currentTarget.classList.add('active');
-      return;
-    }
-    goToBrowse();
+  /* ─── 1. Toast Notification Utility ─── */
+  const showToast = (message) => {
+    const toast = document.getElementById('casaToast');
+    if (!toast) return;
+    toast.innerText = message;
+    toast.classList.add('show');
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3000);
   };
 
-  function hydrateSearchText() {
-    const where = qs.get('where');
-    const dates = qs.get('dates');
-    const guests = qs.get('guests');
-    const navSearch = document.querySelector('.nav-search');
-    if (navSearch) {
-      const values = navSearch.querySelectorAll('.seg .v');
-      if (where && values[0]) values[0].textContent = where;
-      if (dates && values[1]) values[1].textContent = dates.replace('-', ' - ');
-      if (guests && values[2]) values[2].textContent = guests;
-      navSearch.addEventListener('click', () => goToBrowse());
-    }
-    const heroInput = document.querySelector('.search input[type="text"]');
-    if (heroInput && where) heroInput.value = where;
-  }
-
-  function setupSearch() {
-    hydrateSearchText();
-    document.querySelectorAll('.search .seg').forEach((seg) => {
-      seg.addEventListener('click', (ev) => window.goSearch(ev));
-    });
-    document.querySelectorAll('.search-go, .nav-search .go').forEach((button) => {
-      button.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
-        goToBrowse();
-      });
-    });
-    document.querySelectorAll('.search input[type="text"]').forEach((input) => {
-      input.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter') goToBrowse({ where: input.value.trim() });
-      });
-    });
-  }
-
-  function saveKey(button) {
-    const card = button.closest('.pc, .title-row, .post-prop, .gallery, .ps-card') || button.parentElement;
-    const label = card?.querySelector('.pc-title, h1, .pname, .ps-title')?.textContent?.trim()
-      || card?.querySelector('.ph')?.dataset?.label
-      || pageName();
-    return 'casa:saved:' + label.toLowerCase().replace(/\s+/g, '-');
-  }
-
-  function setupSaves() {
-    document.querySelectorAll('.save-heart, .save-btn').forEach((button) => {
-      const key = saveKey(button);
-      if (localStorage.getItem(key) === '1') button.classList.add('saved');
-      button.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
-        button.classList.toggle('saved');
-        localStorage.setItem(key, button.classList.contains('saved') ? '1' : '0');
-        const label = button.querySelector('span');
-        if (label) label.textContent = button.classList.contains('saved') ? 'Saved' : 'Save';
-        toast(button.classList.contains('saved') ? 'Saved to your list' : 'Removed from saved');
-      });
-    });
-  }
-
-  function setupFilterLinks() {
-    document.querySelectorAll('.qf .chip, .tag-wall .ch, .county-pill, .cat-tile, .fb-pill').forEach((el) => {
-      el.addEventListener('click', (ev) => {
-        const href = el.getAttribute('href');
-        if (href && href !== '#') return;
-        ev.preventDefault();
-        const text = el.textContent.trim().replace(/\s+/g, ' ');
-        if (pageName() === 'feed.html') {
-          toast('Showing ' + text);
-          document.querySelectorAll('.county-pill, .side-link, .feed-tab').forEach((x) => x.classList.remove('active'));
-          el.classList.add('active');
-        } else {
-          goToBrowse({ where: text.replace(/^#/, '') });
-        }
-      });
-    });
-  }
-
-  function setupBrowseControls() {
-    if (pageName() !== 'browse.html') return;
-    const activeWhere = qs.get('where');
-    if (activeWhere) {
-      const h = document.querySelector('.head-strip h1');
-      const meta = document.querySelector('.head-strip .h-meta');
-      if (h) h.innerHTML = `Stays around <i>${activeWhere}</i>`;
-      if (meta) meta.innerHTML = `<span class="n">214</span> matching stays<br>fee-free direct booking`;
-    }
-    document.querySelectorAll('.mini-map .pin').forEach((pin) => {
-      pin.addEventListener('click', () => {
-        document.querySelectorAll('.mini-map .pin').forEach((p) => p.classList.remove('active'));
-        pin.classList.add('active');
-        toast('Highlighted stay at ' + pin.textContent.trim() + ' per night');
-      });
-    });
-  }
-
-  function setupFeed() {
-    if (pageName() !== 'feed.html') return;
-    document.querySelectorAll('.post-type-pill, .feed-tab, .side-link').forEach((button) => {
-      button.addEventListener('click', () => {
-        const group = button.classList.contains('feed-tab') ? '.feed-tab'
-          : button.classList.contains('side-link') ? '.side-link'
-          : '.post-type-pill';
-        document.querySelectorAll(group).forEach((x) => x.classList.remove(group === '.post-type-pill' ? 'on' : 'active'));
-        button.classList.add(group === '.post-type-pill' ? 'on' : 'active');
-      });
-    });
-    const postButton = document.querySelector('.post-btn');
-    const textarea = document.querySelector('.compose textarea');
-    postButton?.addEventListener('click', () => {
-      const text = textarea?.value.trim();
-      if (!text) {
-        toast('Write a quick post first');
-        return;
+  /* ─── 2. Inline Replies Toggle & Dynamic Submission ─── */
+  document.querySelectorAll('.reply-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const thread = btn.closest('.post').querySelector('.reply-thread');
+      if (thread) {
+        thread.classList.toggle('open');
       }
-      const card = document.createElement('article');
-      card.className = 'post';
-      card.innerHTML = `<div class="ph-head"><div class="av guest">J</div><div class="who"><div class="nm"><span class="name">James</span><span class="badge">New post</span></div><div class="meta-line"><span class="when">Just now</span><span class="dot"></span><span>Casa member</span></div></div></div><div class="body">${text.replace(/[<>&]/g, (c) => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</div>`;
-      document.querySelector('.feed-col .feed-tabs')?.after(card);
-      textarea.value = '';
-      toast('Posted to the community feed');
     });
-  }
-
-  function setupAuth() {
-    document.querySelectorAll('.submit-btn').forEach((button) => {
-      button.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        localStorage.setItem('casa:joined', '1');
-        toast(button.textContent.toLowerCase().includes('sign') ? 'Welcome back' : 'Account created for the prototype');
-        setTimeout(() => {
-          window.location.href = document.querySelector('.role-card.sel')?.textContent.includes('host') ? 'list.html' : 'profile.html';
-        }, 550);
-      });
-    });
-  }
-
-  function setupPrototypeLinks() {
-    document.querySelectorAll('a[href="#"]').forEach((link) => {
-      link.addEventListener('click', (ev) => {
-        ev.preventDefault();
-        toast('Prototype placeholder - this page comes next');
-      });
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    setupSearch();
-    setupSaves();
-    setupFilterLinks();
-    setupBrowseControls();
-    setupFeed();
-    setupAuth();
-    setupPrototypeLinks();
   });
-})();
+
+  document.querySelectorAll('.reply-form').forEach(form => {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = form.querySelector('input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const thread = form.closest('.reply-thread');
+      
+      // Build a new reply template node
+      const replyCard = document.createElement('div');
+      replyCard.className = 'reply-card';
+      replyCard.innerHTML = `
+        <div class="av">J</div>
+        <div class="r-content">
+          <strong>You</strong> ${text}
+          <div class="r-meta">Just now</div>
+        </div>
+      `;
+
+      // Insert it directly inside the container layout structure above the form
+      thread.insertBefore(replyCard, form);
+      input.value = '';
+
+      // Increment interactive markup count status text badge
+      const countLabel = form.closest('.post').querySelector('.reply-btn .ct');
+      if (countLabel) {
+        const parsedCount = parseInt(countLabel.innerText) || 0;
+        countLabel.innerText = `${parsedCount + 1} replies`;
+      }
+      
+      showToast('Reply posted!');
+    });
+  });
+
+  /* ─── 3. Authentic Profile Drawer Mapping logic ─── */
+  const openProfileDrawer = (data) => {
+    document.getElementById('drawerName').innerText = data.username;
+    document.getElementById('drawerBio').innerText = data.bio;
+    document.getElementById('drawerLocation').innerText = data.location;
+    document.getElementById('drawerStays').innerText = data.property;
+    
+    // Assign proper character visual matching context layout
+    const avatarContainer = document.getElementById('drawerAvatar');
+    avatarContainer.innerText = data.avatarLetter;
+    avatarContainer.className = `av ${data.avatarClass}`;
+
+    // Manage Badge configurations
+    const badgeElement = document.getElementById('drawerBadge');
+    badgeElement.innerText = data.role;
+    badgeElement.className = data.role.toLowerCase() === 'host' ? 'badge-host' : 'badge-guest';
+
+    // Update modal trigger dynamic attributes mapping binding logic
+    const drawerMsgBtn = document.getElementById('drawerMessageBtn');
+    if (drawerMsgBtn) {
+      drawerMsgBtn.setAttribute('data-host', data.username);
+      drawerMsgBtn.setAttribute('data-property', data.property.split(' ·')[0]);
+    }
+
+    // Toggle viewport class states
+    document.getElementById('profileDrawerOverlay').classList.add('open');
+    document.getElementById('profileDrawer').classList.add('open');
+  };
+
+  const closeProfileDrawer = () => {
+    document.getElementById('profileDrawerOverlay').classList.remove('open');
+    document.getElementById('profileDrawer').classList.remove('open');
+  };
+
+  // Extract contextual parameters safely via node attributes mapping
+  const extractProfileMetadata = (node) => ({
+    username: node.getAttribute('data-username'),
+    role: node.getAttribute('data-role'),
+    property: node.getAttribute('data-property'),
+    location: node.getAttribute('data-location'),
+    bio: node.getAttribute('data-bio'),
+    avatarLetter: node.getAttribute('data-avatar'),
+    avatarClass: node.getAttribute('data-avatar-class') || ''
+  });
+
+  // Attach post-card identity interaction boundaries
+  document.querySelectorAll('.ph-head .av, .ph-head .name').forEach(el => {
+    el.style.cursor = 'pointer';
+    el.addEventListener('click', () => {
+      const associatedPostNode = el.closest('.post');
+      if (associatedPostNode) {
+        openProfileDrawer(extractProfileMetadata(associatedPostNode));
+      }
+    });
+  });
+
+  // Attach sidebar element identity interaction paths
+  document.querySelectorAll('.sidebar-host').forEach(el => {
+    el.addEventListener('click', (e) => {
+      if (e.target.classList.contains('follow-btn')) return; // Ignore if clicking follow state toggle
+      openProfileDrawer(extractProfileMetadata(el));
+    });
+  });
+
+  // Wire close elements
+  document.getElementById('profileDrawerClose').addEventListener('click', closeProfileDrawer);
+  document.getElementById('profileDrawerOverlay').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('profileDrawerOverlay')) closeProfileDrawer();
+  });
+
+  /* ─── 4. Direct Booking & Enquiry Modal ─── */
+  const openBookingModal = (host, property) => {
+    document.getElementById('modalHostName').innerText = host;
+    document.getElementById('modalPropName').innerText = property;
+    document.getElementById('bookingModalOverlay').classList.add('open');
+  };
+
+  const closeBookingModal = () => {
+    document.getElementById('bookingModalOverlay').classList.remove('open');
+  };
+
+  // Universal interception node strategy for dynamic lists components paths
+  document.body.addEventListener('click', (e) => {
+    const enquireBtn = e.target.closest('.enquire');
+    if (enquireBtn) {
+      e.preventDefault();
+      const host = enquireBtn.getAttribute('data-host') || 'Member';
+      const property = enquireBtn.getAttribute('data-property') || 'Request Topic';
+      openBookingModal(host, property);
+    }
+  });
+
+  document.getElementById('bookingModalClose').addEventListener('click', closeBookingModal);
+  document.getElementById('bookingModalOverlay').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('bookingModalOverlay')) closeBookingModal();
+  });
+
+  document.getElementById('bookingForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    closeBookingModal();
+    document.getElementById('bookingForm').reset();
+    showToast('Enquiry message sent safely!');
+  });
+
+  /* ─── 5. General Interaction Polish (Likes & Follow Status) ─── */
+  document.querySelectorAll('.like-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const label = btn.querySelector('.ct');
+      let count = parseInt(label.innerText) || 0;
+      if (btn.classList.contains('liked')) {
+        btn.classList.remove('liked');
+        label.innerText = count - 1;
+      } else {
+        btn.classList.add('liked');
+        label.innerText = count + 1;
+      }
+    });
+  });
+
+  document.querySelectorAll('.save-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const svg = btn.querySelector('svg');
+      const textNode = Array.from(btn.childNodes).find(n => n.nodeType === Node.TEXT_NODE && (n.textContent.includes('Save') || n.textContent.includes('Saved')));
+      
+      if (btn.classList.contains('saved')) {
+        btn.classList.remove('saved');
+        if (svg) svg.removeAttribute('fill');
+        if (textNode) textNode.textContent = ' Save';
+      } else {
+        btn.classList.add('saved');
+        if (svg) svg.setAttribute('fill', 'currentColor');
+        if (textNode) textNode.textContent = ' Saved';
+      }
+    });
+  });
+
+  document.querySelectorAll('.follow-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (btn.classList.contains('following')) {
+        btn.classList.remove('following');
+        btn.innerText = 'Follow';
+      } else {
+        btn.classList.add('following');
+        btn.innerText = 'Following';
+      }
+    });
+  });
+});
