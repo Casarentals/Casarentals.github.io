@@ -301,10 +301,10 @@
               <td><span class="status-pill new">New · 2h ago</span></td>
               <td class="actions-cell">
                 <a class="btn btn-primary btn-sm" href="messages.html">Reply</a>
-                <button class="btn btn-ghost btn-sm">Decline</button>
+                <button class="btn btn-ghost btn-sm" onclick="declineEnquiry(this, 'James H.')">Decline</button>
               </td>
             </tr>
-            <tr>
+            <tr id="enq-marcus">
               <td>
                 <div class="guest">
                   <div class="av">M</div>
@@ -320,7 +320,7 @@
               <td><span class="status-pill new">New · 5h ago</span></td>
               <td class="actions-cell">
                 <a class="btn btn-primary btn-sm" href="messages.html">Reply</a>
-                <button class="btn btn-ghost btn-sm">Decline</button>
+                <button class="btn btn-ghost btn-sm" onclick="declineEnquiry(this, 'Marcus & Olivia')">Decline</button>
               </td>
             </tr>
             <tr>
@@ -542,6 +542,83 @@
   </div>
 </div>
 
+<script>
+// ── DECLINE ENQUIRY ──
+function declineEnquiry(btn, guestName) {
+  if (!confirm(`Decline enquiry from ${guestName}? They'll be notified by email.`)) return;
+  const row = btn.closest('tr');
+  if (!row) return;
+  row.style.transition = 'opacity .3s, transform .3s';
+  row.style.opacity = '0.4';
+  row.style.pointerEvents = 'none';
+  const status = row.querySelector('.status-pill');
+  if (status) { status.textContent = 'Declined'; status.className = 'status-pill'; status.style.background='var(--rule)'; status.style.color='var(--ink-3)'; }
+  btn.textContent = 'Declined';
+  btn.disabled = true;
+  // Update KPI badge
+  const badge = document.querySelector('.kpi-card .n');
+  if (badge) badge.textContent = Math.max(0, parseInt(badge.textContent || 0) - 1);
+  showHostToast(`Enquiry from ${guestName} declined. They've been notified.`);
+}
+
+// ── BLOCK CALENDAR DATE ──
+document.querySelectorAll('.cs-day').forEach(day => {
+  if (day.classList.contains('blocked') || day.classList.contains('booked')) return;
+  day.style.cursor = 'pointer';
+  day.addEventListener('click', function() {
+    if (this.classList.contains('selected-block')) {
+      this.classList.remove('selected-block');
+      this.style.background = '';
+      this.style.color = '';
+      showHostToast('Date unblocked');
+    } else {
+      this.classList.add('selected-block');
+      this.style.background = 'var(--rule)';
+      this.style.color = 'var(--ink-3)';
+      this.style.cursor = 'pointer';
+      showHostToast('Date blocked — guests won\'t be able to request this date');
+    }
+  });
+});
+
+// ── EARNINGS CHART BAR HOVER ──
+document.querySelectorAll('.chart-bar, .bar').forEach(bar => {
+  bar.style.cursor = 'pointer';
+  bar.addEventListener('mouseenter', function() {
+    const val = this.dataset.val || this.getAttribute('data-val');
+    if (val) showHostToast('£' + val);
+  });
+});
+
+// ── NOTIFICATION BELL ──
+const bell = document.querySelector('.notif-btn, .bell-btn, [data-notif]');
+if (bell) {
+  bell.addEventListener('click', () => {
+    showHostToast('3 unread notifications — messages available once live');
+  });
+}
+
+// ── HOST TOAST ──
+function showHostToast(msg) {
+  let toast = document.getElementById('hostToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'hostToast';
+    toast.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--ink);color:var(--paper);padding:11px 20px;border-radius:var(--r-pill);font-size:13.5px;font-family:var(--sans);opacity:0;transition:all .2s;z-index:999;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.style.opacity = '1';
+  toast.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(-50%) translateY(12px)'; }, 2600);
+}
+
+// ── QUICK STATS CLICK ──
+document.querySelectorAll('.kpi-card, .stat-card').forEach(card => {
+  card.style.cursor = 'default';
+});
+</script>
 <script src="casa.js"></script>
 </body>
 </html>
