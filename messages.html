@@ -220,7 +220,7 @@
 
     <div class="cl-scroll">
 
-      <div class="conv active unread">
+      <div class="conv active unread" data-id="sarah">
         <div class="av">S<span class="status"></span></div>
         <div class="body-col">
           <div class="head-row">
@@ -233,7 +233,7 @@
         </div>
       </div>
 
-      <div class="conv">
+      <div class="conv" data-id="fiona">
         <div class="av">F</div>
         <div class="body-col">
           <div class="head-row">
@@ -246,7 +246,7 @@
         </div>
       </div>
 
-      <div class="conv unread">
+      <div class="conv unread" data-id="patrick">
         <div class="av">P</div>
         <div class="body-col">
           <div class="head-row">
@@ -259,7 +259,7 @@
         </div>
       </div>
 
-      <div class="conv">
+      <div class="conv" data-id="laura">
         <div class="av guest">L</div>
         <div class="body-col">
           <div class="head-row">
@@ -429,17 +429,17 @@
     <!-- Composer -->
     <div class="composer">
       <div class="row">
-        <textarea placeholder="Reply to Sarah…"></textarea>
+        <textarea id="msgCompose" placeholder="Reply to Sarah…"></textarea>
         <div class="tools">
-          <button class="tool" title="Attach photo"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 16-6-6-9 11"/></svg></button>
-          <button class="tool" title="Suggest dates"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></button>
-          <button class="tool" title="Propose price"><svg viewBox="0 0 24 24"><path d="M16 7c-1-2-3-3-5-3-3 0-4 2-4 5v2H5"/><path d="M7 11v3c0 2-1 4-2 5h12"/></svg></button>
-          <button class="send">
+          <button class="tool" title="Attach photo" onclick="alert('Photo upload available once connected to backend.')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 16-6-6-9 11"/></svg></button>
+          <button class="tool" title="Suggest dates" onclick="insertTemplate('📅 I was thinking {{dates}} — does that work for you?')"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></button>
+          <button class="tool" title="Propose price" onclick="insertTemplate('Happy to confirm at £{{amount}} total — shall I go ahead?')"><svg viewBox="0 0 24 24"><path d="M16 7c-1-2-3-3-5-3-3 0-4 2-4 5v2H5"/><path d="M7 11v3c0 2-1 4-2 5h12"/></svg></button>
+          <button class="send" id="msgSendBtn" onclick="sendMessage()">
             Send <svg viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg>
           </button>
         </div>
       </div>
-      <div class="hint">Tip: messages are end-to-end between you and the host. Press <i>Cmd+Enter</i> to send.</div>
+      <div class="hint">Messages are direct between you and the host. Press <i>Cmd+Enter</i> to send.</div>
     </div>
   </main>
 
@@ -487,6 +487,155 @@
 
 </div>
 
+<script>
+// ── CONVERSATION DATA ──
+const CONVOS = [
+  { id:'sarah', name:'Sarah R.', prop:'Stone Cottage, Windermere', av:'S', avClass:'', tag:'enquiry', tagLabel:'Awaiting your reply', time:'2 hrs', unread:true },
+  { id:'fiona',   name:'Fiona C.',   prop:'Blackhouse, Trotternish',    av:'F', avClass:'', tag:'enquiry',   tagLabel:'Enquiry sent',        time:'Yest.', unread:false },
+  { id:'patrick', name:'Patrick M.', prop:'Cliffside Cottage, Portrush', av:'P', avClass:'', tag:'confirmed', tagLabel:'Booking confirmed',   time:'2 days', unread:true },
+];
+
+let activeConvo = 'sarah';
+
+// ── SWITCH CONVERSATION ──
+function switchConvo(id) {
+  activeConvo = id;
+  const c = CONVOS.find(x => x.id === id);
+  if (!c) return;
+
+  // Update active state in list
+  document.querySelectorAll('.conv').forEach(el => el.classList.remove('active'));
+  const el = document.querySelector(`.conv[data-id="${id}"]`);
+  if (el) { el.classList.add('active'); el.classList.remove('unread'); }
+
+  // Update thread header
+  const header = document.querySelector('.thread-header, .th-name, .msg-header');
+  if (header) header.innerHTML = `<i>${c.name}</i> &mdash; ${c.prop}`;
+
+  // Update composer placeholder
+  const ta = document.getElementById('msgCompose');
+  if (ta) ta.placeholder = `Reply to ${c.name.split(' ')[0]}…`;
+
+  // Update thread (show stub if not Sarah)
+  if (id !== 'sarah') {
+    const thread = document.querySelector('.msg-thread, .thread-scroll, main .scroll');
+    if (thread) {
+      const msgs = thread.querySelectorAll('.msg-row, .day-divider, .pay-card');
+      msgs.forEach(m => m.style.opacity = '0.4');
+      // Show "no messages yet" if empty convo
+      let stub = thread.querySelector('.empty-thread');
+      if (!stub) {
+        stub = document.createElement('div');
+        stub.className = 'empty-thread';
+        stub.style.cssText = 'padding:40px 24px;text-align:center;opacity:0.5';
+        stub.innerHTML = `<p style="font-family:var(--serif);font-style:italic;font-size:20px;color:var(--ink-2)">No messages yet.</p><p style="font-size:13px;color:var(--ink-3);margin-top:8px">Start the conversation below.</p>`;
+        thread.appendChild(stub);
+      }
+    }
+  } else {
+    const thread = document.querySelector('.msg-thread, .thread-scroll, main .scroll');
+    if (thread) {
+      thread.querySelectorAll('.msg-row, .day-divider').forEach(m => m.style.opacity = '1');
+      const stub = thread.querySelector('.empty-thread');
+      if (stub) stub.remove();
+    }
+  }
+}
+
+// ── SEND MESSAGE ──
+function sendMessage() {
+  const ta = document.getElementById('msgCompose');
+  const text = ta.value.trim();
+  if (!text) { ta.focus(); ta.style.borderColor = 'var(--brick)'; setTimeout(()=>ta.style.borderColor='',1200); return; }
+
+  const btn = document.getElementById('msgSendBtn');
+  btn.disabled = true;
+  btn.style.opacity = '0.6';
+
+  // Find thread container — try multiple selectors
+  const thread = document.querySelector('.scroll-area, .thread-scroll') ||
+                 document.querySelector('main > .scroll') ||
+                 document.querySelector('.msg-thread') ||
+                 document.querySelector('main');
+
+  // Build message bubble
+  const now = new Date();
+  const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+
+  const row = document.createElement('div');
+  row.className = 'msg-row from-me';
+  row.style.animation = 'msgIn .2s ease both';
+  row.innerHTML = `
+    <div class="av-sm">J</div>
+    <div>
+      <div class="msg-bubble">
+        <p>${text.replace(/\n/g,'<br>').replace(/[<>&]/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]||c))}</p>
+        <span class="meta-time">${timeStr} · Sent</span>
+      </div>
+    </div>`;
+
+  // Insert before composer, or append to thread
+  const composer = document.querySelector('.composer');
+  if (composer && composer.parentNode) {
+    composer.parentNode.insertBefore(row, composer);
+  } else if (thread) {
+    thread.appendChild(row);
+  }
+
+  // Scroll to bottom
+  if (thread) thread.scrollTop = thread.scrollHeight;
+  if (composer) composer.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
+  // Clear and re-enable
+  ta.value = '';
+  ta.style.height = 'auto';
+  setTimeout(() => { btn.disabled = false; btn.style.opacity = '1'; }, 400);
+
+  // Update conversation preview
+  const convEl = document.querySelector(`.conv[data-id="${activeConvo}"] .conv-preview`);
+  if (convEl) convEl.textContent = text.length > 60 ? text.slice(0,60)+'…' : text;
+  const timeEl = document.querySelector(`.conv[data-id="${activeConvo}"] .conv-time`);
+  if (timeEl) timeEl.textContent = 'Just now';
+  const tagEl = document.querySelector(`.conv[data-id="${activeConvo}"] .conv-tag`);
+  if (tagEl) { tagEl.textContent = 'Message sent'; tagEl.className = 'conv-tag enquiry'; }
+}
+
+// ── INSERT TEMPLATE ──
+function insertTemplate(tpl) {
+  const ta = document.getElementById('msgCompose');
+  ta.value = tpl;
+  ta.focus();
+  ta.selectionStart = ta.selectionEnd = ta.value.length;
+}
+
+// ── KEYBOARD SHORTCUT ──
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+    const ta = document.getElementById('msgCompose');
+    if (document.activeElement === ta) { e.preventDefault(); sendMessage(); }
+  }
+});
+
+// ── AUTO-RESIZE TEXTAREA ──
+const ta = document.getElementById('msgCompose');
+if (ta) {
+  ta.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 160) + 'px';
+  });
+}
+
+// ── WIRE CONVERSATION CLICKS ──
+document.querySelectorAll('.conv').forEach(el => {
+  el.style.cursor = 'pointer';
+  el.addEventListener('click', () => switchConvo(el.dataset.id || 'sarah'));
+});
+
+// ── ADD ANIMATION KEYFRAME ──
+const style = document.createElement('style');
+style.textContent = '@keyframes msgIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }';
+document.head.appendChild(style);
+</script>
 <script src="casa.js"></script>
 </body>
 </html>
