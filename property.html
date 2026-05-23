@@ -197,10 +197,13 @@
   <div class="nav-right">
     <a class="nav-link" href="browse.html">Browse</a>
     <a class="nav-link" href="map.html">Map</a>
+    <a class="nav-link" href="feed.html">Feed</a>
     <a class="nav-link" href="list.html">Become a host</a>
-    <a class="nav-link" href="messages.html"><svg class="i" viewBox="0 0 24 24"><path d="M4 5h16v12H8l-4 4z"/></svg></a>
-    <a class="nav-link" href="saved.html"><svg class="i" viewBox="0 0 24 24"><path d="M12 20s-7-4.5-9.5-9c-1.5-2.8.4-6 3.5-6 1.8 0 3.2 1 4 2.5C10.8 6 12.2 5 14 5c3.1 0 5 3.2 3.5 6C15 15.5 12 20 12 20z"/></svg></a>
-    <a class="nav-link" href="profile.html"><span class="nav-avatar">J</span></a>
+    <div style="width:1px;height:20px;background:var(--rule);margin:0 4px"></div>
+    <a class="nav-link" href="saved.html">Saved</a>
+    <a class="nav-link" href="messages.html">Messages</a>
+    <a class="nav-link" href="signup.html">Sign in</a>
+    <a class="nav-link primary" href="signup.html">Join free</a>
   </div>
 </nav>
 
@@ -452,28 +455,41 @@
 
         <div class="book-form">
           <div class="row">
-            <div class="cell">
+            <div class="cell" onclick="document.getElementById('checkin').showPicker?.() || document.getElementById('checkin').focus()" style="cursor:pointer">
               <span class="l">Check in</span>
-              <span class="v">Sat 12 Jul</span>
+              <span class="v" id="checkinDisplay">Select date</span>
+              <input type="date" id="checkin" style="position:absolute;opacity:0;width:0;height:0" onchange="updateBooking()">
             </div>
-            <div class="cell">
+            <div class="cell" onclick="document.getElementById('checkout').showPicker?.() || document.getElementById('checkout').focus()" style="cursor:pointer">
               <span class="l">Check out</span>
-              <span class="v">Sat 19 Jul</span>
+              <span class="v" id="checkoutDisplay">Select date</span>
+              <input type="date" id="checkout" style="position:absolute;opacity:0;width:0;height:0" onchange="updateBooking()">
             </div>
           </div>
           <div class="row">
             <div class="cell">
               <span class="l">Guests</span>
-              <span class="v">2 adults</span>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:2px">
+                <button onclick="changeGuests(-1)" style="width:22px;height:22px;border-radius:50%;border:1px solid var(--rule-3);background:transparent;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:14px;line-height:1;color:var(--ink)">−</button>
+                <span class="v" id="guestDisplay" style="min-width:20px;text-align:center">2</span>
+                <button onclick="changeGuests(1)" style="width:22px;height:22px;border-radius:50%;border:1px solid var(--rule-3);background:transparent;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:14px;line-height:1;color:var(--ink)">+</button>
+              </div>
             </div>
             <div class="cell">
               <span class="l">Pets</span>
-              <span class="v">1 dog</span>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+                <label style="position:relative;width:36px;height:20px;display:inline-block">
+                  <input type="checkbox" id="petsToggle" onchange="updateBooking()" style="opacity:0;width:0;height:0">
+                  <span id="toggleTrack" style="position:absolute;inset:0;border-radius:10px;background:var(--rule);cursor:pointer;transition:background .2s"></span>
+                  <span id="toggleThumb" style="position:absolute;width:14px;height:14px;border-radius:50%;background:white;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)"></span>
+                </label>
+                <span class="v" id="petsDisplay" style="font-size:13px;color:var(--ink-3)">No</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <a class="book-cta" href="booking.html">
+        <a class="book-cta" href="booking.html" id="enquireBtn" onclick="return goEnquire()">
           Enquire to book
           <svg viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
         </a>
@@ -484,12 +500,12 @@
 
         <div class="book-foot">You won't be charged yet. Sarah will reply with availability and a way to pay directly.</div>
 
-        <div class="breakdown">
-          <div class="row"><span>£175 × 7 nights</span><span>£1,225</span></div>
+        <div class="breakdown" id="breakdown">
+          <div class="row"><span id="nightsLabel">£175 / night</span><span id="nightsTotal">—</span></div>
           <div class="row"><span>Cleaning (set by Sarah)</span><span>£60</span></div>
           <div class="row fee"><span>Casa booking fee</span><span class="v">£0</span></div>
-          <div class="row save"><span>You save vs Booking.com</span><span>~ £243</span></div>
-          <div class="row total"><span>Total to Sarah</span><span>£1,285</span></div>
+          <div class="row save" id="saveRow" style="display:none"><span>You save vs Booking.com</span><span id="saveAmt">—</span></div>
+          <div class="row total"><span>Total to Sarah</span><span id="grandTotal">—</span></div>
         </div>
       </div>
     </aside>
@@ -515,5 +531,135 @@
 </footer>
 
 <script src="casa.js"></script>
+<script>
+// ── Property data (replace with Supabase fetch in production) ──
+const PROP = { title: 'Stone Cottage, Windermere', price: 175, cleaning: 60, maxGuests: 6 };
+let guests = 2;
+
+// ── Format date for display ──
+function fmtDate(val) {
+  if (!val) return 'Select date';
+  const d = new Date(val + 'T12:00:00');
+  return d.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' });
+}
+
+// ── Format date for URL ──
+function fmtISO(val) { return val || ''; }
+
+// ── Guest stepper ──
+function changeGuests(delta) {
+  guests = Math.max(1, Math.min(PROP.maxGuests, guests + delta));
+  document.getElementById('guestDisplay').textContent = guests + (guests === 1 ? ' adult' : ' adults');
+  updateBooking();
+}
+
+// ── Pets toggle ──
+document.getElementById('petsToggle').addEventListener('change', function() {
+  document.getElementById('toggleTrack').style.background = this.checked ? 'var(--moss)' : 'var(--rule)';
+  document.getElementById('toggleThumb').style.transform = this.checked ? 'translateX(16px)' : 'translateX(0)';
+  document.getElementById('petsDisplay').textContent = this.checked ? 'Yes' : 'No';
+});
+
+// ── Update sidebar when dates/guests change ──
+function updateBooking() {
+  const ci = document.getElementById('checkin').value;
+  const co = document.getElementById('checkout').value;
+
+  document.getElementById('checkinDisplay').textContent = fmtDate(ci);
+  document.getElementById('checkoutDisplay').textContent = fmtDate(co);
+  document.getElementById('checkinDisplay').style.color = ci ? 'var(--ink)' : 'var(--ink-4)';
+  document.getElementById('checkoutDisplay').style.color = co ? 'var(--ink)' : 'var(--ink-4)';
+
+  if (ci && co) {
+    const nights = Math.round((new Date(co) - new Date(ci)) / 86400000);
+    if (nights > 0) {
+      const stay = PROP.price * nights;
+      const total = stay + PROP.cleaning;
+      const saving = Math.round(total * 0.147);
+      document.getElementById('nightsLabel').textContent = '£' + PROP.price + ' × ' + nights + ' night' + (nights > 1 ? 's' : '');
+      document.getElementById('nightsTotal').textContent = '£' + stay.toLocaleString();
+      document.getElementById('grandTotal').textContent = '£' + total.toLocaleString();
+      document.getElementById('saveAmt').textContent = '~£' + saving;
+      document.getElementById('saveRow').style.display = 'flex';
+      return;
+    }
+  }
+  document.getElementById('nightsLabel').textContent = '£' + PROP.price + ' / night';
+  document.getElementById('nightsTotal').textContent = '—';
+  document.getElementById('grandTotal').textContent = '—';
+  document.getElementById('saveRow').style.display = 'none';
+}
+
+// ── Build URL and navigate to booking page ──
+function goEnquire() {
+  const ci = document.getElementById('checkin').value;
+  const co = document.getElementById('checkout').value;
+  const pets = document.getElementById('petsToggle').checked;
+  const params = new URLSearchParams({
+    prop: PROP.title,
+    price: PROP.price,
+    guests: guests,
+    pets: pets ? '1' : '0',
+    ...(ci && { checkin: ci }),
+    ...(co && { checkout: co }),
+  });
+  window.location.href = 'booking.html?' + params.toString();
+  return false;
+}
+
+// ── Wire calendar clicks to check-in/out ──
+let pickingCheckin = true;
+document.querySelectorAll('.cal .d:not(.unavailable):not(.muted)').forEach(cell => {
+  cell.style.cursor = 'pointer';
+  cell.addEventListener('click', function() {
+    const day = parseInt(this.textContent);
+    if (isNaN(day)) return;
+    const month = this.closest('.cal-month').querySelector('.mn').textContent.trim().split(' ')[0];
+    const year = 2026;
+    const monthNum = ['January','February','March','April','May','June','July','August','September','October','November','December'].indexOf(month) + 1;
+    const iso = year + '-' + String(monthNum).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+
+    if (pickingCheckin) {
+      document.getElementById('checkin').value = iso;
+      document.getElementById('checkout').value = '';
+      pickingCheckin = false;
+    } else {
+      if (iso > document.getElementById('checkin').value) {
+        document.getElementById('checkout').value = iso;
+        pickingCheckin = true;
+      } else {
+        document.getElementById('checkin').value = iso;
+      }
+    }
+    updateBooking();
+    highlightRange();
+  });
+});
+
+function highlightRange() {
+  const ci = document.getElementById('checkin').value;
+  const co = document.getElementById('checkout').value;
+  document.querySelectorAll('.cal .d').forEach(cell => {
+    cell.classList.remove('start','end','in-range');
+  });
+  if (!ci) return;
+  document.querySelectorAll('.cal .d:not(.unavailable):not(.muted)').forEach(cell => {
+    const day = parseInt(cell.textContent);
+    if (isNaN(day)) return;
+    const month = cell.closest('.cal-month').querySelector('.mn').textContent.trim().split(' ')[0];
+    const monthNum = ['January','February','March','April','May','June','July','August','September','October','November','December'].indexOf(month) + 1;
+    const iso = '2026-' + String(monthNum).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+    if (iso === ci) cell.classList.add('start');
+    else if (co && iso === co) cell.classList.add('end');
+    else if (co && iso > ci && iso < co) cell.classList.add('in-range');
+  });
+}
+
+// Init with the pre-selected July 12–19 dates
+document.getElementById('checkin').value = '2026-07-12';
+document.getElementById('checkout').value = '2026-07-19';
+updateBooking();
+highlightRange();
+</script>
 </body>
 </html>
